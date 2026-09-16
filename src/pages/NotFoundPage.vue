@@ -1,18 +1,20 @@
 <template>
   <DlEmptyState
-    description="The address may be mistyped, or the page moved. The menu on the side has everything your role can open."
+    :description="t('notFound.description')"
     icon="mdi-map-marker-question-outline"
-    title="This page does not exist"
+    :title="t('notFound.title')"
   >
     <DlButton icon="mdi-view-dashboard-outline" variant="tonal" @click="router.push('/')">
-      Go to the overview
+      {{ t('common.goToOverview') }}
     </DlButton>
   </DlEmptyState>
 </template>
 
 <script lang="ts" setup>
   import { DlButton, DlEmptyState } from '@pedrolucaslopes/dotlog-ui'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
 
+  const { t } = useI18n()
   const router = useRouter()
 </script>

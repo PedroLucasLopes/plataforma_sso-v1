@@ -10,10 +10,12 @@
  * - **Sessao que cai no meio do uso** dispara o relogin, e a pessoa volta para
  *   a tela onde estava.
  *
- * O erro sai como `ApiError`, com mensagem pronta para mostrar a uma pessoa.
+ * O erro sai como `ApiError`, com mensagem pronta para mostrar a uma pessoa, na
+ * lingua corrente no momento da falha.
  */
 import { API_PREFIX } from '@/constants/api'
-import { API_MESSAGES, CODE_MESSAGES, STATUS_MESSAGES } from '@/constants/messages'
+import { API_MESSAGE_KEYS, ERROR_CODES, STATUS_MESSAGE_KEYS } from '@/constants/messages'
+import { t } from '@/plugins/i18n'
 
 export class ApiError extends Error {
   constructor (
@@ -39,8 +41,6 @@ export interface RequestOptions {
 }
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
-
-const FALLBACK_MESSAGE = 'The request could not be completed.'
 
 let readCsrfToken: () => string | null = () => null
 let onUnauthorized: () => void = () => {}
@@ -96,22 +96,25 @@ function describe (status: number, payload: unknown): { message: string, code: s
     raw = body.message
   }
 
-  if (code && CODE_MESSAGES[code]) {
-    return { message: CODE_MESSAGES[code], code }
+  if (code && ERROR_CODES.has(code)) {
+    return { message: t(`errors.code.${code}`), code }
   }
 
-  if (raw && API_MESSAGES[raw]) {
-    return { message: API_MESSAGES[raw], code }
+  const apiKey = raw ? API_MESSAGE_KEYS.get(raw) : undefined
+
+  if (apiKey) {
+    return { message: t(apiKey), code }
   }
 
-  // A validacao do class-validator ja vem em ingles e nomeia o campo.
+  // A validacao do class-validator vem em ingles e nomeia o campo. O detalhe vai
+  // como veio, dentro de uma frase na lingua da tela.
   if (status === 400 && raw) {
-    return { message: raw.charAt(0).toUpperCase() + raw.slice(1), code }
+    return { message: t('errors.status.badRequest', { detail: raw }), code }
   }
 
-  const byStatus = STATUS_MESSAGES[status] ?? (status >= 500 ? STATUS_MESSAGES[500] : undefined)
+  const byStatus = STATUS_MESSAGE_KEYS[status] ?? (status >= 500 ? STATUS_MESSAGE_KEYS[500] : undefined)
 
-  return { message: byStatus ?? raw ?? FALLBACK_MESSAGE, code }
+  return { message: byStatus ? t(byStatus) : (raw ?? t('errors.fallback')), code }
 }
 
 export async function request<T> (path: string, options: RequestOptions = {}): Promise<T> {
@@ -145,7 +148,7 @@ export async function request<T> (path: string, options: RequestOptions = {}): P
       throw error
     }
 
-    throw new ApiError(0, STATUS_MESSAGES[0] ?? FALLBACK_MESSAGE, 'network_error')
+    throw new ApiError(0, t('errors.status.network'), 'network_error')
   }
 
   if (response.status === 404 && options.emptyOn404) {
@@ -157,7 +160,7 @@ export async function request<T> (path: string, options: RequestOptions = {}): P
       onUnauthorized()
     }
 
-    throw new ApiError(401, STATUS_MESSAGES[401] ?? FALLBACK_MESSAGE, 'unauthorized')
+    throw new ApiError(401, t('errors.status.unauthorized'), 'unauthorized')
   }
 
   const payload = response.status === 204 ? null : await readBody(response)
@@ -173,5 +176,5 @@ export async function request<T> (path: string, options: RequestOptions = {}): P
 
 /** Mensagem de qualquer falha, para toast e para erro dentro de modal. */
 export function errorMessage (error: unknown): string {
-  return error instanceof ApiError ? error.message : FALLBACK_MESSAGE
+  return error instanceof ApiError ? error.message : t('errors.fallback')
 }

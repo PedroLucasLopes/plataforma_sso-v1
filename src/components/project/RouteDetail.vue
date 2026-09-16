@@ -12,7 +12,7 @@
         variant="tonal"
         @click="emit('create', { path: node.key })"
       >
-        Register this path
+        {{ t('routeDetail.registerPath') }}
       </DlButton>
 
       <DlButton
@@ -22,7 +22,7 @@
         variant="tonal"
         @click="addMethod"
       >
-        Add method
+        {{ t('routeDetail.addMethod') }}
       </DlButton>
 
       <DlButton
@@ -31,13 +31,12 @@
         variant="outlined"
         @click="emit('create', { path: childPrefix })"
       >
-        Add sub-route
+        {{ t('routeDetail.addSubRoute') }}
       </DlButton>
     </template>
 
     <p v-if="node.group" class="route-detail__lead">
-      Not a registered route. It gathers the {{ plural(node.descendants, 'path') }} below that start with this
-      prefix, and answers no request by itself.
+      {{ t('routeDetail.groupLead', node.descendants) }}
     </p>
 
     <div v-else class="route-detail__methods">
@@ -70,24 +69,24 @@
           <DlRoutePath :path="parentKey" />
         </button>
 
-        <span v-else>Top level</span>
+        <span v-else>{{ t('routeDetail.topLevel') }}</span>
       </template>
     </DlDescriptionList>
   </DlSectionCard>
 
   <DlSectionCard
     v-if="!node.group"
-    description="Which role may call each method of this path. A method no role reaches answers 403 to everyone, and a granted method cannot be deleted until its grants are removed."
+    :description="t('routeDetail.access.description')"
     :heading-level="3"
     :padded="roles.length === 0"
-    title="Access"
+    :title="t('routeDetail.access.title')"
   >
     <DlEmptyState
       v-if="roles.length === 0"
       compact
-      description="Create a role in Roles & permissions, then grant this path to it here."
+      :description="t('routeDetail.access.emptyDescription')"
       icon="mdi-shield-account-outline"
-      title="No roles yet"
+      :title="t('routeDetail.access.emptyTitle')"
     />
 
     <DlDataTable
@@ -108,7 +107,7 @@
         <span class="route-detail__grant">
           <VCheckbox
             v-if="canManage"
-            :aria-label="`${roleLabel(role.name)} can call ${row.method} ${row.path}`"
+            :aria-label="t('grants.canCall', { role: roleLabel(role.name), method: String(row.method), path: String(row.path) })"
             color="primary"
             density="compact"
             :disabled="isBusy(role.id, String(row.id))"
@@ -119,19 +118,19 @@
 
           <VIcon
             v-else-if="permissionOf(role.id, String(row.id))"
-            aria-label="Granted"
+            :aria-label="t('routeDetail.access.granted')"
             color="success"
             icon="mdi-check"
             size="18"
           />
 
-          <span v-else aria-label="Not granted" class="route-detail__none">—</span>
+          <span v-else :aria-label="t('routeDetail.access.notGranted')" class="route-detail__none">—</span>
         </span>
       </template>
 
       <template #col-callers="{ row }">
         <span :class="{ 'route-detail__nobody': row.callers === 0 }">
-          {{ row.callers === 0 ? 'Nobody' : plural(Number(row.callers), 'member') }}
+          {{ row.callers === 0 ? t('routeDetail.access.nobody') : t('counts.members', Number(row.callers)) }}
         </span>
       </template>
     </DlDataTable>
@@ -140,20 +139,20 @@
   <DlSectionCard
     v-if="!node.group"
     :count="callers.length"
-    description="Members whose role reaches at least one method of this path, and which methods."
+    :description="t('routeDetail.callers.description')"
     :heading-level="3"
     :padded="callers.length === 0"
-    title="Who can call it"
+    :title="t('routeDetail.callers.title')"
   >
     <DlEmptyState
       v-if="callers.length === 0"
       compact
-      :description="granted ? 'The roles that reach this path have no members yet.' : 'Grant a role above. Until then, every method answers 403.'"
+      :description="granted ? t('routeDetail.callers.emptyGranted') : t('routeDetail.callers.emptyNotGranted')"
       icon="mdi-account-lock-outline"
-      title="Nobody can call it yet"
+      :title="t('routeDetail.callers.emptyTitle')"
     >
       <DlButton v-if="granted" icon="mdi-account-multiple-outline" variant="outlined" @click="openMembers">
-        Open members
+        {{ t('routeDetail.callers.openMembers') }}
       </DlButton>
     </DlEmptyState>
 
@@ -187,13 +186,13 @@
   <DlSectionCard
     v-if="node.children.length > 0"
     :count="node.descendants"
-    description="Paths that start with this one. Pick any to open it."
+    :description="t('routeDetail.below.description')"
     :heading-level="3"
     :padded="false"
-    title="Below this path"
+    :title="t('routeDetail.below.title')"
   >
     <DlRouteTree
-      :label="`Routes below ${node.key}`"
+      :label="t('routeDetail.below.treeLabel', { path: node.key })"
       :nodes="node.children"
       :selected="null"
       @update:selected="openChild"
@@ -219,12 +218,12 @@
     type RowAction,
   } from '@pedrolucaslopes/dotlog-ui'
   import { computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
   import { useGrants } from '@/composables/useGrants'
   import { SELF_PROJECT_NAME } from '@/constants/api'
   import { HTTP_METHODS, METHOD_STATUS, ROLE_STATUS } from '@/constants/status'
   import { useSessionStore } from '@/stores/session'
-  import { plural } from '@/utils/format'
   import { type ProjectRoute, roleLabel, rolesGranted, type RouteEntry, sortRoles } from '@/utils/routes'
 
   /**
@@ -248,13 +247,14 @@
     remove: [route: ProjectRoute]
   }>()
 
+  const { t } = useI18n()
   const router = useRouter()
   const current = useRoute()
   const session = useSessionStore()
   const { canManage, permissionOf, isBusy, toggle } = useGrants(() => props.project)
 
-  /** O catalogo do proprio SSO so muda pelo bootstrap. O servidor recusa; a tela nem oferece. */
-  const catalogLocked = computed(() => props.project.name === SELF_PROJECT_NAME)
+  /** O catalogo do proprio SSO so a raiz muda. O servidor recusa os outros; a tela nem oferece. */
+  const catalogLocked = computed(() => props.project.name === SELF_PROJECT_NAME && !session.root)
 
   const canCreate = computed(() => !catalogLocked.value && session.can('POST', '/route'))
 
@@ -273,15 +273,15 @@
     const { node, parentKey } = props
 
     const items: DescriptionItem[] = [
-      { key: 'path', label: 'Path', value: node.key, mono: true, copyable: true },
-      { key: 'params', label: 'Parameters', value: params.value.join(', ') || null },
-      { key: 'parent', label: 'Parent', value: parentKey ?? 'Top level' },
-      { key: 'below', label: 'Paths below', value: node.descendants > 0 ? plural(node.descendants, 'path') : 'None' },
+      { key: 'path', label: t('routeDetail.facts.path'), value: node.key, mono: true, copyable: true },
+      { key: 'params', label: t('routeDetail.facts.parameters'), value: params.value.join(', ') || null },
+      { key: 'parent', label: t('routeDetail.facts.parent'), value: parentKey ?? t('routeDetail.topLevel') },
+      { key: 'below', label: t('routeDetail.facts.pathsBelow'), value: node.descendants > 0 ? t('counts.paths', node.descendants) : t('common.none') },
     ]
 
     // O id e o que se passa para a API ou para um script. Um por metodo, porque cada metodo e uma linha.
     for (const item of node.routes) {
-      items.push({ key: `id-${item.id}`, label: `${item.method} route ID`, value: item.id, mono: true, copyable: true })
+      items.push({ key: `id-${item.id}`, label: t('routeDetail.facts.routeId', { method: item.method }), value: item.id, mono: true, copyable: true })
     }
 
     return items
@@ -317,15 +317,15 @@
   const roleSlot = (roleId: string): string => `col-role-${roleId}`
 
   const accessColumns = computed<Column<AccessRow>[]>(() => [
-    { key: 'method', label: 'Method', width: '100px' },
+    { key: 'method', label: t('routeDetail.access.method'), width: '100px' },
     ...roles.value.map(role => ({ key: `role-${role.id}`, label: roleLabel(role.name), align: 'center' as const })),
-    { key: 'callers', label: 'Can call', align: 'end' },
+    { key: 'callers', label: t('routeDetail.access.canCall'), align: 'end' },
   ])
 
-  const actions: RowAction<AccessRow>[] = [
+  const actions = computed<RowAction<AccessRow>[]>(() => [
     {
       key: 'edit',
-      label: 'Edit route',
+      label: t('routeDetail.access.editRoute'),
       icon: 'mdi-pencil-outline',
       method: 'PUT',
       path: '/route/:id',
@@ -333,7 +333,7 @@
     },
     {
       key: 'delete',
-      label: 'Delete route',
+      label: t('routeDetail.access.deleteRoute'),
       icon: 'mdi-delete-outline',
       method: 'DELETE',
       path: '/route/:id',
@@ -341,7 +341,7 @@
       // A permissao aponta para a rota: apagar antes de revogar falharia no banco.
       unavailable: row => catalogLocked.value || row.granted,
     },
-  ]
+  ])
 
   function onAction (key: string, row: AccessRow): void {
     const target = props.node.routes.find(item => item.id === row.id)
@@ -384,12 +384,12 @@
       .filter(row => row.methods.length > 0)
   })
 
-  const callerColumns: Column<CallerRow>[] = [
-    { key: 'name', label: 'Name' },
-    { key: 'email', label: 'E-mail', secondary: true },
-    { key: 'role', label: 'Role', width: '140px' },
-    { key: 'methods', label: 'Methods' },
-  ]
+  const callerColumns = computed<Column<CallerRow>[]>(() => [
+    { key: 'name', label: t('common.name') },
+    { key: 'email', label: t('common.email'), secondary: true },
+    { key: 'role', label: t('common.role'), width: '140px' },
+    { key: 'methods', label: t('routeDetail.callers.methods') },
+  ])
 
   /* ------------------------------ navegacao ------------------------------ */
 

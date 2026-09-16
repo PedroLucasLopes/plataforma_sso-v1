@@ -1,3 +1,5 @@
+import { t } from '@/plugins/i18n'
+
 /** Opcao de seletor no formato que `DlSelect` le por padrao. */
 export interface SelectOption {
   title: string
@@ -40,3 +42,20 @@ export const PUBLIC_KEY_PATTERN = /^-----BEGIN PUBLIC KEY-----[\s\S]+-----END PU
 
 /** Caminho de rota do catalogo: comeca com barra e nao tem espaco. */
 export const ROUTE_PATH_PATTERN = /^\/\S*$/
+
+/** O mesmo formato que o SSO exige em nome de papel: ARQUITETO, GESTOR_FINANCEIRO. */
+export const ROLE_NAME_PATTERN = /^[A-Z][A-Z0-9_]{1,39}$/
+
+/** Nome de papel como a pessoa digita, ja no formato do SSO: maiusculas, e espaco vira `_`. */
+export function asRoleName (value: unknown): string {
+  return asText(value).toUpperCase().replaceAll(/\s+/g, '_')
+}
+
+/** Por que o nome de papel nao serve, ou `null`. `taken` sao os nomes que o projeto ja tem. */
+export function roleNameError (name: string, taken: readonly string[]): string | null {
+  if (!ROLE_NAME_PATTERN.test(name)) {
+    return t('forms.roleNamePattern')
+  }
+
+  return taken.includes(name) ? t('forms.roleNameTaken') : null
+}

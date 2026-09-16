@@ -1,14 +1,26 @@
 import type { KeyState } from '@/constants/status'
+import { currentLocale } from '@/plugins/i18n'
 
-const DATE = new Intl.DateTimeFormat('en-US', { day: '2-digit', month: 'short', year: 'numeric' })
+const DATE: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short', year: 'numeric' }
 
-const DATE_TIME = new Intl.DateTimeFormat('en-US', {
-  day: '2-digit',
-  month: 'short',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-})
+const DATE_TIME: Intl.DateTimeFormatOptions = { ...DATE, hour: '2-digit', minute: '2-digit' }
+
+/* Um formatador por lingua e formato: criar `Intl.DateTimeFormat` a cada celula custa caro. */
+const formatters = new Map<string, Intl.DateTimeFormat>()
+
+/** Formatador na lingua corrente. Chamado dentro do template, troca junto com ela. */
+function formatter (name: 'date' | 'dateTime'): Intl.DateTimeFormat {
+  const locale = currentLocale()
+  const key = `${name}:${locale}`
+  let format = formatters.get(key)
+
+  if (!format) {
+    format = new Intl.DateTimeFormat(locale, name === 'date' ? DATE : DATE_TIME)
+    formatters.set(key, format)
+  }
+
+  return format
+}
 
 function parse (iso: string | null | undefined): Date | null {
   if (!iso) {
@@ -24,13 +36,13 @@ function parse (iso: string | null | undefined): Date | null {
 export function formatDate (iso: string | null | undefined): string {
   const date = parse(iso)
 
-  return date ? DATE.format(date) : '—'
+  return date ? formatter('date').format(date) : '—'
 }
 
 export function formatDateTime (iso: string | null | undefined): string {
   const date = parse(iso)
 
-  return date ? DATE_TIME.format(date) : '—'
+  return date ? formatter('dateTime').format(date) : '—'
 }
 
 /** Primeiro nome, para cumprimento. */
@@ -50,11 +62,6 @@ export function keyState (key: { revokedAt: string | null, expiresAt: string | n
   const expires = parse(key.expiresAt)
 
   return expires && expires.getTime() <= Date.now() ? 'EXPIRED' : 'ACTIVE'
-}
-
-/** Plural simples para contagem na interface: "1 route", "3 routes". */
-export function plural (count: number, singular: string, pluralForm = `${singular}s`): string {
-  return `${count} ${count === 1 ? singular : pluralForm}`
 }
 
 /** Parametro de rota ou query que pode vir repetido. */

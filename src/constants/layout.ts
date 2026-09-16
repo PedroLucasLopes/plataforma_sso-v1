@@ -1,6 +1,5 @@
-/** Nome da aplicacao no menu e no titulo da aba. */
+/** Nome da aplicacao no menu e no titulo da aba. E nome proprio: nao se traduz. */
 export const APP_NAME = 'SSO'
-export const APP_SUBTITLE = 'Admin console'
 
 /** Largura maxima do conteudo. Acima disso sobra margem, nao linha comprida. */
 export const CONTENT_MAX_WIDTH = 1280

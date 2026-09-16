@@ -2,20 +2,20 @@
   <div class="page">
     <DlPageHeader
       :actions="headerActions"
-      :breadcrumbs="[{ label: 'Catalogue' }, { label: 'Users' }]"
-      description="People who can sign in through the SSO. Nobody signs in without being registered here first."
-      title="Users"
+      :breadcrumbs="[{ label: t('nav.catalogue') }, { label: t('nav.users') }]"
+      :description="t('users.description')"
+      :title="t('nav.users')"
       :with-menu="false"
       @action="dialog.openCreate()"
     />
 
     <div class="toolbar">
       <DlTextField
-        hint="Part of a name, or a complete e-mail address."
+        :hint="t('users.searchHint')"
         icon="mdi-magnify"
-        label="Search"
+        :label="t('users.search')"
         :model-value="term"
-        placeholder="Marina, or marina@example.com"
+        :placeholder="t('users.searchPlaceholder')"
         :reserve-error="false"
         @update:model-value="onSearch"
       />
@@ -25,18 +25,18 @@
       v-if="users.error && !users.loaded"
       :description="users.error"
       icon="mdi-cloud-alert-outline"
-      title="Users could not be loaded"
+      :title="t('users.loadFailed')"
       tone="error"
     >
-      <DlButton icon="mdi-refresh" variant="outlined" @click="users.load()">Try again</DlButton>
+      <DlButton icon="mdi-refresh" variant="outlined" @click="users.load()">{{ t('common.tryAgain') }}</DlButton>
     </DlEmptyState>
 
     <DlDataTable
       v-else
       :actions="rowActions"
       :columns="columns"
-      :empty-description="term.trim() ? 'No user matches this search.' : 'Register the first person who will sign in through the SSO.'"
-      empty-title="No users found"
+      :empty-description="term.trim() ? t('users.emptySearch') : t('users.emptyDescription')"
+      :empty-title="t('users.emptyTitle')"
       :limit="users.limit"
       :loading="users.loading && !users.loaded"
       :page="users.page"
@@ -52,29 +52,29 @@
 
     <DlFormDialog
       v-model="dialog.open"
-      :description="dialog.mode === 'create' ? 'Registering does not grant access yet. Add the person to a project afterwards.' : undefined"
+      :description="dialog.mode === 'create' ? t('users.registerDescription') : undefined"
       :dirty="dialog.dirty"
       :error="dialog.error"
       :mode="dialog.mode"
       :submitting="dialog.submitting"
-      :title="dialog.mode === 'create' ? 'Register user' : 'Edit user'"
+      :title="dialog.mode === 'create' ? t('users.register') : t('users.editTitle')"
       @submit="save"
     >
       <DlTextField
-        :error="dialog.attempted && !dialog.form.name.trim() ? 'Enter a name.' : null"
-        label="Name"
+        :error="dialog.attempted && !dialog.form.name.trim() ? t('common.enterName') : null"
+        :label="t('common.name')"
         :model-value="dialog.form.name"
-        placeholder="Marina Albuquerque"
+        :placeholder="t('users.namePlaceholder')"
         required
         @update:model-value="value => (dialog.form.name = asText(value))"
       />
 
       <DlTextField
-        :error="dialog.attempted && !EMAIL_PATTERN.test(dialog.form.email.trim()) ? 'Enter a complete e-mail address.' : null"
-        hint="The e-mail of the Google account this person signs in with."
-        label="E-mail"
+        :error="dialog.attempted && !EMAIL_PATTERN.test(dialog.form.email.trim()) ? t('common.enterEmail') : null"
+        :hint="t('common.googleEmailHint')"
+        :label="t('common.email')"
         :model-value="dialog.form.email"
-        placeholder="marina@example.com"
+        :placeholder="t('users.emailPlaceholder')"
         required
         type="email"
         @update:model-value="value => (dialog.form.email = asText(value))"
@@ -83,12 +83,12 @@
 
     <DlConfirmDialog
       v-model="removal.open"
-      confirm-label="Delete user"
+      :confirm-label="t('users.deleteTitle')"
       destructive
       :error="removal.error"
-      :message="removal.target ? `${removal.target.name} can no longer sign in. Registering the same e-mail again creates a new user.` : ''"
+      :message="removal.target ? t('users.deleteMessage', { name: removal.target.name }) : ''"
       :processing="removal.processing"
-      title="Delete user"
+      :title="t('users.deleteTitle')"
       @confirm="remove"
     />
   </div>
@@ -110,6 +110,7 @@
     toast,
   } from '@pedrolucaslopes/dotlog-ui'
   import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
   import { useConfirm } from '@/composables/useConfirm'
   import { useCrudDialog } from '@/composables/useCrudDialog'
@@ -119,6 +120,7 @@
   import { asText, EMAIL_PATTERN } from '@/utils/forms'
 
   /** Pessoas cadastradas. Lista que cresce com o uso, entao pagina no servidor. */
+  const { t, locale } = useI18n()
   const router = useRouter()
   const users = useUsersStore()
 
@@ -143,24 +145,25 @@
   const columns = computed(() =>
     inferColumns(rows.value, {
       omit: ['id'],
+      locale: locale.value,
       overrides: {
-        name: { label: 'Name' },
-        email: { label: 'E-mail' },
-        googleAccount: { label: 'Google account', width: '210px' },
-        projects: { label: 'Projects', width: '100px' },
+        name: { label: t('common.name') },
+        email: { label: t('common.email') },
+        googleAccount: { label: t('users.googleAccount'), width: '210px' },
+        projects: { label: t('common.projects'), width: '100px' },
       },
     }),
   )
 
-  const headerActions: HeaderAction[] = [
-    { key: 'create', label: 'Register user', icon: 'mdi-account-plus-outline', method: 'POST', path: '/user' },
-  ]
+  const headerActions = computed<HeaderAction[]>(() => [
+    { key: 'create', label: t('users.register'), icon: 'mdi-account-plus-outline', method: 'POST', path: '/user' },
+  ])
 
-  const rowActions: RowAction<UserRow>[] = [
-    { key: 'edit', label: 'Edit', icon: 'mdi-pencil-outline', method: 'PUT', path: '/user/:id' },
+  const rowActions = computed<RowAction<UserRow>[]>(() => [
+    { key: 'edit', label: t('common.edit'), icon: 'mdi-pencil-outline', method: 'PUT', path: '/user/:id' },
     {
       key: 'delete',
-      label: 'Delete',
+      label: t('common.delete'),
       icon: 'mdi-delete-outline',
       method: 'DELETE',
       path: '/user/:id',
@@ -168,7 +171,7 @@
       // O SSO recusa apagar quem ainda tem acesso a algum projeto.
       unavailable: row => row.projects > 0,
     },
-  ]
+  ])
 
   /* -------------------------------- busca -------------------------------- */
 
@@ -213,9 +216,9 @@
 
     if (ok) {
       if (editingId) {
-        toast.success('User updated')
+        toast.success(t('users.updated'))
       } else {
-        toast.success('User registered', { description: 'They can sign in once added to a project.' })
+        toast.success(t('users.registered'), { description: t('users.registeredDescription') })
       }
     }
   }
@@ -224,7 +227,7 @@
     const ok = await removal.confirm(row => users.remove(row.id))
 
     if (ok) {
-      toast.success('User deleted')
+      toast.success(t('users.deleted'))
     }
   }
 </script>

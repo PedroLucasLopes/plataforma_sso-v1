@@ -1,11 +1,12 @@
-import type { Project, Role, Route, User } from '@/types/sso'
+import type { Project, Route, User } from '@/types/sso'
 import { defineStore } from 'pinia'
 import { reactive, shallowRef } from 'vue'
 import { LOOKUP_LIMIT } from '@/constants/layout'
+import { t } from '@/plugins/i18n'
 import { errorMessage } from '@/services/http'
-import { projectsApi, rolesApi, routesApi, usersApi } from '@/services/sso'
+import { projectsApi, routesApi, usersApi } from '@/services/sso'
 
-export type CatalogKind = 'projects' | 'users' | 'roles' | 'routes'
+export type CatalogKind = 'projects' | 'users' | 'routes'
 
 interface LoadState {
   loading: boolean
@@ -19,10 +20,12 @@ const idle = (): LoadState => ({ loading: false, loaded: false, error: null })
  * Catalogo inteiro de cada recurso, ate `LOOKUP_LIMIT`.
  *
  * Serve ao que precisa de tudo de uma vez: seletor de projeto, nome no lugar
- * de id, painel, e as listas pequenas por natureza, como projetos e papeis, que
- * filtram e paginam no navegador. Usuarios crescem com o uso e paginam no
- * servidor, no store proprio. Rotas nao tem lista propria: moram dentro de cada
- * projeto, em arvore, e aqui entram so para a contagem do painel.
+ * de id e painel. Projetos filtram e paginam no navegador. Usuarios crescem com
+ * o uso e paginam no servidor, no store proprio.
+ *
+ * Papeis nao tem lista global: moram dentro de cada projeto, e chegam no
+ * overview dele. Rotas tambem moram no projeto, em arvore, e aqui entram so
+ * para a contagem do painel.
  *
  * Quem altera um recurso chama `invalidate`; a proxima tela que precisar
  * busca de novo.
@@ -30,13 +33,11 @@ const idle = (): LoadState => ({ loading: false, loaded: false, error: null })
 export const useCatalogStore = defineStore('catalog', () => {
   const projects = shallowRef<Project[]>([])
   const users = shallowRef<User[]>([])
-  const roles = shallowRef<Role[]>([])
   const routes = shallowRef<Route[]>([])
 
   const state = reactive<Record<CatalogKind, LoadState>>({
     projects: idle(),
     users: idle(),
-    roles: idle(),
     routes: idle(),
   })
 
@@ -46,9 +47,6 @@ export const useCatalogStore = defineStore('catalog', () => {
     },
     users: async () => {
       users.value = await usersApi.list({ limit: LOOKUP_LIMIT, order: 'asc' })
-    },
-    roles: async () => {
-      roles.value = await rolesApi.list({ limit: LOOKUP_LIMIT, order: 'asc' })
     },
     routes: async () => {
       routes.value = await routesApi.list({ limit: LOOKUP_LIMIT, order: 'asc' })
@@ -96,7 +94,7 @@ export const useCatalogStore = defineStore('catalog', () => {
   }
 
   const projectName = (projectId: string): string =>
-    projects.value.find(project => project.id === projectId)?.name ?? 'Unknown project'
+    projects.value.find(project => project.id === projectId)?.name ?? t('common.unknownProject')
 
-  return { projects, users, roles, routes, state, ensure, invalidate, projectName }
+  return { projects, users, routes, state, ensure, invalidate, projectName }
 })

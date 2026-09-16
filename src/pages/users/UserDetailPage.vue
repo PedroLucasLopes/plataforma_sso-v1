@@ -2,7 +2,7 @@
   <div class="page">
     <DlPageHeader
       :actions="headerActions"
-      :breadcrumbs="[{ label: 'Users', to: '/users' }, { label: title }]"
+      :breadcrumbs="[{ label: t('nav.users'), to: '/users' }, { label: title }]"
       :description="user?.email"
       :title="title"
       :with-menu="false"
@@ -16,14 +16,14 @@
       v-else-if="loadError && !user"
       :description="loadError"
       icon="mdi-alert-circle-outline"
-      title="The user could not be loaded"
+      :title="t('user.loadFailed')"
       tone="error"
     >
-      <DlButton icon="mdi-refresh" variant="outlined" @click="load">Try again</DlButton>
+      <DlButton icon="mdi-refresh" variant="outlined" @click="load">{{ t('common.tryAgain') }}</DlButton>
     </DlEmptyState>
 
     <template v-else-if="user">
-      <DlSectionCard description="How this person is identified when signing in." title="Profile">
+      <DlSectionCard :description="t('user.profile.description')" :title="t('user.profile.title')">
         <DlDescriptionList :items="profileItems">
           <template #item-googleAccount>
             <DlStatusChip :map="LINK_STATUS" size="default" :status="linkState" />
@@ -33,20 +33,20 @@
 
       <DlSectionCard
         :count="memberships.length"
-        description="Where this person can sign in, and with which role."
+        :description="t('user.projects.description')"
         :padded="memberships.length === 0"
-        title="Projects"
+        :title="t('common.projects')"
       >
         <template v-if="canAddMembership" #actions>
-          <DlButton icon="mdi-plus" variant="tonal" @click="openMembership">Add to project</DlButton>
+          <DlButton icon="mdi-plus" variant="tonal" @click="openMembership">{{ t('user.addToProject') }}</DlButton>
         </template>
 
         <DlEmptyState
           v-if="memberships.length === 0"
           compact
-          description="Without a project, this person cannot sign in anywhere."
+          :description="t('user.projects.emptyDescription')"
           icon="mdi-apps"
-          title="No projects yet"
+          :title="t('user.projects.emptyTitle')"
         />
 
         <DlDataTable
@@ -74,21 +74,21 @@
       :error="editDialog.error"
       mode="edit"
       :submitting="editDialog.submitting"
-      title="Edit user"
+      :title="t('users.editTitle')"
       @submit="saveEdit"
     >
       <DlTextField
-        :error="editDialog.attempted && !editDialog.form.name.trim() ? 'Enter a name.' : null"
-        label="Name"
+        :error="editDialog.attempted && !editDialog.form.name.trim() ? t('common.enterName') : null"
+        :label="t('common.name')"
         :model-value="editDialog.form.name"
         required
         @update:model-value="value => (editDialog.form.name = asText(value))"
       />
 
       <DlTextField
-        :error="editDialog.attempted && !EMAIL_PATTERN.test(editDialog.form.email.trim()) ? 'Enter a complete e-mail address.' : null"
-        hint="The e-mail of the Google account this person signs in with."
-        label="E-mail"
+        :error="editDialog.attempted && !EMAIL_PATTERN.test(editDialog.form.email.trim()) ? t('common.enterEmail') : null"
+        :hint="t('common.googleEmailHint')"
+        :label="t('common.email')"
         :model-value="editDialog.form.email"
         required
         type="email"
@@ -98,31 +98,31 @@
 
     <DlFormDialog
       v-model="membership.open"
-      :description="`${title} signs in to the chosen project with the chosen role.`"
+      :description="t('user.addDescription', { name: title })"
       :dirty="membership.dirty"
       :error="membership.error"
       mode="create"
-      submit-label="Add to project"
+      :submit-label="t('user.addToProject')"
       :submitting="membership.submitting"
-      title="Add to project"
+      :title="t('user.addToProject')"
       @submit="saveMembership"
     >
       <DlSelect
-        :error="membership.attempted && !membership.form.projectId ? 'Choose a project.' : null"
-        label="Project"
+        :error="membership.attempted && !membership.form.projectId ? t('common.chooseProject') : null"
+        :label="t('common.project')"
         :loading="catalog.state.projects.loading"
         :model-value="membership.form.projectId || null"
         :options="projectOptions"
         required
-        @update:model-value="value => { membership.form.projectId = asOption(value) ?? ''; membership.form.roleId = '' }"
+        @update:model-value="value => selectProject(asOption(value) ?? '')"
       />
 
       <DlSelect
         :disabled="!membership.form.projectId"
-        :error="membership.attempted && !membership.form.roleId ? 'Choose a role.' : null"
-        :hint="membership.form.projectId && roleOptions.length === 0 ? 'This project has no roles yet.' : undefined"
-        label="Role"
-        :loading="catalog.state.roles.loading"
+        :error="membership.attempted && !membership.form.roleId ? t('common.chooseRole') : null"
+        :hint="membership.form.projectId && !rolesLoading && roleOptions.length === 0 ? t('user.noRoles') : undefined"
+        :label="t('common.role')"
+        :loading="rolesLoading"
         :model-value="membership.form.roleId || null"
         :options="roleOptions"
         required
@@ -132,22 +132,22 @@
 
     <DlConfirmDialog
       v-model="unlink.open"
-      confirm-label="Unlink account"
+      :confirm-label="t('user.unlinkConfirm')"
       :error="unlink.error"
-      message="The next Google sign-in with this e-mail links a new account. Use it when the person changed Google accounts."
+      :message="t('user.unlinkMessage')"
       :processing="unlink.processing"
-      title="Unlink Google account"
+      :title="t('user.unlink')"
       @confirm="applyUnlink"
     />
 
     <DlConfirmDialog
       v-model="removal.open"
-      confirm-label="Delete user"
+      :confirm-label="t('users.deleteTitle')"
       destructive
       :error="removal.error"
-      :message="`${title} can no longer sign in. Registering the same e-mail again creates a new user.`"
+      :message="t('users.deleteMessage', { name: title })"
       :processing="removal.processing"
-      title="Delete user"
+      :title="t('users.deleteTitle')"
       @confirm="remove"
     />
   </div>
@@ -173,20 +173,26 @@
     toast,
   } from '@pedrolucaslopes/dotlog-ui'
   import { computed, onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
   import { useConfirm } from '@/composables/useConfirm'
   import { useCrudDialog } from '@/composables/useCrudDialog'
+  import { SELF_PROJECT_NAME } from '@/constants/api'
   import { LINK_STATUS, type LinkState, PROJECT_STATUS, ROLE_STATUS } from '@/constants/status'
   import { errorMessage } from '@/services/http'
   import { useCatalogStore } from '@/stores/catalog'
+  import { useProjectsStore } from '@/stores/projects'
   import { useSessionStore } from '@/stores/session'
   import { useUsersStore } from '@/stores/users'
   import { asOption, asText, EMAIL_PATTERN } from '@/utils/forms'
+  import { roleLabel, sortRoles } from '@/utils/routes'
 
+  const { t } = useI18n()
   const route = useRoute()
   const router = useRouter()
   const session = useSessionStore()
   const catalog = useCatalogStore()
+  const projects = useProjectsStore()
   const users = useUsersStore()
 
   const userId = computed(() => String(route.params.id))
@@ -210,7 +216,7 @@
 
   onMounted(load)
 
-  const title = computed(() => user.value?.name ?? 'User')
+  const title = computed(() => user.value?.name ?? t('pageTitles.user'))
   const linkState = computed<LinkState>(() => (user.value?.authId ? 'LINKED' : 'WAITING'))
 
   const profileItems = computed<DescriptionItem[]>(() => {
@@ -221,17 +227,17 @@
     }
 
     return [
-      { key: 'name', label: 'Name', value: current.name },
-      { key: 'email', label: 'E-mail', value: current.email, copyable: true },
+      { key: 'name', label: t('common.name'), value: current.name },
+      { key: 'email', label: t('common.email'), value: current.email, copyable: true },
       {
         key: 'googleAccount',
-        label: 'Google account',
+        label: t('users.googleAccount'),
         value: linkState.value,
         hint: current.authId
-          ? 'Linked on the first sign-in. Another Google account with this e-mail is refused.'
-          : 'The first Google sign-in with this e-mail links the account.',
+          ? t('user.linkedHint')
+          : t('user.waitingHint'),
       },
-      { key: 'id', label: 'User ID', value: current.id, mono: true, copyable: true },
+      { key: 'id', label: t('user.userId'), value: current.id, mono: true, copyable: true },
     ]
   })
 
@@ -251,11 +257,11 @@
     })),
   )
 
-  const membershipColumns: Column<MembershipRow>[] = [
-    { key: 'project', label: 'Project' },
-    { key: 'role', label: 'Role', width: '150px' },
-    { key: 'status', label: 'Project status', width: '170px' },
-  ]
+  const membershipColumns = computed<Column<MembershipRow>[]>(() => [
+    { key: 'project', label: t('common.project') },
+    { key: 'role', label: t('common.role'), width: '150px' },
+    { key: 'status', label: t('user.projectStatus'), width: '170px' },
+  ])
 
   const headerActions = computed<HeaderAction[]>(() => {
     const current = user.value
@@ -266,17 +272,17 @@
 
     const path = `/user/${current.id}`
     const actions: HeaderAction[] = [
-      { key: 'edit', label: 'Edit', icon: 'mdi-pencil-outline', method: 'PUT', path, variant: 'outlined' },
+      { key: 'edit', label: t('common.edit'), icon: 'mdi-pencil-outline', method: 'PUT', path, variant: 'outlined' },
     ]
 
     if (current.authId) {
-      actions.push({ key: 'unlink', label: 'Unlink Google account', icon: 'mdi-link-variant-off', method: 'PUT', path, variant: 'text' })
+      actions.push({ key: 'unlink', label: t('user.unlink'), icon: 'mdi-link-variant-off', method: 'PUT', path, variant: 'text' })
     }
 
-    // Com acesso a algum projeto o SSO recusa apagar, e o console nao tem como
-    // tirar o vinculo: o botao so criaria um erro garantido.
+    // Com acesso a algum projeto o SSO recusa apagar. O vinculo sai antes, na
+    // aba de membros do projeto; ate la, o botao so criaria um erro garantido.
     if (memberships.value.length === 0) {
-      actions.push({ key: 'delete', label: 'Delete', icon: 'mdi-delete-outline', method: 'DELETE', path, color: 'error', variant: 'text' })
+      actions.push({ key: 'delete', label: t('common.delete'), icon: 'mdi-delete-outline', method: 'DELETE', path, color: 'error', variant: 'text' })
     }
 
     return actions
@@ -320,35 +326,67 @@
     const ok = await editDialog.submit(!!input.name && EMAIL_PATTERN.test(input.email), () => users.update(userId.value, input))
 
     if (ok) {
-      toast.success('User updated')
+      toast.success(t('users.updated'))
     }
   }
 
   /* ------------------------------ projetos ------------------------------ */
 
+  /** Os papeis vem do overview do projeto escolhido: a tela nunca busca os papeis de todos os projetos. */
   const canAddMembership = computed(() =>
-    session.can('POST', '/projectuser') && session.can('GET', '/project') && session.can('GET', '/role'),
+    session.can('POST', '/projectuser') && session.can('GET', '/project') && session.can('GET', '/project/:id/overview'),
   )
 
+  /** Colocar alguem no projeto `SSO` e dar poder administrativo: so a raiz. */
   const projectOptions = computed(() =>
     catalog.projects
       .filter(project => !memberships.value.some(row => row.id === project.id))
+      .filter(project => session.root || project.name !== SELF_PROJECT_NAME)
       .map(project => ({ title: project.name, value: project.id })),
   )
 
   const roleOptions = computed(() =>
-    catalog.roles
-      .filter(role => role.projectId === membership.form.projectId)
-      .map(role => ({ title: ROLE_STATUS[role.name]?.label ?? role.name, value: role.id })),
+    sortRoles(projects.overviews[membership.form.projectId]?.roles ?? [])
+      .map(role => ({ title: roleLabel(role.name), value: role.id })),
   )
+
+  const rolesLoading = ref(false)
+
+  /** Ultima escolha de projeto: a resposta de uma escolha anterior nao encerra o carregamento da atual. */
+  let selection = 0
+
+  async function selectProject (projectId: string): Promise<void> {
+    membership.form.projectId = projectId
+    membership.form.roleId = ''
+
+    if (!projectId) {
+      return
+    }
+
+    selection += 1
+
+    const current = selection
+
+    rolesLoading.value = true
+
+    try {
+      await projects.fetchOverview(projectId)
+    } catch (error) {
+      toast.error(t('user.rolesLoadFailed'), { description: errorMessage(error) })
+    } finally {
+      if (current === selection) {
+        rolesLoading.value = false
+      }
+    }
+  }
 
   async function openMembership (): Promise<void> {
     membership.openCreate()
 
     try {
-      await Promise.all([catalog.ensure('projects'), catalog.ensure('roles')])
+      await catalog.ensure('projects')
     } catch (error) {
-      toast.error('Projects and roles could not be loaded', { description: errorMessage(error) })
+      toast.error(t('common.projectsLoadFailed'), { description: errorMessage(error) })
     }
   }
 
@@ -358,7 +396,7 @@
     const ok = await membership.submit(!!projectId && !!roleId, () => users.addMembership(userId.value, projectId, roleId))
 
     if (ok) {
-      toast.success('Added to project')
+      toast.success(t('user.added'))
     }
   }
 
@@ -366,7 +404,7 @@
     const ok = await unlink.confirm(id => users.update(id, { authId: null }))
 
     if (ok) {
-      toast.success('Google account unlinked', { description: 'The next Google sign-in with this e-mail links a new account.' })
+      toast.success(t('user.unlinked'), { description: t('user.unlinkedDescription') })
     }
   }
 
@@ -374,7 +412,7 @@
     const ok = await removal.confirm(id => users.remove(id))
 
     if (ok) {
-      toast.success('User deleted')
+      toast.success(t('users.deleted'))
       await router.replace({ name: 'users' })
     }
   }

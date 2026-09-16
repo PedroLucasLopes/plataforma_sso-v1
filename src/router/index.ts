@@ -6,14 +6,17 @@
  * isso antes de montar a tela, e o backend pergunta de novo em cada chamada.
  */
 
-import type { RouteRecordRaw } from 'vue-router'
+import type { RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
+import { watch } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { APP_NAME } from '@/constants/layout'
+import { i18n, t } from '@/plugins/i18n'
 import { useSessionStore } from '@/stores/session'
 import { routeLoading } from './loading'
 
 declare module 'vue-router' {
   interface RouteMeta {
+    /** Chave de traducao do titulo da aba. */
     title?: string
     /** Nao exige sessao: login do IdP, volta do login, sem acesso, indisponivel. */
     public?: boolean
@@ -29,25 +32,25 @@ const routes: RouteRecordRaw[] = [
     path: '/login',
     name: 'login',
     component: () => import('@/pages/LoginPage.vue'),
-    meta: { public: true, title: 'Sign in' },
+    meta: { public: true, title: 'pageTitles.login' },
   },
   {
     path: '/callback',
     name: 'callback',
     component: () => import('@/pages/CallbackPage.vue'),
-    meta: { public: true, title: 'Signing in' },
+    meta: { public: true, title: 'pageTitles.callback' },
   },
   {
     path: '/no-access',
     name: 'no-access',
     component: () => import('@/pages/NoAccessPage.vue'),
-    meta: { public: true, title: 'No access' },
+    meta: { public: true, title: 'pageTitles.noAccess' },
   },
   {
     path: '/unavailable',
     name: 'unavailable',
     component: () => import('@/pages/UnavailablePage.vue'),
-    meta: { public: true, title: 'Unavailable' },
+    meta: { public: true, title: 'pageTitles.unavailable' },
   },
   {
     path: '/',
@@ -57,55 +60,49 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'dashboard',
         component: () => import('@/pages/DashboardPage.vue'),
-        meta: { title: 'Overview', nav: 'dashboard' },
+        meta: { title: 'pageTitles.dashboard', nav: 'dashboard' },
       },
       {
         path: 'projects',
         name: 'projects',
         component: () => import('@/pages/projects/ProjectsPage.vue'),
-        meta: { title: 'Projects', nav: 'project', permission: { method: 'GET', path: '/project' } },
+        meta: { title: 'pageTitles.projects', nav: 'project', permission: { method: 'GET', path: '/project' } },
       },
       {
         path: 'projects/:id',
         name: 'project',
         component: () => import('@/pages/projects/ProjectDetailPage.vue'),
-        meta: { title: 'Project', nav: 'project', permission: { method: 'GET', path: '/project/:id' } },
+        meta: { title: 'pageTitles.project', nav: 'project', permission: { method: 'GET', path: '/project/:id' } },
       },
       {
         path: 'users',
         name: 'users',
         component: () => import('@/pages/users/UsersPage.vue'),
-        meta: { title: 'Users', nav: 'user', permission: { method: 'GET', path: '/user' } },
+        meta: { title: 'pageTitles.users', nav: 'user', permission: { method: 'GET', path: '/user' } },
       },
       {
         path: 'users/:id',
         name: 'user',
         component: () => import('@/pages/users/UserDetailPage.vue'),
-        meta: { title: 'User', nav: 'user', permission: { method: 'GET', path: '/user/:id' } },
-      },
-      {
-        path: 'roles',
-        name: 'roles',
-        component: () => import('@/pages/RolesPage.vue'),
-        meta: { title: 'Roles', nav: 'role', permission: { method: 'GET', path: '/role' } },
+        meta: { title: 'pageTitles.user', nav: 'user', permission: { method: 'GET', path: '/user/:id' } },
       },
       {
         path: 'client-keys',
         name: 'client-keys',
         component: () => import('@/pages/ClientKeysPage.vue'),
-        meta: { title: 'Client keys', nav: 'clientkey', permission: { method: 'GET', path: '/clientkey' } },
+        meta: { title: 'pageTitles.clientKeys', nav: 'clientkey', permission: { method: 'GET', path: '/clientkey' } },
       },
       {
         path: 'forbidden',
         name: 'forbidden',
         component: () => import('@/pages/ForbiddenPage.vue'),
-        meta: { title: 'Not allowed' },
+        meta: { title: 'pageTitles.forbidden' },
       },
       {
         path: ':pathMatch(.*)*',
         name: 'not-found',
         component: () => import('@/pages/NotFoundPage.vue'),
-        meta: { title: 'Not found' },
+        meta: { title: 'pageTitles.notFound' },
       },
     ],
   },
@@ -152,10 +149,17 @@ router.beforeEach(async to => {
   return true
 })
 
+function applyTitle (to: RouteLocationNormalized): void {
+  document.title = to.meta.title ? `${t(to.meta.title)} · ${APP_NAME}` : APP_NAME
+}
+
 router.afterEach(to => {
   routeLoading.value = false
-  document.title = to.meta.title ? `${to.meta.title} · ${APP_NAME}` : APP_NAME
+  applyTitle(to)
 })
+
+// O titulo da aba acompanha a troca de lingua, sem esperar a proxima navegacao.
+watch(i18n.global.locale, () => applyTitle(router.currentRoute.value))
 
 router.onError(() => {
   routeLoading.value = false

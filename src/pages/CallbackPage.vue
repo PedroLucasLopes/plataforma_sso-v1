@@ -4,18 +4,18 @@
       v-if="phase === 'working'"
       active
       :delay="0"
-      message="Signing you in…"
+      :message="t('callback.working')"
       variant="inline"
     />
 
     <DlEmptyState
       v-else
-      description="The link that brought you here is no longer valid. Start again and you will return to the console."
+      :description="t('callback.failedDescription')"
       icon="mdi-link-variant-off"
-      title="This sign-in could not be completed"
+      :title="t('callback.failedTitle')"
       tone="warning"
     >
-      <DlButton icon="mdi-login" @click="session.beginLogin('/')">Sign in again</DlButton>
+      <DlButton icon="mdi-login" @click="session.beginLogin('/')">{{ t('callback.signInAgain') }}</DlButton>
     </DlEmptyState>
   </GateLayout>
 </template>
@@ -23,6 +23,7 @@
 <script lang="ts" setup>
   import { DlButton, DlEmptyState, DlLoader } from '@pedrolucaslopes/dotlog-ui'
   import { onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
   import GateLayout from '@/layouts/GateLayout.vue'
   import { useSessionStore } from '@/stores/session'
@@ -36,6 +37,7 @@
    * qualquer link externo apontando para ca poderia empurrar a pessoa para uma
    * tela escolhida por outro.
    */
+  const { t } = useI18n()
   const route = useRoute()
   const router = useRouter()
   const session = useSessionStore()

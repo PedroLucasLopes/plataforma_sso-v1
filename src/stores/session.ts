@@ -116,6 +116,13 @@ export const useSessionStore = defineStore('session', () => {
 
   const permissions = computed(() => me.value?.permissions ?? [])
 
+  /**
+   * SUPERADMIN do projeto `SSO`. O servidor manda para ela, em `permissions`,
+   * toda rota administrativa que existe, entao `can` ja responde que sim; `root`
+   * serve ao que so ela pode dentro do proprio SSO.
+   */
+  const root = computed(() => me.value?.root === true)
+
   /** Mesma pergunta do servidor, com o mesmo matcher. So controla interface. */
   const can = (method: string, path: string): boolean =>
     permits(permissions.value, method, path, API_PREFIX)
@@ -242,6 +249,7 @@ export const useSessionStore = defineStore('session', () => {
     status,
     signingOut,
     permissions,
+    root,
     can,
     ensure,
     refresh,

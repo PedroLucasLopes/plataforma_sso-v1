@@ -1,0 +1,556 @@
+{
+  "app": {
+    "subtitle": "Admin console"
+  },
+  "pageTitles": {
+    "login": "Sign in",
+    "callback": "Signing in",
+    "noAccess": "No access",
+    "unavailable": "Unavailable",
+    "dashboard": "Overview",
+    "projects": "Projects",
+    "project": "Project",
+    "users": "Users",
+    "user": "User",
+    "clientKeys": "Client keys",
+    "forbidden": "Not allowed",
+    "notFound": "Not found"
+  },
+  "nav": {
+    "overview": "Overview",
+    "projects": "Projects",
+    "users": "Users",
+    "clientKeys": "Client keys",
+    "catalogue": "Catalogue",
+    "credentials": "Credentials"
+  },
+  "common": {
+    "tryAgain": "Try again",
+    "goToOverview": "Go to the overview",
+    "name": "Name",
+    "email": "E-mail",
+    "status": "Status",
+    "project": "Project",
+    "projects": "Projects",
+    "role": "Role",
+    "members": "Members",
+    "registered": "Registered",
+    "clientId": "Client ID",
+    "edit": "Edit",
+    "rename": "Rename",
+    "delete": "Delete",
+    "never": "Never",
+    "none": "None",
+    "unknownProject": "Unknown project",
+    "enterName": "Enter a name.",
+    "enterEmail": "Enter a complete e-mail address.",
+    "chooseProject": "Choose a project.",
+    "chooseRole": "Choose a role.",
+    "projectsLoadFailed": "Projects could not be loaded",
+    "roleNameHint": "Capital letters, digits and underscores, starting with a letter.",
+    "googleEmailHint": "The e-mail of the Google account this person signs in with."
+  },
+  "counts": {
+    "projects": "{count} project | {count} projects",
+    "members": "{count} member | {count} members",
+    "routes": "{count} route | {count} routes",
+    "paths": "{count} path | {count} paths",
+    "addresses": "{count} address | {count} addresses",
+    "activeKeys": "{count} active key | {count} active keys"
+  },
+  "status": {
+    "project": {
+      "ACTIVE": "Active",
+      "PENDING": "Pending",
+      "SUSPENDED": "Suspended"
+    },
+    "role": {
+      "SUPERADMIN": "Superadmin",
+      "ADMIN": "Admin",
+      "MANAGER": "Manager",
+      "VIEWER": "Viewer"
+    },
+    "key": {
+      "ACTIVE": "Active",
+      "EXPIRED": "Expired",
+      "REVOKED": "Revoked"
+    },
+    "link": {
+      "LINKED": "Linked",
+      "WAITING": "Waiting first sign-in"
+    }
+  },
+  "errors": {
+    "fallback": "The request could not be completed.",
+    "status": {
+      "network": "The SSO did not respond. Check your connection and try again.",
+      "badRequest": "The SSO refused the values sent: {detail}",
+      "unauthorized": "Your session ended. Sign in again to continue.",
+      "forbidden": "Your role does not allow this action.",
+      "notFound": "The record was not found. It may have been removed.",
+      "conflict": "A record with these values already exists.",
+      "server": "The SSO could not process the request. Nothing was changed."
+    },
+    "api": {
+      "keyRequiredToActivate": "Register at least one client key before activating the project.",
+      "projectHasMembers": "Add no one else and remove the members of this project before deleting it.",
+      "projectHasRoutes": "Delete the routes of this project before deleting it.",
+      "userHasProjects": "This user still has access to a project. Remove the memberships first.",
+      "roleAndRouteProjects": "The role and the route belong to different projects.",
+      "publicKeyNotPem": "Paste a public key in PEM format, starting with -----BEGIN PUBLIC KEY-----.",
+      "publicKeyInvalid": "This is not a valid public key.",
+      "publicKeyNotRsa": "Only RSA keys are accepted (RS256).",
+      "publicKeyTooShort": "The RSA key must have at least 2048 bits.",
+      "keyNotFound": "The key was not found or is already revoked.",
+      "noKeys": "This project has no client keys yet."
+    },
+    "code": {
+      "csrf_token_invalid": "Your security token is out of date. Reload the page and try again.",
+      "origin_not_allowed": "This request did not come from the console and was refused.",
+      "sso_project_protected": "The SSO project runs the administration of every application. Only its SUPERADMIN changes its routes, roles, permissions, members, redirect URIs and keys, and some changes are refused to everyone.",
+      "sso_last_superadmin": "The SSO project needs at least one SUPERADMIN. Give the role to someone else first.",
+      "sso_redirect_uri_last": "The SSO project needs at least one redirect URI. Add the new address before deleting this one.",
+      "sso_redirect_uri_in_use": "This console signs in through this address. Delete it from a console running at another address."
+    }
+  },
+  "forms": {
+    "roleNamePattern": "Use 2 to 40 capital letters, digits or underscores, starting with a letter.",
+    "roleNameTaken": "This project already has a role with this name."
+  },
+  "login": {
+    "errors": {
+      "no_pending_request": {
+        "title": "There is no sign-in waiting here",
+        "description": "Open the application you want to use. It will bring you back to this page."
+      },
+      "request_expired": {
+        "title": "The sign-in request expired",
+        "description": "A request lasts five minutes. Go back to the application and start again."
+      },
+      "account_not_registered": {
+        "title": "This Google account is not registered",
+        "description": "Ask an administrator to add your e-mail to the SSO, then try again."
+      },
+      "email_not_verified": {
+        "title": "Your Google e-mail is not verified",
+        "description": "Verify the address in your Google account and try again."
+      },
+      "account_mismatch": {
+        "title": "This is not the Google account linked to you",
+        "description": "Use the Google account from your first sign-in, or ask an administrator to unlink it."
+      },
+      "provider_denied": {
+        "title": "Sign-in was cancelled",
+        "description": "Google did not share your identity. Choose the provider again when you are ready."
+      },
+      "provider_error": {
+        "title": "Google could not complete the sign-in",
+        "description": "Nothing was changed. Try again in a moment."
+      }
+    },
+    "generic": {
+      "title": "Sign-in could not be completed",
+      "description": "Go back to the application and try again."
+    },
+    "unavailable": {
+      "title": "The SSO is not responding",
+      "description": "Nothing was changed. Reload this page in a moment."
+    }
+  },
+  "callback": {
+    "working": "Signing you in…",
+    "failedTitle": "This sign-in could not be completed",
+    "failedDescription": "The link that brought you here is no longer valid. Start again and you will return to the console.",
+    "signInAgain": "Sign in again"
+  },
+  "noAccess": {
+    "title": "You don't have access to the SSO console",
+    "descriptionAs": "You are signed in as {name} ({email}), but this account has no role in the SSO project. Ask an administrator for access.",
+    "description": "Your account has no role in the SSO project. Ask an administrator for access.",
+    "useAnotherAccount": "Use another account"
+  },
+  "unavailable": {
+    "title": "The SSO is not responding",
+    "description": "The console could not reach the SSO. Nothing was changed. Try again in a moment.",
+    "stillTitle": "The SSO is still not responding",
+    "stillDescription": "Check that the service is running, then try again."
+  },
+  "forbidden": {
+    "title": "You cannot open this page",
+    "description": "Your role does not include this area. Ask an administrator if you need it."
+  },
+  "notFound": {
+    "title": "This page does not exist",
+    "description": "The address may be mistyped, or the page moved. The menu on the side has everything your role can open."
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {name}",
+    "description": "The state of the SSO catalogue, from what your role can read.",
+    "totals": "Catalogue totals",
+    "charts": "Project charts",
+    "nothingTitle": "Nothing to show yet",
+    "nothingDescription": "Your role opens the console, but does not read any part of the catalogue.",
+    "loadFailed": "Part of the overview could not be loaded",
+    "stats": {
+      "projects": "Projects",
+      "waiting": "{count} waiting for activation",
+      "noneWaiting": "None waiting for activation",
+      "activeProjects": "Active projects",
+      "users": "Users",
+      "signedIn": "{count} already signed in once",
+      "routes": "Routes",
+      "routesHint": "Managed inside each project"
+    },
+    "byStatus": {
+      "title": "Projects by status",
+      "empty": "No projects registered yet.",
+      "share": "Share"
+    },
+    "members": {
+      "title": "Members per project",
+      "description": "Top 8 by number of members",
+      "empty": "No project has members yet."
+    },
+    "growth": {
+      "title": "Projects registered",
+      "description": "Last 12 months",
+      "month": "Month"
+    },
+    "pending": {
+      "title": "Waiting for activation",
+      "description": "Registered in the catalogue, but unable to use the SSO until an administrator activates them.",
+      "emptyTitle": "Nothing waiting",
+      "emptyDescription": "Every registered project is active, or was suspended on purpose."
+    }
+  },
+  "projects": {
+    "description": "Applications connected to the SSO. A project starts pending and only uses the SSO after an administrator activates it.",
+    "new": "New project",
+    "emptyTitle": "No projects found",
+    "emptyFiltered": "No project matches these filters.",
+    "emptyDescription": "Register the first application that will sign people in through the SSO.",
+    "createDescription": "It starts pending. After creating, add a redirect URI and a client key, then activate it.",
+    "renameTitle": "Rename project",
+    "renameDescription": "The name appears on the sign-in screen, as the application people are signing in to.",
+    "nameHint": "Unique in the SSO.",
+    "namePlaceholder": "Finance Dashboard",
+    "deleteTitle": "Delete project",
+    "deleteMessage": "The project leaves the catalogue with its identity. The SSO refuses while it still has routes or members.",
+    "created": "Project created",
+    "createdDescription": "Next: a redirect URI and a client key, then activation.",
+    "renamed": "Project renamed",
+    "deleted": "Project deleted",
+    "filters": {
+      "title": "Filters",
+      "namePlaceholder": "Search by name",
+      "anyStatus": "Any status",
+      "membersHint": "Filters the projects already loaded.",
+      "nameHas": "name has \"{term}\"",
+      "membersRange": "{min} to {max} members",
+      "none": "{count} project, no filter | {count} projects, no filter"
+    }
+  },
+  "project": {
+    "loadFailed": "The project could not be loaded",
+    "headerDescription": "{status} · registered {date}",
+    "activate": "Activate",
+    "suspend": "Suspend",
+    "activateProject": "Activate project",
+    "suspendProject": "Suspend project",
+    "activateTitle": "Activate {name}?",
+    "suspendTitle": "Suspend {name}?",
+    "activateMessage": "Applications with this client ID can start signing people in right away.",
+    "suspendMessage": "Every application with this client ID stops signing people in, and refresh tokens stop renewing. The catalogue stays as it is.",
+    "activated": "Project activated",
+    "suspended": "Project suspended",
+    "tabs": {
+      "overview": "Overview",
+      "redirects": "Redirect URIs",
+      "routes": "Routes",
+      "roles": "Roles & permissions",
+      "members": "Members",
+      "keys": "Client keys"
+    },
+    "identity": {
+      "title": "Identity",
+      "description": "How applications and people identify this project.",
+      "clientIdHint": "Public identifier. Applications send it as client_id; the proof is their private key.",
+      "lastActivated": "Last activated",
+      "lastSuspended": "Last suspended",
+      "selfNote": "This is the SSO's own project: it signs in the administrators of every application. It cannot be renamed, suspended or deleted, and only its SUPERADMIN changes its routes, roles, permissions, members, redirect URIs and keys."
+    }
+  },
+  "checklist": {
+    "title": "Ready to use the SSO",
+    "required": "Required",
+    "active": "This project is active. Applications with its client ID can sign people in.",
+    "ready": "Everything required is in place. Activating lets the application start signing people in.",
+    "notReady": "A project only uses the SSO after activation, and activation needs the required items below.",
+    "redirect": {
+      "label": "Redirect URI registered",
+      "empty": "The SSO only returns a sign-in to a registered address."
+    },
+    "key": {
+      "label": "Active client key",
+      "empty": "The application proves who it is by signing with the private half."
+    },
+    "routes": {
+      "label": "Routes registered",
+      "empty": "A route that is not in the catalogue answers 404 to everyone, as if it did not exist."
+    },
+    "grants": {
+      "label": "Routes granted to a role",
+      "done": "{count} role with permissions | {count} roles with permissions",
+      "empty": "Permissions connect a role to the routes it unlocks."
+    },
+    "members": {
+      "label": "People with access",
+      "empty": "Only members can sign in to this application."
+    }
+  },
+  "redirectUris": {
+    "title": "Redirect URIs",
+    "description": "The SSO only returns a sign-in to these addresses, compared character by character. Register each environment separately.",
+    "add": "Add redirect URI",
+    "editTitle": "Edit redirect URI",
+    "emptyTitle": "No redirect URIs yet",
+    "emptyDescription": "Without one, no application can complete a sign-in with this project.",
+    "selfNote": "This console signs in through these addresses, so they are never edited: add the new address, then delete the old one. The last address, and the one this console is using now, cannot be deleted. Only a SUPERADMIN of the SSO adds or deletes them.",
+    "dialogDescription": "Scheme, host, port and path, exactly as the application sends it. A trailing slash makes it a different address.",
+    "field": "Redirect URI",
+    "fieldHint": "Example: https://app.example.com/api/auth/callback",
+    "address": "Address",
+    "enterAddress": "Enter the address.",
+    "useHttp": "Use a full http or https address.",
+    "deleteTitle": "Delete redirect URI",
+    "deleteOnly": "{uri} is the only address of {project}. Until another one is added, nobody can sign in to it.",
+    "deleteMessage": "Applications that still send {uri} stop signing in, and codes already issued to it are refused.",
+    "added": "Redirect URI added",
+    "updated": "Redirect URI updated",
+    "deleted": "Redirect URI deleted"
+  },
+  "routes": {
+    "title": "Routes",
+    "description": "What this application exposes, grouped by path. Pick any path to see its methods and who can call it.",
+    "add": "Add route",
+    "editTitle": "Edit route",
+    "allRoutes": "All routes",
+    "filterPlaceholder": "Filter by path",
+    "filterByMethod": "Filter by method",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all",
+    "emptyDescription": "Register the routes of the application, then grant them to roles.",
+    "treeLabel": "{project} routes",
+    "selfNote": "These are the SSO's own routes. Only a SUPERADMIN of the SSO changes them.",
+    "notFoundTitle": "Route not found",
+    "notFoundDescription": "{path} is not in the {project} catalogue. It may have been renamed or deleted.",
+    "backToRoutes": "Back to routes",
+    "selectTitle": "Select a route",
+    "selectDescription": "Pick any path in the tree to see its methods, the roles that reach it and who can call it.",
+    "dialogDescription": "The path as the application declares it, without the global prefix. Use :name for parameters.",
+    "method": "Method",
+    "path": "Path",
+    "pathError": "Start with a slash and leave no spaces, like /equipment/:id.",
+    "deleteTitle": "Delete route",
+    "deleteMessage": "{method} {path} leaves the catalogue. The application then answers 404 to everyone on it, as if it did not exist.",
+    "noRoleGranted": "No role granted",
+    "added": "Route added",
+    "updated": "Route updated",
+    "deleted": "Route deleted"
+  },
+  "routeDetail": {
+    "registerPath": "Register this path",
+    "addMethod": "Add method",
+    "addSubRoute": "Add sub-route",
+    "groupLead": "Not a registered route. It gathers the {count} path below that starts with this prefix, and answers no request by itself. | Not a registered route. It gathers the {count} paths below that start with this prefix, and answers no request by itself.",
+    "topLevel": "Top level",
+    "facts": {
+      "path": "Path",
+      "parameters": "Parameters",
+      "parent": "Parent",
+      "pathsBelow": "Paths below",
+      "routeId": "{method} route ID"
+    },
+    "access": {
+      "title": "Access",
+      "description": "Which role may call each method of this path. A method no role reaches answers 404 to everyone, as if it did not exist, and a granted method cannot be deleted until its grants are removed.",
+      "emptyTitle": "No roles yet",
+      "emptyDescription": "Create a role in Roles & permissions, then grant this path to it here.",
+      "method": "Method",
+      "canCall": "Can call",
+      "granted": "Granted",
+      "notGranted": "Not granted",
+      "nobody": "Nobody",
+      "editRoute": "Edit route",
+      "deleteRoute": "Delete route"
+    },
+    "callers": {
+      "title": "Who can call it",
+      "description": "Members whose role reaches at least one method of this path, and which methods.",
+      "emptyTitle": "Nobody can call it yet",
+      "emptyGranted": "The roles that reach this path have no members yet.",
+      "emptyNotGranted": "Grant a role above. Until then, every method answers 404.",
+      "openMembers": "Open members",
+      "methods": "Methods"
+    },
+    "below": {
+      "title": "Below this path",
+      "description": "Paths that start with this one. Pick any to open it.",
+      "treeLabel": "Routes below {path}"
+    }
+  },
+  "grants": {
+    "canCall": "{role} can call {method} {path}",
+    "grantFailed": "The route could not be granted",
+    "revokeFailed": "The permission could not be removed",
+    "bulkFailed": "Not every {method} route could be granted"
+  },
+  "roles": {
+    "title": "Roles & permissions",
+    "description": "Each role unlocks the routes checked below, grouped by path. Changes apply on the next request, without anyone signing in again.",
+    "add": "Add role",
+    "emptyTitle": "No roles yet",
+    "emptyDescription": "Create the roles this application uses, then check the routes each one unlocks.",
+    "rootLead": "The SSO's SUPERADMIN is the root: it reaches every administrative route without any being checked, and it cannot be renamed or deleted.",
+    "noRoutes": "Register routes first. A role only unlocks routes that exist in the catalogue.",
+    "grantAllGet": "Grant all GET routes",
+    "allGetGranted": "Every GET route is granted to {role}.",
+    "getMissing": "{count} GET route not granted to {role} yet. | {count} GET routes not granted to {role} yet.",
+    "getGranted": "{count} GET route granted | {count} GET routes granted",
+    "treeLabel": "Routes the {role} role unlocks",
+    "openInRoutes": "Open {path} in Routes",
+    "deleteBlocked": "Uncheck every route and move the members to another role before deleting it.",
+    "rename": "Rename role",
+    "delete": "Delete role",
+    "selfNote": "These are the SSO's own roles and permissions. Only a SUPERADMIN of the SSO changes them.",
+    "addDescription": "Every project starts with SUPERADMIN, ADMIN, MANAGER and VIEWER. Add the roles {project} needs; a new role starts with no routes.",
+    "namePlaceholder": "ARCHITECT",
+    "renameDescription": "Members and permissions stay with the role. Applications only know the new name once access tokens renew, so members may be refused for up to 15 minutes.",
+    "deleteMessage": "The {role} role leaves {project}.",
+    "summaryRoot": "Reaches every route · {members}",
+    "summary": "{granted} of {routes} · {members}",
+    "inProject": "{role} in {project}",
+    "added": "Role added",
+    "renamed": "Role renamed",
+    "renamedDescription": "{previous} is now {name} in {project}",
+    "deleted": "Role deleted"
+  },
+  "members": {
+    "title": "Members",
+    "description": "Who can sign in to this application, and with which role. Each person has one role per project.",
+    "add": "Add member",
+    "emptyTitle": "No members yet",
+    "emptyDescription": "Nobody can sign in to this application yet.",
+    "emptyNoRoles": "Create a role first. Every member joins with one.",
+    "addDescription": "The person signs in to {project} with the role chosen here.",
+    "person": "Person",
+    "personHint": "Only registered people who are not members yet.",
+    "choosePerson": "Choose a person.",
+    "granted": "Granted",
+    "changeRole": "Change role",
+    "changeRoleTitle": "Change role of {name}",
+    "removeFromProject": "Remove from project",
+    "remove": "Remove member",
+    "removeTitle": "Remove {name}?",
+    "lockedNote": "Members of the SSO project administer every application. Only a SUPERADMIN of the SSO changes them.",
+    "lastRootNote": "The SSO always keeps at least one SUPERADMIN: the last one cannot change role or leave.",
+    "peopleLoadFailed": "The list of people could not be loaded",
+    "changeNoteSelf": "The new role replaces the current one and applies to the console on the next request.",
+    "changeNote": "The new role replaces the current one. Applications apply it when the access token renews, within 15 minutes.",
+    "removeSelf": "You lose access to this console right away.",
+    "removeFromSso": "{name} loses access to the SSO console on the next request.",
+    "removeMessage": "{name} stops signing in to {project}. Their refresh tokens for it are revoked now, and an access token already issued runs out within 15 minutes.",
+    "added": "Member added",
+    "roleChanged": "Role changed",
+    "roleChangedDescription": "{name} is now {role} in {project}",
+    "removed": "Member removed",
+    "removedDescription": "{name} left {project}"
+  },
+  "users": {
+    "description": "People who can sign in through the SSO. Nobody signs in without being registered here first.",
+    "search": "Search",
+    "searchHint": "Part of a name, or a complete e-mail address.",
+    "searchPlaceholder": "Marina, or marina{'@'}example.com",
+    "loadFailed": "Users could not be loaded",
+    "emptyTitle": "No users found",
+    "emptySearch": "No user matches this search.",
+    "emptyDescription": "Register the first person who will sign in through the SSO.",
+    "register": "Register user",
+    "registerDescription": "Registering does not grant access yet. Add the person to a project afterwards.",
+    "editTitle": "Edit user",
+    "namePlaceholder": "Marina Albuquerque",
+    "emailPlaceholder": "marina{'@'}example.com",
+    "googleAccount": "Google account",
+    "deleteTitle": "Delete user",
+    "deleteMessage": "{name} can no longer sign in. Registering the same e-mail again creates a new user.",
+    "updated": "User updated",
+    "registered": "User registered",
+    "registeredDescription": "They can sign in once added to a project.",
+    "deleted": "User deleted"
+  },
+  "user": {
+    "loadFailed": "The user could not be loaded",
+    "userId": "User ID",
+    "linkedHint": "Linked on the first sign-in. Another Google account with this e-mail is refused.",
+    "waitingHint": "The first Google sign-in with this e-mail links the account.",
+    "projectStatus": "Project status",
+    "addToProject": "Add to project",
+    "addDescription": "{name} signs in to the chosen project with the chosen role.",
+    "noRoles": "This project has no roles yet.",
+    "rolesLoadFailed": "The roles of this project could not be loaded",
+    "added": "Added to project",
+    "unlink": "Unlink Google account",
+    "unlinkConfirm": "Unlink account",
+    "unlinkMessage": "The next Google sign-in with this e-mail links a new account. Use it when the person changed Google accounts.",
+    "unlinked": "Google account unlinked",
+    "unlinkedDescription": "The next Google sign-in with this e-mail links a new account.",
+    "profile": {
+      "title": "Profile",
+      "description": "How this person is identified when signing in."
+    },
+    "projects": {
+      "description": "Where this person can sign in, and with which role.",
+      "emptyTitle": "No projects yet",
+      "emptyDescription": "Without a project, this person cannot sign in anywhere."
+    }
+  },
+  "clientKeys": {
+    "title": "Client keys",
+    "pageDescription": "Keys that applications sign with to prove who they are to the SSO. Every key belongs to one project.",
+    "choosePlaceholder": "Choose a project",
+    "noProjectTitle": "No project selected",
+    "noProjectDescription": "Choose a project above to see and manage its keys.",
+    "description": "Public halves the SSO uses to verify the application's signed assertions. The private half never comes back to the SSO.",
+    "registerPublic": "Register public key",
+    "generatePair": "Generate key pair",
+    "loadFailed": "Keys could not be loaded",
+    "emptyTitle": "No keys yet",
+    "emptyDescription": "The application cannot authenticate to the SSO without an active key.",
+    "registerDescription": "Generated on the application owner's machine. Only the public half is sent; the private half stays with them.",
+    "registerKey": "Register key",
+    "publicKey": "Public key",
+    "publicKeyHint": "RSA, at least 2048 bits, in PEM (SPKI) format.",
+    "pemError": "Paste the whole key, from -----BEGIN PUBLIC KEY----- to -----END PUBLIC KEY-----.",
+    "expiresOn": "Expires on",
+    "expiresHint": "Optional. Leave empty for a key without expiry.",
+    "generateKey": "Generate key",
+    "generateTitle": "Generate a key pair",
+    "generateMessage": "The SSO creates the pair, keeps only the public half and shows you the private key once. Hand it to the owner of {project} through a secure channel.",
+    "secretTitle": "Copy the private key now",
+    "secretDescription": "Private key for {project}. The application loads it from its own environment, as APP_PRIVATE_KEY_BASE64.",
+    "secretLabel": "Private key (base64, PKCS#8)",
+    "secretWarning": "This key is shown once and is not stored in the SSO. If it passes through chat, a ticket, a commit or a CI log, revoke it and generate another.",
+    "secretAcknowledge": "I stored this key in a safe place",
+    "revoke": "Revoke",
+    "revokeKey": "Revoke key",
+    "revokeTitle": "Revoke client key",
+    "revokeMessage": "Applications signing with this key stop authenticating immediately. A revoked key cannot be restored.",
+    "columns": {
+      "key": "Key",
+      "created": "Created",
+      "expires": "Expires"
+    },
+    "registered": "Public key registered",
+    "revoked": "Client key revoked"
+  }
+}

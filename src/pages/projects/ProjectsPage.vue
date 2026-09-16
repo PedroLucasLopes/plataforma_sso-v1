@@ -2,9 +2,9 @@
   <div class="page">
     <DlPageHeader
       :actions="headerActions"
-      :breadcrumbs="[{ label: 'Catalogue' }, { label: 'Projects' }]"
-      description="Applications connected to the SSO. A project starts pending and only uses the SSO after an administrator activates it."
-      title="Projects"
+      :breadcrumbs="[{ label: t('nav.catalogue') }, { label: t('common.projects') }]"
+      :description="t('projects.description')"
+      :title="t('common.projects')"
       :with-menu="false"
       @action="dialog.openCreate()"
     />
@@ -14,26 +14,26 @@
         <div class="toolbar">
           <DlTextField
             icon="mdi-magnify"
-            label="Name"
+            :label="t('common.name')"
             :model-value="search"
-            placeholder="Search by name"
+            :placeholder="t('projects.filters.namePlaceholder')"
             :reserve-error="false"
             @update:model-value="value => { search = asText(value); page = 1 }"
           />
 
           <DlSelect
-            label="Status"
+            :label="t('common.status')"
             :model-value="statuses"
             multiple
             :options="statusOptions"
-            placeholder="Any status"
+            :placeholder="t('projects.filters.anyStatus')"
             @update:model-value="value => { statuses = asOptions(value); page = 1 }"
           />
 
           <DlRange
             v-model="members"
-            hint="Filters the projects already loaded."
-            label="Members"
+            :hint="t('projects.filters.membersHint')"
+            :label="t('common.members')"
             :max="maxMembers"
             :min="0"
             slider-only
@@ -47,18 +47,18 @@
       v-if="catalog.state.projects.error && !catalog.state.projects.loaded"
       :description="catalog.state.projects.error"
       icon="mdi-cloud-alert-outline"
-      title="Projects could not be loaded"
+      :title="t('common.projectsLoadFailed')"
       tone="error"
     >
-      <DlButton icon="mdi-refresh" variant="outlined" @click="reload">Try again</DlButton>
+      <DlButton icon="mdi-refresh" variant="outlined" @click="reload">{{ t('common.tryAgain') }}</DlButton>
     </DlEmptyState>
 
     <DlDataTable
       v-else
       :actions="rowActions"
       :columns="columns"
-      :empty-description="hasFilters ? 'No project matches these filters.' : 'Register the first application that will sign people in through the SSO.'"
-      empty-title="No projects found"
+      :empty-description="hasFilters ? t('projects.emptyFiltered') : t('projects.emptyDescription')"
+      :empty-title="t('projects.emptyTitle')"
       :limit="pageLimit"
       :loading="catalog.state.projects.loading && !catalog.state.projects.loaded"
       :page="page"
@@ -78,27 +78,27 @@
           variant="tonal"
           @click="dialog.openCreate()"
         >
-          New project
+          {{ t('projects.new') }}
         </DlButton>
       </template>
     </DlDataTable>
 
     <DlFormDialog
       v-model="dialog.open"
-      :description="dialog.mode === 'create' ? 'It starts pending. After creating, add a redirect URI and a client key, then activate it.' : 'The name appears on the sign-in screen, as the application people are signing in to.'"
+      :description="dialog.mode === 'create' ? t('projects.createDescription') : t('projects.renameDescription')"
       :dirty="dialog.dirty"
       :error="dialog.error"
       :mode="dialog.mode"
       :submitting="dialog.submitting"
-      :title="dialog.mode === 'create' ? 'New project' : 'Rename project'"
+      :title="dialog.mode === 'create' ? t('projects.new') : t('projects.renameTitle')"
       @submit="save"
     >
       <DlTextField
-        :error="dialog.attempted && !dialog.form.name.trim() ? 'Enter a name.' : null"
-        hint="Unique in the SSO."
-        label="Name"
+        :error="dialog.attempted && !dialog.form.name.trim() ? t('common.enterName') : null"
+        :hint="t('projects.nameHint')"
+        :label="t('common.name')"
         :model-value="dialog.form.name"
-        placeholder="Finance Dashboard"
+        :placeholder="t('projects.namePlaceholder')"
         required
         @update:model-value="value => (dialog.form.name = asText(value))"
       />
@@ -106,13 +106,13 @@
 
     <DlConfirmDialog
       v-model="removal.open"
-      confirm-label="Delete project"
+      :confirm-label="t('projects.deleteTitle')"
       destructive
       :error="removal.error"
-      message="The project leaves the catalogue with its identity. The SSO refuses while it still has routes or members."
+      :message="t('projects.deleteMessage')"
       :processing="removal.processing"
       :require-text="removal.target?.name ?? null"
-      title="Delete project"
+      :title="t('projects.deleteTitle')"
       @confirm="remove"
     />
   </div>
@@ -138,6 +138,7 @@
     toast,
   } from '@pedrolucaslopes/dotlog-ui'
   import { computed, onMounted, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
   import { useConfirm } from '@/composables/useConfirm'
   import { useCrudDialog } from '@/composables/useCrudDialog'
@@ -147,7 +148,7 @@
   import { useCatalogStore } from '@/stores/catalog'
   import { useProjectsStore } from '@/stores/projects'
   import { useSessionStore } from '@/stores/session'
-  import { plural, shortId } from '@/utils/format'
+  import { shortId } from '@/utils/format'
   import { asOptions, asText } from '@/utils/forms'
 
   /**
@@ -155,6 +156,7 @@
    * inteira vem do catalogo e filtra no navegador, o que permite filtrar por
    * situacao e por membros, coisa que o backend nao oferece.
    */
+  const { t, locale } = useI18n()
   const router = useRouter()
   const session = useSessionStore()
   const catalog = useCatalogStore()
@@ -184,12 +186,13 @@
   const columns = computed(() =>
     inferColumns(rows.value, {
       only: ['name', 'status', 'members', 'clientId', 'createdAt'],
+      locale: locale.value,
       overrides: {
-        name: { label: 'Project' },
-        status: { label: 'Status', width: '150px' },
-        members: { label: 'Members', width: '110px' },
-        clientId: { label: 'Client ID', format: row => shortId(String(row.clientId), 12) },
-        createdAt: { label: 'Registered', width: '150px' },
+        name: { label: t('common.project') },
+        status: { label: t('common.status'), width: '150px' },
+        members: { label: t('common.members'), width: '110px' },
+        clientId: { label: t('common.clientId'), format: row => shortId(String(row.clientId), 12) },
+        createdAt: { label: t('common.registered'), width: '150px' },
       },
     }),
   )
@@ -209,10 +212,10 @@
     members.value = [0, max]
   }, { immediate: true })
 
-  const statusOptions = (Object.keys(PROJECT_STATUS) as ProjectStatus[]).map(status => ({
+  const statusOptions = computed(() => (Object.keys(PROJECT_STATUS) as ProjectStatus[]).map(status => ({
     title: PROJECT_STATUS[status].label,
     value: status,
-  }))
+  })))
 
   const hasFilters = computed(() =>
     !!search.value.trim()
@@ -225,22 +228,24 @@
     const parts: string[] = []
 
     if (search.value.trim()) {
-      parts.push(`name has "${search.value.trim()}"`)
+      parts.push(t('projects.filters.nameHas', { term: search.value.trim() }))
     }
 
     if (statuses.value.length > 0) {
-      parts.push(statuses.value.map(status => PROJECT_STATUS[status as ProjectStatus]?.label ?? status).join(' or '))
+      const labels = statuses.value.map(status => PROJECT_STATUS[status as ProjectStatus]?.label ?? status)
+
+      parts.push(new Intl.ListFormat(locale.value, { type: 'disjunction' }).format(labels))
     }
 
     if (members.value[0] > 0 || members.value[1] < maxMembers.value) {
-      parts.push(`${members.value[0]} to ${members.value[1]} members`)
+      parts.push(t('projects.filters.membersRange', { min: members.value[0], max: members.value[1] }))
     }
 
     return [{
       key: 'filters',
-      title: 'Filters',
+      title: t('projects.filters.title'),
       icon: 'mdi-filter-variant',
-      summary: parts.length > 0 ? parts.join(' · ') : `${plural(rows.value.length, 'project')}, no filter`,
+      summary: parts.length > 0 ? parts.join(' · ') : t('projects.filters.none', rows.value.length),
     }]
   })
 
@@ -267,17 +272,17 @@
 
   /* -------------------------------- acoes -------------------------------- */
 
-  const headerActions: HeaderAction[] = [
-    { key: 'create', label: 'New project', icon: 'mdi-plus', method: 'POST', path: '/project' },
-  ]
+  const headerActions = computed<HeaderAction[]>(() => [
+    { key: 'create', label: t('projects.new'), icon: 'mdi-plus', method: 'POST', path: '/project' },
+  ])
 
   /** O projeto do proprio SSO nao se renomeia nem se apaga. O servidor recusa; a tela nem oferece. */
   const isSelf = (row: ProjectRow): boolean => row.name === SELF_PROJECT_NAME
 
-  const rowActions: RowAction<ProjectRow>[] = [
-    { key: 'rename', label: 'Rename', icon: 'mdi-pencil-outline', method: 'PUT', path: '/project/:id', unavailable: isSelf },
-    { key: 'delete', label: 'Delete', icon: 'mdi-delete-outline', method: 'DELETE', path: '/project/:id', color: 'error', unavailable: isSelf },
-  ]
+  const rowActions = computed<RowAction<ProjectRow>[]>(() => [
+    { key: 'rename', label: t('common.rename'), icon: 'mdi-pencil-outline', method: 'PUT', path: '/project/:id', unavailable: isSelf },
+    { key: 'delete', label: t('common.delete'), icon: 'mdi-delete-outline', method: 'DELETE', path: '/project/:id', color: 'error', unavailable: isSelf },
+  ])
 
   const dialog = useCrudDialog(() => ({ name: '' }))
   const removal = useConfirm<ProjectRow>()
@@ -310,10 +315,10 @@
     }
 
     if (result.created) {
-      toast.success('Project created', { description: 'Next: a redirect URI and a client key, then activation.' })
+      toast.success(t('projects.created'), { description: t('projects.createdDescription') })
       await router.push({ name: 'project', params: { id: result.created.id } })
     } else {
-      toast.success('Project renamed')
+      toast.success(t('projects.renamed'))
     }
   }
 
@@ -324,7 +329,7 @@
     })
 
     if (ok) {
-      toast.success('Project deleted')
+      toast.success(t('projects.deleted'))
     }
   }
 

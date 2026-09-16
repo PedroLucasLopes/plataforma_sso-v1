@@ -69,7 +69,7 @@ export const useProjectsStore = defineStore('projects', () => {
     delete projects.value[projectId]
     delete overviews.value[projectId]
 
-    catalog.invalidate('projects', 'roles', 'routes')
+    catalog.invalidate('projects', 'routes')
   }
 
   async function setStatus (projectId: string, status: ProjectStatus, withOverview: boolean): Promise<void> {
@@ -113,30 +113,75 @@ export const useProjectsStore = defineStore('projects', () => {
 
   async function addRole (projectId: string, name: RoleName): Promise<void> {
     await rolesApi.create({ projectId, name })
-    catalog.invalidate('roles')
+    await fetchOverview(projectId)
+  }
+
+  async function renameRole (projectId: string, roleId: string, name: RoleName): Promise<void> {
+    await rolesApi.update(roleId, { name })
     await fetchOverview(projectId)
   }
 
   async function removeRole (projectId: string, roleId: string): Promise<void> {
     await rolesApi.remove(roleId)
-    catalog.invalidate('roles')
     await fetchOverview(projectId)
   }
 
   async function grant (projectId: string, roleId: string, routeId: string): Promise<void> {
     await permissionsApi.grant({ roleId, routeId })
-    catalog.invalidate('roles', 'routes')
+    catalog.invalidate('routes')
     await fetchOverview(projectId)
+  }
+
+  /**
+   * Varias rotas para o mesmo papel, uma chamada por rota, em sequencia. Para
+   * na primeira falha, e o overview e relido uma vez so, no fim, inclusive
+   * quando algo falha: a tela mostra o que de fato ficou gravado.
+   */
+  async function grantMany (projectId: string, roleId: string, routeIds: string[]): Promise<number> {
+    let granted = 0
+    let failure: unknown = null
+
+    for (const routeId of routeIds) {
+      try {
+        await permissionsApi.grant({ roleId, routeId })
+        granted += 1
+      } catch (error) {
+        failure = error
+
+        break
+      }
+    }
+
+    catalog.invalidate('routes')
+    await fetchOverview(projectId)
+
+    if (failure) {
+      throw failure
+    }
+
+    return granted
   }
 
   async function revokePermission (projectId: string, permissionId: string): Promise<void> {
     await permissionsApi.revoke(permissionId)
-    catalog.invalidate('roles', 'routes')
+    catalog.invalidate('routes')
     await fetchOverview(projectId)
   }
 
   async function addMember (projectId: string, userId: string, roleId: string): Promise<void> {
     await membersApi.add({ projectId, userId, roleId })
+    catalog.invalidate('projects', 'users')
+    await fetchOverview(projectId)
+  }
+
+  async function changeMemberRole (projectId: string, userId: string, roleId: string): Promise<void> {
+    await membersApi.changeRole(projectId, userId, roleId)
+    catalog.invalidate('projects', 'users')
+    await fetchOverview(projectId)
+  }
+
+  async function removeMember (projectId: string, userId: string): Promise<void> {
+    await membersApi.remove(projectId, userId)
     catalog.invalidate('projects', 'users')
     await fetchOverview(projectId)
   }
@@ -158,9 +203,13 @@ export const useProjectsStore = defineStore('projects', () => {
     updateRoute,
     removeRoute,
     addRole,
+    renameRole,
     removeRole,
     grant,
+    grantMany,
     revokePermission,
     addMember,
+    changeMemberRole,
+    removeMember,
   }
 })

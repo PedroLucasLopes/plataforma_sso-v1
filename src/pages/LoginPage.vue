@@ -14,9 +14,10 @@
   import type { LoginRequestView } from '@/types/sso'
   import { DlSignIn, type SignInError, type SignInProvider } from '@pedrolucaslopes/dotlog-ui'
   import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute } from 'vue-router'
   import { APP_NAME } from '@/constants/layout'
-  import { GENERIC_LOGIN_ERROR, LOGIN_ERRORS, PROVIDER_ICONS } from '@/constants/messages'
+  import { loginError, PROVIDER_ICONS } from '@/constants/messages'
   import { ApiError } from '@/services/http'
   import { sessionApi } from '@/services/sso'
   import { queryString } from '@/utils/format'
@@ -29,6 +30,7 @@
    * aplicacao. O SSO garante o mesmo do lado dele: sem pedido, ir ao Google
    * devolve a pessoa para ca, e o pedido nunca e criado por esta tela.
    */
+  const { t } = useI18n()
   const route = useRoute()
 
   const state = ref<'loading' | 'ready' | 'blocked'>('loading')
@@ -39,8 +41,8 @@
   const error = computed<SignInError | null>(() => {
     if (unavailable.value) {
       return {
-        title: 'The SSO is not responding',
-        description: 'Nothing was changed. Reload this page in a moment.',
+        title: t('login.unavailable.title'),
+        description: t('login.unavailable.description'),
       }
     }
 
@@ -56,7 +58,7 @@
     }
 
     // So codigo conhecido vira texto. O que vier fora da lista nao e ecoado.
-    return LOGIN_ERRORS[code] ?? GENERIC_LOGIN_ERROR
+    return loginError(code)
   })
 
   const providers = computed<SignInProvider[]>(() =>

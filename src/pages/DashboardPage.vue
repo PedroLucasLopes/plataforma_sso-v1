@@ -1,12 +1,12 @@
 <template>
   <div class="page">
     <DlPageHeader
-      description="The state of the SSO catalogue, from what your role can read."
+      :description="t('dashboard.description')"
       :title="greeting"
       :with-menu="false"
     />
 
-    <section v-if="stats.length > 0" aria-label="Catalogue totals" class="stats">
+    <section v-if="stats.length > 0" :aria-label="t('dashboard.totals')" class="stats">
       <DlStatCard
         v-for="stat in stats"
         :key="stat.key"
@@ -23,23 +23,23 @@
 
     <DlEmptyState
       v-else
-      description="Your role opens the console, but does not read any part of the catalogue."
+      :description="t('dashboard.nothingDescription')"
       icon="mdi-eye-off-outline"
-      title="Nothing to show yet"
+      :title="t('dashboard.nothingTitle')"
     />
 
-    <section v-if="canProjects" aria-label="Project charts" class="charts">
+    <section v-if="canProjects" :aria-label="t('dashboard.charts')" class="charts">
       <DlChartFrame
-        :description="plural(projects.length, 'project')"
+        :description="t('counts.projects', projects.length)"
         :empty="projectsState.ready && (projects.length === 0 || !!projectsState.error)"
-        :empty-message="projectsState.error ?? 'No projects registered yet.'"
+        :empty-message="projectsState.error ?? t('dashboard.byStatus.empty')"
         :loading="projectsState.loading"
         :series="statusSeries"
-        :table-headers="['Status', 'Projects', 'Share']"
+        :table-headers="[t('common.status'), t('common.projects'), t('dashboard.byStatus.share')]"
         :table-rows="statusRows"
-        title="Projects by status"
+        :title="t('dashboard.byStatus.title')"
       >
-        <DlDonutChart :data="statusSlices" total-label="Projects" />
+        <DlDonutChart :data="statusSlices" :total-label="t('common.projects')" />
 
         <template #loading>
           <div class="chart-placeholder">
@@ -49,14 +49,14 @@
       </DlChartFrame>
 
       <DlChartFrame
-        description="Top 8 by number of members"
+        :description="t('dashboard.members.description')"
         :empty="projectsState.ready && memberBars.length === 0"
-        :empty-message="projectsState.error ?? 'No project has members yet.'"
+        :empty-message="projectsState.error ?? t('dashboard.members.empty')"
         :loading="projectsState.loading"
         :series="memberSeries"
-        :table-headers="['Project', 'Members']"
+        :table-headers="[t('common.project'), t('common.members')]"
         :table-rows="memberRows"
-        title="Members per project"
+        :title="t('dashboard.members.title')"
       >
         <DlBarChart :data="memberBars" />
 
@@ -67,14 +67,14 @@
 
       <DlChartFrame
         class="charts__wide"
-        description="Last 12 months"
+        :description="t('dashboard.growth.description')"
         :empty="projectsState.ready && (projects.length === 0 || !!projectsState.error)"
-        :empty-message="projectsState.error ?? 'No projects registered yet.'"
+        :empty-message="projectsState.error ?? t('dashboard.byStatus.empty')"
         :loading="projectsState.loading"
         :series="growthSeries"
-        :table-headers="['Month', 'Projects registered']"
+        :table-headers="[t('dashboard.growth.month'), t('dashboard.growth.title')]"
         :table-rows="growthRows"
-        title="Projects registered"
+        :title="t('dashboard.growth.title')"
       >
         <DlAreaChart filled :labels="months.map(month => month.label)" :series="growthSeries" />
 
@@ -87,18 +87,18 @@
     <DlSectionCard
       v-if="canProjects"
       :count="pending.length"
-      description="Registered in the catalogue, but unable to use the SSO until an administrator activates them."
+      :description="t('dashboard.pending.description')"
       :padded="!projectsState.ready || pending.length === 0"
-      title="Waiting for activation"
+      :title="t('dashboard.pending.title')"
     >
       <DlSkeleton v-if="projectsState.loading" height="36px" :lines="3" />
 
       <DlEmptyState
         v-else-if="pending.length === 0"
         compact
-        description="Every registered project is active, or was suspended on purpose."
+        :description="t('dashboard.pending.emptyDescription')"
         icon="mdi-check-all"
-        title="Nothing waiting"
+        :title="t('dashboard.pending.emptyTitle')"
         tone="success"
       />
 
@@ -138,6 +138,7 @@
     toast,
   } from '@pedrolucaslopes/dotlog-ui'
   import { computed, onMounted } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
   import { LOOKUP_LIMIT, STAT_CARD_MIN_WIDTH } from '@/constants/layout'
   import { PROJECT_STATUS } from '@/constants/status'
@@ -146,13 +147,14 @@
   import { type CatalogKind, useCatalogStore } from '@/stores/catalog'
   import { usePreferencesStore } from '@/stores/preferences'
   import { useSessionStore } from '@/stores/session'
-  import { firstName, plural } from '@/utils/format'
+  import { firstName } from '@/utils/format'
 
   /**
    * Painel de entrada. Cada indicador e grafico so aparece para quem pode ler
    * o recurso de onde ele sai; um cartao com "—" para quem nao pode ver usuarios
    * so apontaria o que a pessoa nao alcanca.
    */
+  const { t, locale } = useI18n()
   const router = useRouter()
   const session = useSessionStore()
   const catalog = useCatalogStore()
@@ -162,7 +164,7 @@
   const canUsers = computed(() => session.can('GET', '/user'))
   const canRoutes = computed(() => session.can('GET', '/route'))
 
-  const greeting = computed(() => (session.me ? `Welcome back, ${firstName(session.me.name)}` : 'Overview'))
+  const greeting = computed(() => (session.me ? t('dashboard.welcome', { name: firstName(session.me.name) }) : t('nav.overview')))
 
   const theme = computed(() => (preferences.isDark ? 'dark' : 'light'))
 
@@ -202,17 +204,17 @@
       list.push(
         {
           key: 'projects',
-          label: 'Projects',
+          label: t('dashboard.stats.projects'),
           value: projectsState.value.error ? null : count(projects.value.length),
           icon: 'mdi-apps',
           tone: 'primary',
-          hint: waiting ? `${waiting} waiting for activation` : 'None waiting for activation',
+          hint: waiting ? t('dashboard.stats.waiting', { count: waiting }) : t('dashboard.stats.noneWaiting'),
           loading: projectsState.value.loading,
           to: '/projects',
         },
         {
           key: 'active',
-          label: 'Active projects',
+          label: t('dashboard.stats.activeProjects'),
           value: projectsState.value.error ? null : projects.value.filter(project => project.status === 'ACTIVE').length,
           icon: 'mdi-check-circle-outline',
           tone: 'success',
@@ -226,11 +228,11 @@
 
       list.push({
         key: 'users',
-        label: 'Users',
+        label: t('dashboard.stats.users'),
         value: stateOf('users').error ? null : count(users.length),
         icon: 'mdi-account-multiple-outline',
         tone: 'info',
-        hint: `${users.filter(user => user.authId).length} already signed in once`,
+        hint: t('dashboard.stats.signedIn', { count: users.filter(user => user.authId).length }),
         loading: stateOf('users').loading,
         to: '/users',
       })
@@ -239,12 +241,12 @@
     if (canRoutes.value) {
       list.push({
         key: 'routes',
-        label: 'Routes',
+        label: t('dashboard.stats.routes'),
         value: stateOf('routes').error ? null : count(catalog.routes.length),
         icon: 'mdi-sitemap-outline',
         tone: 'neutral',
         // Sem link: rota nao tem tela propria. Ela mora dentro de cada projeto, em arvore.
-        hint: 'Managed inside each project',
+        hint: t('dashboard.stats.routesHint'),
         loading: stateOf('routes').loading,
       })
     }
@@ -290,17 +292,17 @@
       .slice(0, 8),
   )
 
-  const memberSeries = computed(() => [{ label: 'Members', color: memberColor.value }])
+  const memberSeries = computed(() => [{ label: t('common.members'), color: memberColor.value }])
 
   const memberRows = computed(() => memberBars.value.map(item => [item.label, String(item.value)]))
 
   /* ---------------------------- crescimento ---------------------------- */
 
-  const MONTH = new Intl.DateTimeFormat('en-US', { month: 'short' })
-  const MONTH_YEAR = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' })
-
   const months = computed(() => {
     const now = new Date()
+    // Na lingua da tela: o eixo e a tabela trocam de mes junto com o resto.
+    const MONTH = new Intl.DateTimeFormat(locale.value, { month: 'short' })
+    const MONTH_YEAR = new Intl.DateTimeFormat(locale.value, { month: 'short', year: 'numeric' })
 
     return Array.from({ length: 12 }, (_, index) => {
       const date = new Date(now.getFullYear(), now.getMonth() - 11 + index, 1)
@@ -320,7 +322,7 @@
   )
 
   const growthSeries = computed(() => [
-    { label: 'Projects', color: seriesColor(0, preferences.isDark), values: growthValues.value },
+    { label: t('common.projects'), color: seriesColor(0, preferences.isDark), values: growthValues.value },
   ])
 
   const growthRows = computed(() => months.value.map((month, index) => [month.long, String(growthValues.value[index] ?? 0)]))
@@ -343,10 +345,11 @@
   const pendingColumns = computed<Column<PendingRow>[]>(() =>
     inferColumns(pending.value, {
       omit: ['id'],
+      locale: locale.value,
       overrides: {
-        name: { label: 'Project' },
-        status: { label: 'Status', width: '150px' },
-        createdAt: { label: 'Registered', width: '170px' },
+        name: { label: t('common.project') },
+        status: { label: t('common.status'), width: '150px' },
+        createdAt: { label: t('common.registered'), width: '170px' },
       },
     }),
   )
@@ -362,7 +365,7 @@
     const failure = results.find((result): result is PromiseRejectedResult => result.status === 'rejected')
 
     if (failure) {
-      toast.error('Part of the overview could not be loaded', { description: errorMessage(failure.reason) })
+      toast.error(t('dashboard.loadFailed'), { description: errorMessage(failure.reason) })
     }
   })
 </script>

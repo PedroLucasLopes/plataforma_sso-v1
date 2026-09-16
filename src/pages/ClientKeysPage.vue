@@ -1,19 +1,19 @@
 <template>
   <div class="page">
     <DlPageHeader
-      :breadcrumbs="[{ label: 'Credentials' }, { label: 'Client keys' }]"
-      description="Keys that applications sign with to prove who they are to the SSO. Every key belongs to one project."
-      title="Client keys"
+      :breadcrumbs="[{ label: t('nav.credentials') }, { label: t('clientKeys.title') }]"
+      :description="t('clientKeys.pageDescription')"
+      :title="t('clientKeys.title')"
       :with-menu="false"
     />
 
     <div class="toolbar">
       <DlSelect
-        label="Project"
+        :label="t('common.project')"
         :loading="catalog.state.projects.loading"
         :model-value="selectedId"
         :options="projectOptions"
-        placeholder="Choose a project"
+        :placeholder="t('clientKeys.choosePlaceholder')"
         @update:model-value="select"
       />
     </div>
@@ -22,9 +22,9 @@
 
     <DlEmptyState
       v-else
-      description="Choose a project above to see and manage its keys."
+      :description="t('clientKeys.noProjectDescription')"
       icon="mdi-key-variant"
-      title="No project selected"
+      :title="t('clientKeys.noProjectTitle')"
     />
   </div>
 </template>
@@ -32,6 +32,7 @@
 <script lang="ts" setup>
   import { DlEmptyState, DlPageHeader, DlSelect, toast } from '@pedrolucaslopes/dotlog-ui'
   import { computed, onMounted } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
   import ClientKeysPanel from '@/components/ClientKeysPanel.vue'
   import { errorMessage } from '@/services/http'
@@ -40,6 +41,7 @@
   import { asOption } from '@/utils/forms'
 
   /** O projeto escolhido fica na URL: o link leva direto as chaves dele. */
+  const { t } = useI18n()
   const route = useRoute()
   const router = useRouter()
   const catalog = useCatalogStore()
@@ -58,7 +60,7 @@
 
   onMounted(() => {
     catalog.ensure('projects').catch(error => {
-      toast.error('Projects could not be loaded', { description: errorMessage(error) })
+      toast.error(t('common.projectsLoadFailed'), { description: errorMessage(error) })
     })
   })
 </script>

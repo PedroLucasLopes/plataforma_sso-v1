@@ -17,7 +17,6 @@ import type {
   RedirectUri,
   Role,
   RoleInput,
-  RoleName,
   Route,
   RouteInput,
   SessionView,
@@ -73,9 +72,8 @@ export const routesApi = {
   remove: (routeId: string) => request<void>(`/route/${id(routeId)}`, { method: 'DELETE' }),
 }
 
+/** Sem listagem: papel mora no projeto, e chega no overview dele. */
 export const rolesApi = {
-  list: (query: ListQuery & { name?: RoleName } = {}) =>
-    request<Role[]>('/role', { query, emptyOn404: true }),
   create: (body: RoleInput) => request<Role>('/role', { method: 'POST', body }),
   update: (roleId: string, body: Partial<RoleInput>) =>
     request<Role>(`/role/${id(roleId)}`, { method: 'PUT', body }),
@@ -89,9 +87,16 @@ export const permissionsApi = {
     request<void>(`/permission/${id(permissionId)}`, { method: 'DELETE' }),
 }
 
+/** O vinculo e identificado pelo par projeto e pessoa, que e a chave dele no banco. */
 export const membersApi = {
   add: (body: { userId: string, projectId: string, roleId: string }) =>
     request<void>('/projectuser', { method: 'POST', body }),
+  /** Um papel por pessoa por projeto: o novo substitui o anterior. */
+  changeRole: (projectId: string, userId: string, roleId: string) =>
+    request<void>(`/projectuser/${id(projectId)}/${id(userId)}`, { method: 'PUT', body: { roleId } }),
+  /** Tira a pessoa do projeto e revoga os refresh tokens dela ali. */
+  remove: (projectId: string, userId: string) =>
+    request<void>(`/projectuser/${id(projectId)}/${id(userId)}`, { method: 'DELETE' }),
 }
 
 export const redirectUrisApi = {

@@ -2,7 +2,7 @@
   <div class="page">
     <DlPageHeader
       :actions="headerActions"
-      :breadcrumbs="[{ label: 'Projects', to: '/projects' }, { label: title }]"
+      :breadcrumbs="[{ label: t('common.projects'), to: '/projects' }, { label: title }]"
       :description="headerDescription"
       :title="title"
       :with-menu="false"
@@ -16,15 +16,15 @@
       v-else-if="loadError && !project"
       :description="loadError"
       icon="mdi-alert-circle-outline"
-      title="The project could not be loaded"
+      :title="t('project.loadFailed')"
       tone="error"
     >
-      <DlButton icon="mdi-refresh" variant="outlined" @click="load">Try again</DlButton>
+      <DlButton icon="mdi-refresh" variant="outlined" @click="load">{{ t('common.tryAgain') }}</DlButton>
     </DlEmptyState>
 
     <DlTabs v-else-if="project" v-model="tab" :tabs="tabs">
       <template #overview>
-        <DlSectionCard description="How applications and people identify this project." title="Identity">
+        <DlSectionCard :description="t('project.identity.description')" :title="t('project.identity.title')">
           <DlDescriptionList :items="identityItems">
             <template #item-status>
               <DlStatusChip :map="PROJECT_STATUS" size="default" :status="project.status" />
@@ -32,9 +32,7 @@
           </DlDescriptionList>
 
           <template v-if="isSelf" #footer>
-            This is the SSO's own project: it signs in the administrators of every application. It cannot be
-            renamed, suspended or deleted, and its routes, roles and permissions change only through
-            scripts/bootstrap-sso.js.
+            {{ t('project.identity.selfNote') }}
           </template>
         </DlSectionCard>
 
@@ -70,17 +68,17 @@
 
     <DlFormDialog
       v-model="renameDialog.open"
-      description="The name appears on the sign-in screen, as the application people are signing in to."
+      :description="t('projects.renameDescription')"
       :dirty="renameDialog.dirty"
       :error="renameDialog.error"
       mode="edit"
       :submitting="renameDialog.submitting"
-      title="Rename project"
+      :title="t('projects.renameTitle')"
       @submit="rename"
     >
       <DlTextField
-        :error="renameDialog.attempted && !renameDialog.form.name.trim() ? 'Enter a name.' : null"
-        label="Name"
+        :error="renameDialog.attempted && !renameDialog.form.name.trim() ? t('common.enterName') : null"
+        :label="t('common.name')"
         :model-value="renameDialog.form.name"
         required
         @update:model-value="value => (renameDialog.form.name = asText(value))"
@@ -89,26 +87,24 @@
 
     <DlConfirmDialog
       v-model="statusChange.open"
-      :confirm-label="statusChange.target === 'ACTIVE' ? 'Activate project' : 'Suspend project'"
+      :confirm-label="statusChange.target === 'ACTIVE' ? t('project.activateProject') : t('project.suspendProject')"
       :destructive="statusChange.target === 'SUSPENDED'"
       :error="statusChange.error"
-      :message="statusChange.target === 'ACTIVE'
-        ? 'Applications with this client ID can start signing people in right away.'
-        : 'Every application with this client ID stops signing people in, and refresh tokens stop renewing. The catalogue stays as it is.'"
+      :message="statusChange.target === 'ACTIVE' ? t('project.activateMessage') : t('project.suspendMessage')"
       :processing="statusChange.processing"
-      :title="statusChange.target === 'ACTIVE' ? `Activate ${title}?` : `Suspend ${title}?`"
+      :title="statusChange.target === 'ACTIVE' ? t('project.activateTitle', { name: title }) : t('project.suspendTitle', { name: title })"
       @confirm="applyStatus"
     />
 
     <DlConfirmDialog
       v-model="removal.open"
-      confirm-label="Delete project"
+      :confirm-label="t('projects.deleteTitle')"
       destructive
       :error="removal.error"
-      message="The project leaves the catalogue with its identity. The SSO refuses while it still has routes or members."
+      :message="t('projects.deleteMessage')"
       :processing="removal.processing"
       :require-text="removal.target?.name ?? null"
-      title="Delete project"
+      :title="t('projects.deleteTitle')"
       @confirm="remove"
     />
   </div>
@@ -134,6 +130,7 @@
     toast,
   } from '@pedrolucaslopes/dotlog-ui'
   import { computed, onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
   import ClientKeysPanel from '@/components/ClientKeysPanel.vue'
   import ActivationChecklist from '@/components/project/ActivationChecklist.vue'
@@ -159,6 +156,7 @@
    * O overview, que alimenta as abas de gestao, exige papel de administracao.
    * Quem so le o catalogo ve a identidade e mais nada, e as abas somem juntas.
    */
+  const { t } = useI18n()
   const route = useRoute()
   const router = useRouter()
   const session = useSessionStore()
@@ -206,11 +204,11 @@
     },
   })
 
-  const title = computed(() => project.value?.name ?? 'Project')
+  const title = computed(() => project.value?.name ?? t('pageTitles.project'))
 
   const headerDescription = computed(() =>
     project.value
-      ? `${PROJECT_STATUS[project.value.status].label} · registered ${formatDate(project.value.createdAt)}`
+      ? t('project.headerDescription', { status: PROJECT_STATUS[project.value.status].label, date: formatDate(project.value.createdAt) })
       : undefined,
   )
 
@@ -219,14 +217,14 @@
     const current = overview.value
 
     return [
-      { key: 'overview', label: 'Overview', icon: 'mdi-information-outline' },
-      { key: 'redirects', label: 'Redirect URIs', icon: 'mdi-link-variant', count: current?.redirectUriRecords.length, permission },
-      { key: 'routes', label: 'Routes', icon: 'mdi-sitemap-outline', count: current?.routes.length, permission },
-      { key: 'roles', label: 'Roles & permissions', icon: 'mdi-shield-account-outline', count: current?.roles.length, permission },
-      { key: 'members', label: 'Members', icon: 'mdi-account-multiple-outline', count: current?.users.length, permission },
+      { key: 'overview', label: t('project.tabs.overview'), icon: 'mdi-information-outline' },
+      { key: 'redirects', label: t('project.tabs.redirects'), icon: 'mdi-link-variant', count: current?.redirectUriRecords.length, permission },
+      { key: 'routes', label: t('project.tabs.routes'), icon: 'mdi-sitemap-outline', count: current?.routes.length, permission },
+      { key: 'roles', label: t('project.tabs.roles'), icon: 'mdi-shield-account-outline', count: current?.roles.length, permission },
+      { key: 'members', label: t('project.tabs.members'), icon: 'mdi-account-multiple-outline', count: current?.users.length, permission },
       {
         key: 'keys',
-        label: 'Client keys',
+        label: t('project.tabs.keys'),
         icon: 'mdi-key-variant',
         count: current?.clientKeys.filter(key => keyState(key) === 'ACTIVE').length,
         permission: { method: 'GET', path: '/clientkey' },
@@ -242,19 +240,19 @@
     }
 
     return [
-      { key: 'name', label: 'Name', value: current.name },
-      { key: 'status', label: 'Status', value: current.status },
+      { key: 'name', label: t('common.name'), value: current.name },
+      { key: 'status', label: t('common.status'), value: current.status },
       {
         key: 'clientId',
-        label: 'Client ID',
+        label: t('common.clientId'),
         value: current.clientId,
         mono: true,
         copyable: true,
-        hint: 'Public identifier. Applications send it as client_id; the proof is their private key.',
+        hint: t('project.identity.clientIdHint'),
       },
-      { key: 'createdAt', label: 'Registered', value: formatDateTime(current.createdAt) },
-      { key: 'activatedAt', label: 'Last activated', value: current.activatedAt ? formatDateTime(current.activatedAt) : null },
-      { key: 'suspendedAt', label: 'Last suspended', value: current.suspendedAt ? formatDateTime(current.suspendedAt) : null },
+      { key: 'createdAt', label: t('common.registered'), value: formatDateTime(current.createdAt) },
+      { key: 'activatedAt', label: t('project.identity.lastActivated'), value: current.activatedAt ? formatDateTime(current.activatedAt) : null },
+      { key: 'suspendedAt', label: t('project.identity.lastSuspended'), value: current.suspendedAt ? formatDateTime(current.suspendedAt) : null },
     ]
   })
 
@@ -266,7 +264,7 @@
     }
 
     const statusPath = `/project/${current.id}/status`
-    const activate: HeaderAction = { key: 'activate', label: 'Activate', icon: 'mdi-play-circle-outline', method: 'PATCH', path: statusPath, color: 'success' }
+    const activate: HeaderAction = { key: 'activate', label: t('project.activate'), icon: 'mdi-play-circle-outline', method: 'PATCH', path: statusPath, color: 'success' }
 
     // O servidor recusa renomear, suspender e apagar o projeto do proprio SSO; a tela nem oferece.
     if (isSelf.value) {
@@ -275,10 +273,10 @@
 
     return [
       current.status === 'ACTIVE'
-        ? { key: 'suspend', label: 'Suspend', icon: 'mdi-pause-circle-outline', method: 'PATCH', path: statusPath, color: 'warning', variant: 'tonal' }
+        ? { key: 'suspend', label: t('project.suspend'), icon: 'mdi-pause-circle-outline', method: 'PATCH', path: statusPath, color: 'warning', variant: 'tonal' }
         : activate,
-      { key: 'rename', label: 'Rename', icon: 'mdi-pencil-outline', method: 'PUT', path: `/project/${current.id}`, variant: 'outlined' },
-      { key: 'delete', label: 'Delete', icon: 'mdi-delete-outline', method: 'DELETE', path: `/project/${current.id}`, color: 'error', variant: 'text' },
+      { key: 'rename', label: t('common.rename'), icon: 'mdi-pencil-outline', method: 'PUT', path: `/project/${current.id}`, variant: 'outlined' },
+      { key: 'delete', label: t('common.delete'), icon: 'mdi-delete-outline', method: 'DELETE', path: `/project/${current.id}`, color: 'error', variant: 'text' },
     ]
   })
 
@@ -324,7 +322,7 @@
     const ok = await renameDialog.submit(!!name, () => projects.rename(projectId.value, name))
 
     if (ok) {
-      toast.success('Project renamed')
+      toast.success(t('projects.renamed'))
     }
   }
 
@@ -332,7 +330,7 @@
     const ok = await statusChange.confirm(status => projects.setStatus(projectId.value, status, canOverview.value))
 
     if (ok) {
-      toast.success(statusChange.target === 'ACTIVE' ? 'Project activated' : 'Project suspended')
+      toast.success(statusChange.target === 'ACTIVE' ? t('project.activated') : t('project.suspended'))
     }
   }
 
@@ -343,7 +341,7 @@
     })
 
     if (ok) {
-      toast.success('Project deleted')
+      toast.success(t('projects.deleted'))
       await router.replace({ name: 'projects' })
     }
   }

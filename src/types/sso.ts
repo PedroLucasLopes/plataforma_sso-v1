@@ -6,7 +6,10 @@
 import type { Permission } from '@pedrolucaslopes/dotlog-ui'
 
 export type ProjectStatus = 'PENDING' | 'ACTIVE' | 'SUSPENDED'
-export type RoleName = 'SUPERADMIN' | 'ADMIN' | 'MANAGER' | 'VIEWER'
+/** Os quatro papeis com que todo projeto nasce, vazios. */
+export type DefaultRoleName = 'SUPERADMIN' | 'ADMIN' | 'MANAGER' | 'VIEWER'
+/** Nome de papel: um dos padrao, ou um de nome livre, como ARQUITETO. */
+export type RoleName = string
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'UPDATE'
 
 /* -------------------------------- sessao -------------------------------- */
@@ -17,6 +20,11 @@ export interface Me {
   email: string
   name: string
   role: RoleName
+  /**
+   * SUPERADMIN do projeto `SSO`. A raiz alcanca toda rota administrativa, e
+   * `permissions` traz todas as que o servidor expoe, cadastradas ou nao.
+   */
+  root: boolean
   permissions: Permission[]
   csrfToken?: string
 }

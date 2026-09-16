@@ -15,7 +15,8 @@ no repositório da biblioteca, sai numa versão publicada, e só depois é consu
 neste projeto é composição com regra de domínio: painéis do projeto, páginas e stores. Regras de
 estilo do scaffold em `AGENTS.md`; o ESLint decide o formato.
 
-A interface é em **inglês**; comentário em português, como no resto do repositório.
+A interface fala **inglês, espanhol e português do Brasil**, e a pessoa troca pelo menu com o nome dela,
+no canto da barra. Comentário continua em português, como no resto do repositório. Ver "Traduções".
 
 ---
 
@@ -34,7 +35,8 @@ npm install          # exige NODE_AUTH_TOKEN (read:packages) para baixar a bibli
 npm run dev          # Vite na 5173, com proxy de /sso para localhost:8080
 npm run type-check   # vue-tsc
 npm run lint:fix
-npm run build        # type-check + build
+npm run check:locales # as três línguas contra o en.json, e cada chave usada no código
+npm run build        # type-check + check:locales + build
 ```
 
 O SSO precisa estar de pé na 8080, pelo compose do `sso-api-v1` ou por `npm run start:dev` nele. Para outro
@@ -60,8 +62,9 @@ próprio console.
 - **Só oferece provedor com pedido pendente.** A tela consulta `GET /sso/login/request`. Com pedido,
   mostra "Sign in to continue to <aplicação>" e o botão do Google; sem pedido, explica que o login
   começa pela aplicação e não mostra botão nenhum. Não há caminho para criar pedido a partir daqui.
-- **Erro por código.** O SSO devolve a pessoa com `?error=<código>`, e `constants/messages.ts`
-  traduz. Código desconhecido vira mensagem genérica; texto da URL nunca é ecoado.
+- **Erro por código.** O SSO devolve a pessoa com `?error=<código>`, e `loginError`, em
+  `constants/messages.ts`, só aceita os códigos da lista dele; o texto mora em `login.errors`. Código
+  desconhecido vira mensagem genérica; texto da URL nunca é ecoado.
 - **O botão escolhido trava** enquanto navega ao Google, e destrava se a pessoa voltar pelo botão do
   navegador (`pageshow` com `persisted`).
 - **Não é embutível.** `X-Frame-Options: DENY` e `frame-ancestors 'none'`, no Vite e no nginx.
@@ -91,17 +94,67 @@ entrou sem papel, e fica só na memória do store. A camada HTTP anexa em todo m
 **Logout** é `POST /sso/session/logout`: encerra a sessão do SSO e derruba a renovação de todas as
 aplicações. Em seguida o console pede login de novo, e a pessoa cai na tela do IdP.
 
-A `redirect_uri` `http://localhost:5173/callback` foi cadastrada pelo `bootstrap-sso.js`. Console em
-outro endereço precisa ter a sua `…/callback` registrada no projeto `SSO`.
+A `redirect_uri` `http://localhost:5173/callback` vem do SQL de primeira subida do ambiente. Console
+em outro endereço precisa ter a sua `…/callback` registrada no projeto `SSO`, pela raiz.
+
+### A raiz e os papéis
+
+`GET /sso/me` traz `root`. A raiz, o `SUPERADMIN` do projeto `SSO`, recebe em `permissions` toda rota
+administrativa que o servidor expõe, lida do roteador dele: num ambiente novo, com o catálogo vazio,
+ela entra num console completo. Os outros papéis veem o que `Permission` concede, e o que não alcançam
+some da tela; se forçarem a chamada, o SSO responde 404.
+
+Papel tem **nome livre** em maiúsculas, dígitos e `_` (`ROLE_NAME_PATTERN`), e o campo converte o que
+se digita. Os quatro padrão aparecem com pastilha própria; os de nome livre, com o próprio nome, em
+tom neutro, depois dos padrão. Cada papel tem, no próprio painel do projeto, o atalho "Grant all GET
+routes" e as ações de renomear e apagar. No painel de membros, trocar o papel e tirar do projeto são
+ações da linha.
 
 ---
 
-## 🌳 Rotas moram dentro do projeto
+## 🗣️ Traduções
+
+Todo texto de tela mora em `src/locales`, um JSON por língua: `en.json`, `es.json`, `pt-BR.json`. O
+`en.json` é a referência. Nenhum rótulo, mensagem de erro, aviso ou opção fica escrito no código.
+
+- **Língua nova é só um JSON.** `plugins/i18n.ts` registra todo arquivo da pasta pelo
+  `import.meta.glob`, e o `DlUserMenu` lista a língua com o nome nela mesma e a bandeira do país, sem
+  declaração nenhuma. O arquivo precisa das mesmas chaves do `en.json`.
+- **Uma língua só para tudo.** `createDotlogLocale`, em `plugins/vuetify.ts`, liga o Vuetify e os
+  componentes da biblioteca ao vue-i18n do console. Os textos dos componentes `Dl*` vêm traduzidos da
+  própria biblioteca.
+- **A língua inicial** é a que a pessoa escolheu neste navegador, senão a do navegador, senão o
+  inglês. A escolha fica em `localStorage`, na chave `dl.locale`. `<html lang>` e o título da aba
+  acompanham a troca.
+- **No componente,** `const { t } = useI18n()`. **Fora dele,** em store, serviço e constante, o `t` de
+  `@/plugins/i18n`. Os dois leem a língua na hora da chamada.
+- **Rótulo lido na montagem não troca.** Lista de colunas, ações e opções é `computed`; as pastilhas de
+  `constants/status.ts` têm o rótulo num getter. Um array constante com `t()` ficaria na língua do boot.
+- **Data e número seguem a língua.** `formatDate` e `formatDateTime` usam a corrente, e `inferColumns`
+  recebe `locale`.
+- **Mensagem do backend** é traduzida por `API_MESSAGE_KEYS` (texto exato do servidor → chave) e
+  `ERROR_CODES` (`errors.code.<código>`). A validação do class-validator vem em inglês e entra como
+  detalhe de `errors.status.badRequest`. O texto do erro é o da língua no momento da falha.
+- **Plural** é do vue-i18n: `"{count} rota | {count} rotas"` e `t('counts.routes', n)`.
+- **`@` literal é `{'@'}`**, senão a mensagem não compila no vue-i18n.
+
+`npm run check:locales` recusa chave faltando ou sobrando, parâmetro ou plural diferente do inglês,
+mensagem que não compila e chave usada no código que não existe, e avisa de chave que nada usa. Roda
+dentro do `npm run build`, então o container não sobe com tradução quebrada.
+
+---
+
+## 🌳 Rotas e papéis moram dentro do projeto
 
 Não existe tela com as rotas de todas as aplicações. Uma lista assim cresce sem limite e não ajuda
 ninguém a achar nada; dentro do projeto, o próprio caminho diz onde cada rota mora. O `GET /route`
 continua existindo e continua no papel, mas `navigation.ts` o esconde do menu, e o painel só usa o
 catálogo para contar.
+
+**Papéis também não têm tela global.** O `GET /role` continua na API, mas `navigation.ts` o esconde do
+menu e o console não o chama: com muitos projetos, ele devolveria os papéis de todos de uma vez. Os
+papéis de um projeto chegam no overview dele, e é daí que saem a aba de papéis, o painel de membros e
+o diálogo "Add to project" da ficha do usuário, que busca o overview só do projeto escolhido.
 
 **A aba de rotas é árvore e detalhe lado a lado** (`RoutesPanel`, com `DlRouteTree` e `DlMasterDetail`).
 
@@ -109,7 +162,7 @@ catálogo para contar.
   junta dois caminhos ou mais vira grupo, como `/generate`.
 - **Tudo é clicável e abre o detalhe** (`RouteDetail`): os métodos, os parâmetros, o pai, os ids de
   cada método, a matriz de acesso com uma caixa por papel, quem pode chamar e o que mora abaixo.
-  Método que nenhum papel alcança sai marcado na árvore, porque responde 403 a todo mundo.
+  Método que nenhum papel alcança sai marcado na árvore, porque responde 404 a todo mundo.
 - **O caminho escolhido mora na URL**, em `?route=`. Recarregar, voltar e compartilhar abrem o mesmo
   detalhe. Trocar de aba tira o parâmetro.
 - **Estreito, o detalhe toma o lugar da árvore** e abrir entra no histórico: o voltar do navegador, ou
@@ -129,11 +182,13 @@ Conceder e revogar moram em `composables/useGrants.ts`, usado pelos dois lados.
 💻 src/
 ├─ 🧭 router/        # rotas, guard de sessão e de permissão, barra de carregamento
 ├─ 🧱 layouts/       # ConsoleLayout (DlAppShell) · GateLayout (telas sem menu)
-├─ 📄 pages/         # Login, Callback, NoAccess, Unavailable, Dashboard, projects/, users/, Roles, ClientKeys
+├─ 📄 pages/         # Login, Callback, NoAccess, Unavailable, Dashboard, projects/, users/, ClientKeys
 ├─ 🧩 components/    # ClientKeysPanel · project/ (checklist, redirect URIs, rotas e detalhe, papéis, membros)
-├─ 🗃️ stores/        # session, preferences, catalog, projects, clientKeys, users, roles
+├─ 🗃️ stores/        # session, preferences, catalog, projects, clientKeys, users
 ├─ 🔌 services/      # http.ts (erro, CSRF, 401, 404 vazio) · sso.ts (endpoints por recurso)
-├─ 🎨 constants/     # theme, layout, api, navigation, status, messages
+├─ 🗣️ locales/       # en.json (referência), es.json, pt-BR.json: todo texto de tela
+├─ 🔧 plugins/       # i18n.ts (vue-i18n, língua inicial, `t` fora de componente) · vuetify.ts
+├─ 🎨 constants/     # theme, layout, api, navigation, status, messages (códigos → chaves)
 ├─ 🧰 composables/   # useCrudDialog · useConfirm · useGrants
 ├─ 🔤 types/         # sso.ts, espelho dos DTOs do backend
 └─ 🛠️ utils/         # format.ts · forms.ts · routes.ts (rotas do overview no formato da árvore)
@@ -154,8 +209,8 @@ pastilhas de situação, papel, método e chave, e `navigation.ts` o que o banco
 
 - **`session`**: quem entrou, permissões, token anti-CSRF e todo o ciclo de login e logout.
 - **`catalog`**: lista inteira de cada recurso até `LOOKUP_LIMIT`, para seletor, nome no lugar de id e
-  painel. Projetos e papéis filtram e paginam no navegador; usuários paginam no servidor. Rotas não
-  têm lista própria: entram só na contagem do painel.
+  painel. Projetos filtram e paginam no navegador; usuários paginam no servidor. Papéis não têm lista
+  global, e rotas entram só na contagem do painel: os dois moram no overview de cada projeto.
 - **`projects`**: projeto e overview. Toda escrita relê o overview em vez de remendar estado local, e a
   árvore de rotas é montada dele a cada leitura.
 - **`clientKeys`**: chaves por projeto. ⚠️ **A chave privada gerada nunca entra em store.** Ela vive
@@ -169,10 +224,14 @@ pastilhas de situação, papel, método e chave, e `navigation.ts` o que o banco
 | Não há total de registros | tabela com paginação cega; no catálogo, `pageLimit` evita "Next" sem próxima |
 | `limit` com piso 10 e sem teto | `PAGE_SIZE = 20`, `LOOKUP_LIMIT = 500` |
 | Filtro `email` exige endereço completo | a busca manda texto com cara de e-mail como `email`, e o resto como `name` |
-| Mensagens de erro em português | `API_MESSAGES` traduz as conhecidas; a validação do class-validator já vem em inglês |
+| Mensagens de erro em português | `API_MESSAGE_KEYS` leva as conhecidas a uma chave de tradução; a validação do class-validator vem em inglês, como detalhe |
 | Apagar rota ou papel com permissão falha no banco | a ação fica desabilitada até a permissão sair |
 | Rota não guarda data nem autor | o detalhe do caminho sai inteiro do overview, sem chamada a mais |
-| Não há rota para tirar membro nem apagar redirect URI | o console não oferece, e o painel de membros avisa |
+| Um papel por pessoa por projeto | trocar o papel e tirar do projeto são ações da linha, em `MembersPanel` |
+| Rota que o papel não alcança responde 404 | a tela esconde antes; um 404 inesperado vira a mensagem de registro não encontrado |
+| O projeto `SSO` é protegido no servidor | `SELF_PROJECT_NAME` e `session.root`: renomear, suspender e apagar somem para todos; catálogo, membros, redirect URIs e chaves do SSO somem para quem não é a raiz, com aviso no rodapé |
+| O `SUPERADMIN` do SSO é a raiz e sempre sobra um | o papel não oferece renomear nem apagar; o último `SUPERADMIN` não troca de papel nem sai |
+| Redirect URI do `SSO` não se edita; a última e a desta origem não saem | a ação fica indisponível na linha. Nas outras aplicações, apagar pede confirmação |
 | `authId: null` em `PUT /user/:id` desfaz o vínculo com o Google | ação "Unlink Google account" |
 
 ---
@@ -225,8 +284,14 @@ que devia ter saído continua na tela. Confira o DOM antes de chamar de defeito.
 - Nenhum token de acesso, chave privada ou segredo em store, `localStorage`, log ou URL.
 - `NODE_AUTH_TOKEN` só no ambiente. Nunca no `.npmrc`, no Dockerfile como `ARG`, ou em arquivo versionado.
 - A tela de login só mostra texto de erro a partir de código conhecido.
+- Texto de tela vai para `src/locales`, nas três línguas, e sai por `t()`. Nada de rótulo, mensagem
+  ou opção escrito no componente, na store ou na constante.
+- Rótulo que depende da língua é lido na hora de desenhar: `computed`, template ou getter.
 - Toda escrita passa por `services/http.ts`, que anexa o `X-CSRF-Token`.
 - Tela nova declara `meta.permission` com o mesmo método e caminho do catálogo do SSO.
 - Ação que o papel não alcança sai do DOM; desabilitar fica para bloqueio por estado.
-- Rota de aplicação não ganha lista global. Ela aparece dentro do projeto dela.
-- Rode `npm run type-check` e `npm run lint` antes de considerar pronto.
+- Rota e papel de aplicação não ganham lista global. Aparecem dentro do projeto deles.
+- O console não oferece o que o servidor recusa no projeto `SSO`. A regra vale no servidor; a tela só
+  evita o caminho fechado, e a mensagem de cada recusa vem de `CODE_MESSAGES`.
+- Nome de papel é texto livre. Nada na tela depende de a lista de papéis ser fixa.
+- Rode `npm run type-check`, `npm run lint` e `npm run check:locales` antes de considerar pronto.

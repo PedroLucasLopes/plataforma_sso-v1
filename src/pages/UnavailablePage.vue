@@ -1,12 +1,12 @@
 <template>
   <GateLayout>
     <DlEmptyState
-      description="The console could not reach the SSO. Nothing was changed. Try again in a moment."
+      :description="t('unavailable.description')"
       icon="mdi-cloud-alert-outline"
-      title="The SSO is not responding"
+      :title="t('unavailable.title')"
       tone="error"
     >
-      <DlButton icon="mdi-refresh" :loading="retrying" @click="retry">Try again</DlButton>
+      <DlButton icon="mdi-refresh" :loading="retrying" @click="retry">{{ t('common.tryAgain') }}</DlButton>
     </DlEmptyState>
   </GateLayout>
 </template>
@@ -14,6 +14,7 @@
 <script lang="ts" setup>
   import { DlButton, DlEmptyState, toast } from '@pedrolucaslopes/dotlog-ui'
   import { ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
   import GateLayout from '@/layouts/GateLayout.vue'
   import { safeReturnPath, useSessionStore } from '@/stores/session'
@@ -23,6 +24,7 @@
    * O SSO nao respondeu, e sem ele nao da para afirmar se a pessoa tem sessao.
    * A tela nao manda ao login, que tambem depende do SSO: so oferece tentar.
    */
+  const { t } = useI18n()
   const route = useRoute()
   const router = useRouter()
   const session = useSessionStore()
@@ -34,8 +36,8 @@
 
     try {
       if ((await session.refresh()) === 'unavailable') {
-        toast.error('The SSO is still not responding', {
-          description: 'Check that the service is running, then try again.',
+        toast.error(t('unavailable.stillTitle'), {
+          description: t('unavailable.stillDescription'),
         })
 
         return

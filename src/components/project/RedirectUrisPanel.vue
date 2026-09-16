@@ -1,20 +1,20 @@
 <template>
   <DlSectionCard
     :count="rows.length"
-    description="The SSO only returns a sign-in to these addresses, compared character by character. Register each environment separately."
+    :description="t('redirectUris.description')"
     :padded="rows.length === 0"
-    title="Redirect URIs"
+    :title="t('redirectUris.title')"
   >
-    <template v-if="session.can('POST', '/redirecturi')" #actions>
-      <DlButton icon="mdi-plus" variant="tonal" @click="dialog.openCreate()">Add redirect URI</DlButton>
+    <template v-if="canAdd" #actions>
+      <DlButton icon="mdi-plus" variant="tonal" @click="dialog.openCreate()">{{ t('redirectUris.add') }}</DlButton>
     </template>
 
     <DlEmptyState
       v-if="rows.length === 0"
       compact
-      description="Without one, no application can complete a sign-in with this project."
+      :description="t('redirectUris.emptyDescription')"
       icon="mdi-link-variant"
-      title="No redirect URIs yet"
+      :title="t('redirectUris.emptyTitle')"
     />
 
     <DlDataTable
@@ -28,25 +28,24 @@
     />
 
     <template v-if="isSelf && rows.length > 0" #footer>
-      This console signs in through these addresses, so they are never edited: add the new address, then delete
-      the old one. The last address, and the one this console is using now, cannot be deleted.
+      {{ t('redirectUris.selfNote') }}
     </template>
   </DlSectionCard>
 
   <DlFormDialog
     v-model="dialog.open"
-    description="Scheme, host, port and path, exactly as the application sends it. A trailing slash makes it a different address."
+    :description="t('redirectUris.dialogDescription')"
     :dirty="dialog.dirty"
     :error="dialog.error"
     :mode="dialog.mode"
     :submitting="dialog.submitting"
-    :title="dialog.mode === 'create' ? 'Add redirect URI' : 'Edit redirect URI'"
+    :title="dialog.mode === 'create' ? t('redirectUris.add') : t('redirectUris.editTitle')"
     @submit="save"
   >
     <DlTextField
       :error="uriError"
-      hint="Example: https://app.example.com/api/auth/callback"
-      label="Redirect URI"
+      :hint="t('redirectUris.fieldHint')"
+      :label="t('redirectUris.field')"
       :model-value="dialog.form.redirectUri"
       mono
       placeholder="https://app.example.com/api/auth/callback"
@@ -58,12 +57,12 @@
 
   <DlConfirmDialog
     v-model="removal.open"
-    confirm-label="Delete redirect URI"
+    :confirm-label="t('redirectUris.deleteTitle')"
     destructive
     :error="removal.error"
     :message="removalMessage"
     :processing="removal.processing"
-    title="Delete redirect URI"
+    :title="t('redirectUris.deleteTitle')"
     @confirm="remove"
   />
 </template>
@@ -83,6 +82,7 @@
     toast,
   } from '@pedrolucaslopes/dotlog-ui'
   import { computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useConfirm } from '@/composables/useConfirm'
   import { useCrudDialog } from '@/composables/useCrudDialog'
   import { SELF_PROJECT_NAME } from '@/constants/api'
@@ -92,6 +92,7 @@
 
   const props = defineProps<{ project: ProjectOverview }>()
 
+  const { t } = useI18n()
   const session = useSessionStore()
   const projects = useProjectsStore()
 
@@ -102,7 +103,7 @@
 
   const rows = computed<UriRow[]>(() => props.project.redirectUriRecords.map(record => ({ ...record })))
 
-  const columns: Column<UriRow>[] = [{ key: 'redirectUri', label: 'Address', mono: true }]
+  const columns = computed<Column<UriRow>[]>(() => [{ key: 'redirectUri', label: t('redirectUris.address'), mono: true }])
 
   /**
    * No projeto do proprio SSO estas URIs sao por onde o console entra. O servidor
@@ -110,6 +111,11 @@
    * pedido sai; a tela so deixa de oferecer o que seria recusado.
    */
   const isSelf = computed(() => props.project.name === SELF_PROJECT_NAME)
+
+  /** No SSO, cadastrar ou apagar redirect URI e abrir ou fechar a porta do console: so a raiz. */
+  const locked = computed(() => isSelf.value && !session.root)
+
+  const canAdd = computed(() => !locked.value && session.can('POST', '/redirecturi'))
 
   function originOf (uri: string): string | null {
     try {
@@ -119,25 +125,27 @@
     }
   }
 
-  const actions: RowAction<UriRow>[] = [
-    {
-      key: 'edit',
-      label: 'Edit',
-      icon: 'mdi-pencil-outline',
-      method: 'PUT',
-      path: '/redirecturi/:id',
-      unavailable: () => isSelf.value,
-    },
-    {
-      key: 'delete',
-      label: 'Delete',
-      icon: 'mdi-delete-outline',
-      method: 'DELETE',
-      path: '/redirecturi/:id',
-      color: 'error',
-      unavailable: row => isSelf.value && (rows.value.length <= 1 || originOf(row.redirectUri) === window.location.origin),
-    },
-  ]
+  const actions = computed<RowAction<UriRow>[]>(() => (locked.value
+    ? []
+    : [
+      {
+        key: 'edit',
+        label: t('common.edit'),
+        icon: 'mdi-pencil-outline',
+        method: 'PUT',
+        path: '/redirecturi/:id',
+        unavailable: () => isSelf.value,
+      },
+      {
+        key: 'delete',
+        label: t('common.delete'),
+        icon: 'mdi-delete-outline',
+        method: 'DELETE',
+        path: '/redirecturi/:id',
+        color: 'error',
+        unavailable: row => isSelf.value && (rows.value.length <= 1 || originOf(row.redirectUri) === window.location.origin),
+      },
+    ]))
 
   const dialog = useCrudDialog(() => ({ redirectUri: '' }))
   const removal = useConfirm<UriRow>()
@@ -150,10 +158,10 @@
     }
 
     if (props.project.status === 'ACTIVE' && rows.value.length === 1) {
-      return `${target.redirectUri} is the only address of ${props.project.name}. Until another one is added, nobody can sign in to it.`
+      return t('redirectUris.deleteOnly', { uri: target.redirectUri, project: props.project.name })
     }
 
-    return `Applications that still send ${target.redirectUri} stop signing in, and codes already issued to it are refused.`
+    return t('redirectUris.deleteMessage', { uri: target.redirectUri })
   })
 
   function onAction (key: string, row: UriRow): void {
@@ -172,10 +180,10 @@
     const value = dialog.form.redirectUri.trim()
 
     if (!value) {
-      return 'Enter the address.'
+      return t('redirectUris.enterAddress')
     }
 
-    return isHttpUrl(value) ? null : 'Use a full http or https address.'
+    return isHttpUrl(value) ? null : t('redirectUris.useHttp')
   })
 
   async function save (): Promise<void> {
@@ -189,7 +197,7 @@
     })
 
     if (ok) {
-      toast.success(editingId ? 'Redirect URI updated' : 'Redirect URI added')
+      toast.success(editingId ? t('redirectUris.updated') : t('redirectUris.added'))
     }
   }
 
@@ -197,7 +205,7 @@
     const ok = await removal.confirm(target => projects.removeRedirectUri(props.project.id, target.id))
 
     if (ok) {
-      toast.success('Redirect URI deleted')
+      toast.success(t('redirectUris.deleted'))
     }
   }
 </script>

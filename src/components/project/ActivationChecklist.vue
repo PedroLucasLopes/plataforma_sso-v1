@@ -1,7 +1,7 @@
 <template>
   <DlSectionCard
     :description="description"
-    title="Ready to use the SSO"
+    :title="t('checklist.title')"
   >
     <template v-if="overview.status !== 'ACTIVE' && canActivate" #actions>
       <DlButton
@@ -10,7 +10,7 @@
         :loading="activating"
         @click="emit('activate')"
       >
-        Activate project
+        {{ t('project.activateProject') }}
       </DlButton>
     </template>
 
@@ -27,7 +27,7 @@
           <span class="checklist__detail">{{ item.detail }}</span>
         </div>
 
-        <span v-if="item.required" class="checklist__required">Required</span>
+        <span v-if="item.required" class="checklist__required">{{ t('checklist.required') }}</span>
       </li>
     </ul>
   </DlSectionCard>
@@ -37,7 +37,8 @@
   import type { ProjectOverview } from '@/types/sso'
   import { DlButton, DlSectionCard } from '@pedrolucaslopes/dotlog-ui'
   import { computed } from 'vue'
-  import { keyState, plural } from '@/utils/format'
+  import { useI18n } from 'vue-i18n'
+  import { keyState } from '@/utils/format'
 
   /**
    * O que falta para o projeto funcionar, em ordem.
@@ -55,52 +56,54 @@
 
   const emit = defineEmits<{ activate: [] }>()
 
+  const { t } = useI18n()
+
   const activeKeys = computed(() => props.overview.clientKeys.filter(key => keyState(key) === 'ACTIVE').length)
   const grantedRoles = computed(() => props.overview.roles.filter(role => role.permissions.length > 0).length)
 
   const items = computed(() => [
     {
       key: 'redirect',
-      label: 'Redirect URI registered',
+      label: t('checklist.redirect.label'),
       detail: props.overview.redirectUriRecords.length > 0
-        ? plural(props.overview.redirectUriRecords.length, 'address', 'addresses')
-        : 'The SSO only returns a sign-in to a registered address.',
+        ? t('counts.addresses', props.overview.redirectUriRecords.length)
+        : t('checklist.redirect.empty'),
       done: props.overview.redirectUriRecords.length > 0,
       required: true,
     },
     {
       key: 'key',
-      label: 'Active client key',
+      label: t('checklist.key.label'),
       detail: activeKeys.value
-        ? plural(activeKeys.value, 'active key')
-        : 'The application proves who it is by signing with the private half.',
+        ? t('counts.activeKeys', activeKeys.value)
+        : t('checklist.key.empty'),
       done: activeKeys.value > 0,
       required: true,
     },
     {
       key: 'routes',
-      label: 'Routes registered',
+      label: t('checklist.routes.label'),
       detail: props.overview.routes.length > 0
-        ? plural(props.overview.routes.length, 'route')
-        : 'A route that is not in the catalogue answers 403 to everyone.',
+        ? t('counts.routes', props.overview.routes.length)
+        : t('checklist.routes.empty'),
       done: props.overview.routes.length > 0,
       required: false,
     },
     {
       key: 'grants',
-      label: 'Routes granted to a role',
+      label: t('checklist.grants.label'),
       detail: grantedRoles.value
-        ? `${plural(grantedRoles.value, 'role')} with permissions`
-        : 'Permissions connect a role to the routes it unlocks.',
+        ? t('checklist.grants.done', grantedRoles.value)
+        : t('checklist.grants.empty'),
       done: grantedRoles.value > 0,
       required: false,
     },
     {
       key: 'members',
-      label: 'People with access',
+      label: t('checklist.members.label'),
       detail: props.overview.users.length > 0
-        ? plural(props.overview.users.length, 'member')
-        : 'Only members can sign in to this application.',
+        ? t('counts.members', props.overview.users.length)
+        : t('checklist.members.empty'),
       done: props.overview.users.length > 0,
       required: false,
     },
@@ -110,12 +113,12 @@
 
   const description = computed(() => {
     if (props.overview.status === 'ACTIVE') {
-      return 'This project is active. Applications with its client ID can sign people in.'
+      return t('checklist.active')
     }
 
     return ready.value
-      ? 'Everything required is in place. Activating lets the application start signing people in.'
-      : 'A project only uses the SSO after activation, and activation needs the required items below.'
+      ? t('checklist.ready')
+      : t('checklist.notReady')
   })
 </script>
 

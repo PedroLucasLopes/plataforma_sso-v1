@@ -1,9 +1,9 @@
 <template>
   <DlSectionCard
     :count="activeCount"
-    description="Public halves the SSO uses to verify the application's signed assertions. The private half never comes back to the SSO."
+    :description="t('clientKeys.description')"
     :padded="!keys.loading && rows.length === 0"
-    title="Client keys"
+    :title="t('clientKeys.title')"
   >
     <template v-if="canRegister || canGenerate" #actions>
       <DlButton
@@ -12,7 +12,7 @@
         variant="outlined"
         @click="registerDialog.openCreate()"
       >
-        Register public key
+        {{ t('clientKeys.registerPublic') }}
       </DlButton>
 
       <DlButton
@@ -21,7 +21,7 @@
         variant="tonal"
         @click="generation.ask(projectId)"
       >
-        Generate key pair
+        {{ t('clientKeys.generatePair') }}
       </DlButton>
     </template>
 
@@ -30,18 +30,18 @@
       compact
       :description="loadError"
       icon="mdi-cloud-alert-outline"
-      title="Keys could not be loaded"
+      :title="t('clientKeys.loadFailed')"
       tone="error"
     >
-      <DlButton icon="mdi-refresh" variant="outlined" @click="load">Try again</DlButton>
+      <DlButton icon="mdi-refresh" variant="outlined" @click="load">{{ t('common.tryAgain') }}</DlButton>
     </DlEmptyState>
 
     <DlEmptyState
       v-else-if="!keys.loading && rows.length === 0"
       compact
-      description="The application cannot authenticate to the SSO without an active key."
+      :description="t('clientKeys.emptyDescription')"
       icon="mdi-key-variant"
-      title="No keys yet"
+      :title="t('clientKeys.emptyTitle')"
     />
 
     <DlDataTable
@@ -62,20 +62,20 @@
 
   <DlFormDialog
     v-model="registerDialog.open"
-    description="Generated on the application owner's machine. Only the public half is sent; the private half stays with them."
+    :description="t('clientKeys.registerDescription')"
     :dirty="registerDialog.dirty"
     :error="registerDialog.error"
     mode="create"
-    submit-label="Register key"
+    :submit-label="t('clientKeys.registerKey')"
     :submitting="registerDialog.submitting"
-    title="Register public key"
+    :title="t('clientKeys.registerPublic')"
     :width="640"
     @submit="register"
   >
     <DlTextField
       :error="pemError"
-      hint="RSA, at least 2048 bits, in PEM (SPKI) format."
-      label="Public key"
+      :hint="t('clientKeys.publicKeyHint')"
+      :label="t('clientKeys.publicKey')"
       :model-value="registerDialog.form.publicKeyPem"
       mono
       placeholder="-----BEGIN PUBLIC KEY-----"
@@ -85,8 +85,8 @@
     />
 
     <DlTextField
-      hint="Optional. Leave empty for a key without expiry."
-      label="Expires on"
+      :hint="t('clientKeys.expiresHint')"
+      :label="t('clientKeys.expiresOn')"
       :model-value="registerDialog.form.expiresOn"
       :reserve-error="false"
       type="date"
@@ -96,34 +96,34 @@
 
   <DlConfirmDialog
     v-model="generation.open"
-    confirm-label="Generate key"
+    :confirm-label="t('clientKeys.generateKey')"
     :error="generation.error"
-    :message="`The SSO creates the pair, keeps only the public half and shows you the private key once. Hand it to the owner of ${projectName} through a secure channel.`"
+    :message="t('clientKeys.generateMessage', { project: projectName })"
     :processing="generation.processing"
-    title="Generate a key pair"
+    :title="t('clientKeys.generateTitle')"
     @confirm="generate"
   />
 
   <DlSecretDialog
     v-model="secretOpen"
-    acknowledge-label="I stored this key in a safe place"
-    :description="`Private key for ${projectName}. The application loads it from its own environment, as APP_PRIVATE_KEY_BASE64.`"
-    label="Private key (base64, PKCS#8)"
+    :acknowledge-label="t('clientKeys.secretAcknowledge')"
+    :description="t('clientKeys.secretDescription', { project: projectName })"
+    :label="t('clientKeys.secretLabel')"
     :secret="secret"
-    title="Copy the private key now"
-    warning="This key is shown once and is not stored in the SSO. If it passes through chat, a ticket, a commit or a CI log, revoke it and generate another."
+    :title="t('clientKeys.secretTitle')"
+    :warning="t('clientKeys.secretWarning')"
     @closed="forgetSecret"
   />
 
   <DlConfirmDialog
     v-model="revocation.open"
-    confirm-label="Revoke key"
+    :confirm-label="t('clientKeys.revokeKey')"
     destructive
     :error="revocation.error"
-    message="Applications signing with this key stop authenticating immediately. A revoked key cannot be restored."
+    :message="t('clientKeys.revokeMessage')"
     :processing="revocation.processing"
     :require-text="revocation.target ? String(revocation.target.id).slice(0, 8) : null"
-    title="Revoke client key"
+    :title="t('clientKeys.revokeTitle')"
     @confirm="revoke"
   />
 </template>
@@ -145,8 +145,10 @@
     toast,
   } from '@pedrolucaslopes/dotlog-ui'
   import { computed, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useConfirm } from '@/composables/useConfirm'
   import { useCrudDialog } from '@/composables/useCrudDialog'
+  import { SELF_PROJECT_NAME } from '@/constants/api'
   import { KEY_STATUS, type KeyState } from '@/constants/status'
   import { errorMessage } from '@/services/http'
   import { useClientKeysStore } from '@/stores/clientKeys'
@@ -159,12 +161,16 @@
     projectName: string
   }>()
 
+  const { t, locale } = useI18n()
   const session = useSessionStore()
   const keys = useClientKeysStore()
 
-  const canRegister = computed(() => session.can('POST', '/clientkey'))
-  // Material de chave: no catalogo, so o papel de nivel maximo alcanca.
-  const canGenerate = computed(() => session.can('POST', '/clientkey/generate'))
+  /** Chave do projeto `SSO` autentica o proprio SSO como cliente: so a raiz mexe nela. */
+  const locked = computed(() => props.projectName === SELF_PROJECT_NAME && !session.root)
+
+  const canRegister = computed(() => !locked.value && session.can('POST', '/clientkey'))
+  // Material de chave: quem alcanca e o que o catalogo concede ao papel.
+  const canGenerate = computed(() => !locked.value && session.can('POST', '/clientkey/generate'))
 
   const loadError = ref<string | null>(null)
 
@@ -194,7 +200,7 @@
       keyId: shortId(key.id, 13),
       state: keyState(key),
       createdAt: key.createdAt,
-      expiresAt: key.expiresAt ? formatDate(key.expiresAt) : 'Never',
+      expiresAt: key.expiresAt ? formatDate(key.expiresAt) : t('common.never'),
     })),
   )
 
@@ -203,26 +209,29 @@
   const columns = computed<Column<KeyRow>[]>(() =>
     inferColumns(rows.value, {
       omit: ['id'],
+      locale: locale.value,
       overrides: {
-        keyId: { label: 'Key', mono: true, secondary: false },
-        state: { label: 'Status', width: '140px' },
-        createdAt: { label: 'Created', width: '150px' },
-        expiresAt: { label: 'Expires', width: '140px' },
+        keyId: { label: t('clientKeys.columns.key'), mono: true, secondary: false },
+        state: { label: t('common.status'), width: '140px' },
+        createdAt: { label: t('clientKeys.columns.created'), width: '150px' },
+        expiresAt: { label: t('clientKeys.columns.expires'), width: '140px' },
       },
     }),
   )
 
-  const actions: RowAction<KeyRow>[] = [
-    {
-      key: 'revoke',
-      label: 'Revoke',
-      icon: 'mdi-key-remove',
-      method: 'DELETE',
-      path: '/clientkey/:id',
-      color: 'error',
-      unavailable: row => row.state === 'REVOKED',
-    },
-  ]
+  const actions = computed<RowAction<KeyRow>[]>(() => (locked.value
+    ? []
+    : [
+      {
+        key: 'revoke',
+        label: t('clientKeys.revoke'),
+        icon: 'mdi-key-remove',
+        method: 'DELETE',
+        path: '/clientkey/:id',
+        color: 'error',
+        unavailable: row => row.state === 'REVOKED',
+      },
+    ]))
 
   /* ------------------------------ registrar ------------------------------ */
 
@@ -230,7 +239,7 @@
 
   const pemError = computed(() =>
     registerDialog.attempted && !PUBLIC_KEY_PATTERN.test(registerDialog.form.publicKeyPem.trim())
-      ? 'Paste the whole key, from -----BEGIN PUBLIC KEY----- to -----END PUBLIC KEY-----.'
+      ? t('clientKeys.pemError')
       : null,
   )
 
@@ -244,7 +253,7 @@
     const ok = await registerDialog.submit(PUBLIC_KEY_PATTERN.test(pem), () => keys.register(props.projectId, `${pem}\n`, expiresAt))
 
     if (ok) {
-      toast.success('Public key registered')
+      toast.success(t('clientKeys.registered'))
     }
   }
 
@@ -280,7 +289,7 @@
     const ok = await revocation.confirm(row => keys.revoke(props.projectId, row.id))
 
     if (ok) {
-      toast.success('Client key revoked')
+      toast.success(t('clientKeys.revoked'))
     }
   }
 </script>

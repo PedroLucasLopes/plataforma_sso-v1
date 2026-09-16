@@ -3,7 +3,7 @@
     <DlEmptyState
       :description="description"
       icon="mdi-shield-lock-outline"
-      title="You don't have access to the SSO console"
+      :title="t('noAccess.title')"
       tone="warning"
     >
       <DlButton
@@ -12,7 +12,7 @@
         variant="outlined"
         @click="session.signOut()"
       >
-        Use another account
+        {{ t('noAccess.useAnotherAccount') }}
       </DlButton>
     </DlEmptyState>
   </GateLayout>
@@ -21,6 +21,7 @@
 <script lang="ts" setup>
   import { DlButton, DlEmptyState } from '@pedrolucaslopes/dotlog-ui'
   import { computed, onMounted } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
   import GateLayout from '@/layouts/GateLayout.vue'
   import { useSessionStore } from '@/stores/session'
@@ -32,13 +33,14 @@
    * administra nada aqui. Dizer com qual conta ela entrou evita o engano mais
    * comum, que e ter usado a conta pessoal no lugar da do trabalho.
    */
+  const { t } = useI18n()
   const router = useRouter()
   const session = useSessionStore()
 
   const description = computed(() =>
     session.identity
-      ? `You are signed in as ${session.identity.name} (${session.identity.email}), but this account has no role in the SSO project. Ask an administrator for access.`
-      : 'Your account has no role in the SSO project. Ask an administrator for access.',
+      ? t('noAccess.descriptionAs', { name: session.identity.name, email: session.identity.email })
+      : t('noAccess.description'),
   )
 
   onMounted(async () => {

@@ -1,6 +1,6 @@
 <template>
   <DlMasterDetail
-    back-label="All routes"
+    :back-label="t('routes.allRoutes')"
     :detail-key="selectedKey"
     :detail-open="!!selectedKey"
     @back="closeDetail"
@@ -9,12 +9,12 @@
     <template #master>
       <DlSectionCard
         :count="project.routes.length"
-        description="What this application exposes, grouped by path. Pick any path to see its methods and who can call it."
+        :description="t('routes.description')"
         :padded="false"
-        title="Routes"
+        :title="t('routes.title')"
       >
         <template v-if="canCreate" #actions>
-          <DlButton icon="mdi-plus" variant="tonal" @click="openCreate()">Add route</DlButton>
+          <DlButton icon="mdi-plus" variant="tonal" @click="openCreate()">{{ t('routes.add') }}</DlButton>
         </template>
 
         <div v-if="project.routes.length > 0" class="routes__toolbar">
@@ -23,7 +23,7 @@
               density="compact"
               icon="mdi-magnify"
               :model-value="query"
-              placeholder="Filter by path"
+              :placeholder="t('routes.filterPlaceholder')"
               :reserve-error="false"
               @update:model-value="value => (query = asText(value))"
             />
@@ -32,7 +32,7 @@
           <VChipGroup
             v-if="presentMethods.length > 1"
             v-model="methods"
-            aria-label="Filter by method"
+            :aria-label="t('routes.filterByMethod')"
             class="routes__methods"
             color="primary"
             multiple
@@ -51,21 +51,21 @@
 
           <div class="routes__tree-actions">
             <VBtn
-              aria-label="Expand all"
+              :aria-label="t('routes.expandAll')"
               density="comfortable"
               icon="mdi-unfold-more-horizontal"
               size="small"
-              title="Expand all"
+              :title="t('routes.expandAll')"
               variant="text"
               @click="treeView?.expandAll()"
             />
 
             <VBtn
-              aria-label="Collapse all"
+              :aria-label="t('routes.collapseAll')"
               density="comfortable"
               icon="mdi-unfold-less-horizontal"
               size="small"
-              title="Collapse all"
+              :title="t('routes.collapseAll')"
               variant="text"
               @click="treeView?.collapseAll()"
             />
@@ -74,8 +74,8 @@
 
         <DlRouteTree
           ref="treeView"
-          empty-description="Register the routes of the application, then grant them to roles."
-          :label="`${project.name} routes`"
+          :empty-description="t('routes.emptyDescription')"
+          :label="t('routes.treeLabel', { project: project.name })"
           :methods="methods"
           :query="query"
           :routes="entries"
@@ -84,7 +84,7 @@
         />
 
         <template v-if="catalogLocked" #footer>
-          These are the SSO's own routes. They change only through scripts/bootstrap-sso.js, never here.
+          {{ t('routes.selfNote') }}
         </template>
       </DlSectionCard>
     </template>
@@ -104,11 +104,11 @@
       <div v-else class="routes__panel">
         <DlEmptyState
           compact
-          :description="`${selectedKey} is not in the ${project.name} catalogue. It may have been renamed or deleted.`"
+          :description="t('routes.notFoundDescription', { path: selectedKey ?? '', project: project.name })"
           icon="mdi-map-marker-question-outline"
-          title="Route not found"
+          :title="t('routes.notFoundTitle')"
         >
-          <DlButton variant="outlined" @click="closeDetail">Back to routes</DlButton>
+          <DlButton variant="outlined" @click="closeDetail">{{ t('routes.backToRoutes') }}</DlButton>
         </DlEmptyState>
       </div>
     </template>
@@ -117,9 +117,9 @@
       <div class="routes__panel">
         <DlEmptyState
           compact
-          description="Pick any path in the tree to see its methods, the roles that reach it and who can call it."
+          :description="t('routes.selectDescription')"
           icon="mdi-gesture-tap"
-          title="Select a route"
+          :title="t('routes.selectTitle')"
         />
       </div>
     </template>
@@ -127,18 +127,18 @@
 
   <DlFormDialog
     v-model="dialog.open"
-    description="The path as the application declares it, without the global prefix. Use :name for parameters."
+    :description="t('routes.dialogDescription')"
     :dirty="dialog.dirty"
     :error="dialog.error"
     :mode="dialog.mode"
     :submitting="dialog.submitting"
-    :title="dialog.mode === 'create' ? 'Add route' : 'Edit route'"
+    :title="dialog.mode === 'create' ? t('routes.add') : t('routes.editTitle')"
     @submit="save"
   >
     <div class="form-grid">
       <DlSelect
         :clearable="false"
-        label="Method"
+        :label="t('routes.method')"
         :model-value="dialog.form.method"
         :options="HTTP_METHODS"
         required
@@ -147,7 +147,7 @@
 
       <DlTextField
         :error="pathError"
-        label="Path"
+        :label="t('routes.path')"
         :model-value="dialog.form.path"
         mono
         placeholder="/equipment/:id"
@@ -159,12 +159,12 @@
 
   <DlConfirmDialog
     v-model="removal.open"
-    confirm-label="Delete route"
+    :confirm-label="t('routes.deleteTitle')"
     destructive
     :error="removal.error"
-    :message="removal.target ? `${removal.target.method} ${removal.target.path} leaves the catalogue and starts answering 403 to everyone.` : ''"
+    :message="removal.target ? t('routes.deleteMessage', { method: removal.target.method, path: removal.target.path }) : ''"
     :processing="removal.processing"
-    title="Delete route"
+    :title="t('routes.deleteTitle')"
     @confirm="remove"
   />
 </template>
@@ -188,6 +188,7 @@
     toast,
   } from '@pedrolucaslopes/dotlog-ui'
   import { computed, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
   import RouteDetail from '@/components/project/RouteDetail.vue'
   import { useConfirm } from '@/composables/useConfirm'
@@ -208,13 +209,14 @@
    */
   const props = defineProps<{ project: ProjectOverview }>()
 
+  const { t } = useI18n()
   const route = useRoute()
   const router = useRouter()
   const session = useSessionStore()
   const projects = useProjectsStore()
 
-  /** O catalogo do proprio SSO so muda pelo bootstrap. O servidor recusa; a tela nem oferece. */
-  const catalogLocked = computed(() => props.project.name === SELF_PROJECT_NAME)
+  /** O catalogo do proprio SSO so a raiz muda. O servidor recusa os outros; a tela nem oferece. */
+  const catalogLocked = computed(() => props.project.name === SELF_PROJECT_NAME && !session.root)
 
   const canCreate = computed(() => !catalogLocked.value && session.can('POST', '/route'))
 
@@ -302,7 +304,7 @@
       return null
     }
 
-    return ROUTE_PATH_PATTERN.test(dialog.form.path.trim()) ? null : 'Start with a slash and leave no spaces, like /equipment/:id.'
+    return ROUTE_PATH_PATTERN.test(dialog.form.path.trim()) ? null : t('routes.pathError')
   })
 
   function openCreate (values: { method?: HttpMethod, path?: string } = {}): void {
@@ -325,7 +327,7 @@
     })
 
     if (ok) {
-      toast.success(editingId ? 'Route updated' : 'Route added', { description: `${method} ${path}` })
+      toast.success(editingId ? t('routes.updated') : t('routes.added'), { description: `${method} ${path}` })
       // O detalhe acompanha a rota gravada, inclusive quando o caminho mudou.
       select(normalizeRoutePath(path))
     }
@@ -341,7 +343,7 @@
       return
     }
 
-    toast.success('Route deleted')
+    toast.success(t('routes.deleted'))
 
     if (!selectedKey.value || findRouteNode(tree.value, selectedKey.value)) {
       return
