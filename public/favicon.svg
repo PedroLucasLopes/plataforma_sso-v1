@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!--
+    Marca do SSO: o escudo com chave do menu e da tela de login, o APP_LOGO de
+    src/constants/layout.ts (mdi-shield-key-outline, @mdi/js 7.4.47, licenca
+    Apache-2.0). Trocou a marca, troque os dois.
+
+    Cores dos tokens primary e onPrimary da @pedrolucaslopes/dotlog-ui, o par que
+    ja passou pela conferencia de contraste. Arquivo estatico nao le variavel CSS:
+    mudou a paleta, mude aqui tambem. O tema segue o do sistema, como a aba.
+  -->
+  <style>
+    .fundo { fill: #3B5BDB; }
+    .marca { fill: #FFFFFF; }
+
+    @media (prefers-color-scheme: dark) {
+      .fundo { fill: #93A8FF; }
+      .marca { fill: #10121C; }
+    }
+  </style>
+  <rect class="fundo" width="32" height="32" rx="7" />
+  <path
+    class="marca"
+    transform="translate(5.2 5.2) scale(0.9)"
+    d="M21,11C21,16.55 17.16,21.74 12,23C6.84,21.74 3,16.55 3,11V5L12,1L21,5V11M12,21C15.75,20 19,15.54 19,11.22V6.3L12,3.18L5,6.3V11.22C5,15.54 8.25,20 12,21M12,6A3,3 0 0,1 15,9C15,10.31 14.17,11.42 13,11.83V14H15V16H13V18H11V11.83C9.83,11.42 9,10.31 9,9A3,3 0 0,1 12,6M12,8A1,1 0 0,0 11,9A1,1 0 0,0 12,10A1,1 0 0,0 13,9A1,1 0 0,0 12,8Z"
+  />
+</svg>

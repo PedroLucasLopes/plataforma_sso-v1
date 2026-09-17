@@ -3,6 +3,7 @@
     :application="request?.application ?? null"
     :brand="APP_NAME"
     :error="error"
+    :logo="APP_LOGO"
     :pending-provider="pendingProvider"
     :providers="providers"
     :state="state"
@@ -16,7 +17,7 @@
   import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRoute } from 'vue-router'
-  import { APP_NAME } from '@/constants/layout'
+  import { APP_LOGO, APP_NAME } from '@/constants/layout'
   import { loginError, PROVIDER_ICONS } from '@/constants/messages'
   import { ApiError } from '@/services/http'
   import { sessionApi } from '@/services/sso'

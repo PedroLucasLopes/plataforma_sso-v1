@@ -202,7 +202,14 @@ passaram pela conferência de contraste. No template, prefira a classe do tema (
 variável (`var(--dl-surface)`), que trocam sozinhas com o tema. A constante serve ao que não enxerga
 CSS, como a cor de um gráfico.
 
-`constants/layout.ts` guarda largura do conteúdo, tamanho de página e debounce. `status.ts` guarda as
+**A marca do SSO é o escudo com chave.** `APP_LOGO`, em `constants/layout.ts`, vai ao topo do menu
+pelo `logo` do `DlAppShell` e à tela de login pelo do `DlSignIn`; `public/favicon.svg` desenha o mesmo
+ícone na aba. Arquivo estático não lê constante nem token, então ele repete à mão o desenho, o
+`primary` e o `onPrimary` da biblioteca, com a versão escura por `prefers-color-scheme`. Mudou a marca
+ou a paleta, mude o ícone da aba junto.
+
+`constants/layout.ts` guarda nome e marca da aplicação, largura do conteúdo, tamanho de página e
+debounce. `status.ts` guarda as
 pastilhas de situação, papel, método e chave, e `navigation.ts` o que o banco não guarda do menu.
 
 ## 🗃️ Estado

@@ -1,6 +1,13 @@
 /** Nome da aplicacao no menu e no titulo da aba. E nome proprio: nao se traduz. */
 export const APP_NAME = 'SSO'
 
+/**
+ * Marca do SSO no topo do menu e na tela de login: o escudo com chave que
+ * `public/favicon.svg` desenha na aba. Arquivo estatico nao le constante; trocou a
+ * marca aqui, troque o icone da aba.
+ */
+export const APP_LOGO = 'mdi-shield-key-outline'
+
 /** Largura maxima do conteudo. Acima disso sobra margem, nao linha comprida. */
 export const CONTENT_MAX_WIDTH = 1280
 

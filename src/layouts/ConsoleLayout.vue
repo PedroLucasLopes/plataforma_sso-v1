@@ -5,6 +5,7 @@
     :active="activeNav"
     :groups="groups"
     :loading="routeLoading"
+    :logo="APP_LOGO"
     :max-width="CONTENT_MAX_WIDTH"
     :subtitle="t('app.subtitle')"
     :title="APP_NAME"
@@ -37,7 +38,7 @@
   import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
   import { API_PREFIX } from '@/constants/api'
-  import { APP_NAME, CONTENT_MAX_WIDTH } from '@/constants/layout'
+  import { APP_LOGO, APP_NAME, CONTENT_MAX_WIDTH } from '@/constants/layout'
   import { buildNavGroups } from '@/constants/navigation'
   import { routeLoading } from '@/router/loading'
   import { usePreferencesStore } from '@/stores/preferences'
