@@ -15,8 +15,7 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { extname, join, relative } from 'node:path'
-import { resolve } from 'node:path'
+import { extname, join, relative, resolve, sep } from 'node:path'
 
 const args = process.argv.slice(2)
 const dir = args.find(arg => !arg.startsWith('--'))
@@ -123,18 +122,24 @@ for (const file of files) {
 }
 
 if (sources) {
-  const resolvedSources = resolve(sources)
+  /*
+   * A varredura começa na própria pasta de `--sources` e não sai dela: entrada
+   * que resolva para fora, como um link, para a conferência. O caminho sempre
+   * resolve a partir da base, e a raiz é `.`; resolver a base contra ela mesma
+   * procuraria `src/src`, que não existe, e derrubava o build do container.
+   */
+  const base = resolve(sources)
   const walk = path => {
-    const resolvedBase = resolve(resolvedSources)
-    const resolvedTarget = resolve(resolvedBase, path)
-    const rel = relative(resolvedBase, resolvedTarget)
-    if (rel.startsWith('..') || resolve(rel) === rel) {
-      throw new Error('Invalid file path')
+    const target = resolve(base, path)
+
+    if (target !== base && !target.startsWith(base + sep)) {
+      throw new Error(`caminho fora de ${sources}: ${path}`)
     }
-    return statSync(resolvedTarget).isDirectory() ? readdirSync(resolvedTarget).flatMap(entry => walk(join(path, entry))) : [resolvedTarget]
+
+    return statSync(target).isDirectory() ? readdirSync(target).flatMap(entry => walk(join(path, entry))) : [target]
   }
 
-  const code = walk(sources).filter(file => ['.vue', '.ts'].includes(extname(file)) && !file.endsWith('.d.ts'))
+  const code = walk('.').filter(file => ['.vue', '.ts'].includes(extname(file)) && !file.endsWith('.d.ts'))
   const namespaces = new Set([...reference.keys()].map(key => key.split('.', 1)[0]))
   const groups = new Set([...reference.keys()].flatMap(key => key.split('.').slice(0, -1).map((_, index, parts) => parts.slice(0, index + 1).join('.'))))
   const used = new Set()

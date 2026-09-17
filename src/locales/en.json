@@ -482,7 +482,7 @@
     "emailPlaceholder": "marina{'@'}example.com",
     "googleAccount": "Google account",
     "deleteTitle": "Delete user",
-    "deleteMessage": "{name} can no longer sign in. Registering the same e-mail again creates a new user.",
+    "deleteMessage": "{name} can no longer sign in, and any open sessions with the SSO end now. Registering the same e-mail again creates a new user.",
     "updated": "User updated",
     "registered": "User registered",
     "registeredDescription": "They can sign in once added to a project.",

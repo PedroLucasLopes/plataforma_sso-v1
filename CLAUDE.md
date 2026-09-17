@@ -15,6 +15,8 @@ no repositório da biblioteca, sai numa versão publicada, e só depois é consu
 neste projeto é composição com regra de domínio: painéis do projeto, páginas e stores. Regras de
 estilo do scaffold em `AGENTS.md`; o ESLint decide o formato.
 
+A revisão de segurança deste front está em [`PENTEST.md`](PENTEST.md).
+
 A interface fala **inglês, espanhol e português do Brasil**, e a pessoa troca pelo menu com o nome dela,
 no canto da barra. Comentário continua em português, como no resto do repositório. Ver "Traduções".
 

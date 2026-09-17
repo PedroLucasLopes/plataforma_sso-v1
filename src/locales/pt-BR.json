@@ -482,7 +482,7 @@
     "emailPlaceholder": "marina{'@'}example.com",
     "googleAccount": "Conta Google",
     "deleteTitle": "Excluir usuário",
-    "deleteMessage": "{name} não poderá mais entrar. Cadastrar o mesmo e-mail de novo cria um usuário novo.",
+    "deleteMessage": "{name} não poderá mais entrar, e as sessões abertas no SSO terminam agora. Cadastrar o mesmo e-mail de novo cria um usuário novo.",
     "updated": "Usuário atualizado",
     "registered": "Usuário cadastrado",
     "registeredDescription": "A pessoa consegue entrar assim que for adicionada a um projeto.",

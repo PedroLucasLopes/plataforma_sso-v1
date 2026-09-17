@@ -482,7 +482,7 @@
     "emailPlaceholder": "marina{'@'}example.com",
     "googleAccount": "Cuenta de Google",
     "deleteTitle": "Eliminar usuario",
-    "deleteMessage": "{name} ya no podrá iniciar sesión. Registrar el mismo correo de nuevo crea un usuario nuevo.",
+    "deleteMessage": "{name} ya no podrá iniciar sesión, y las sesiones abiertas en el SSO terminan ahora. Registrar el mismo correo de nuevo crea un usuario nuevo.",
     "updated": "Usuario actualizado",
     "registered": "Usuario registrado",
     "registeredDescription": "Podrá iniciar sesión cuando se agregue a un proyecto.",
