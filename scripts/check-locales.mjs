@@ -16,6 +16,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { extname, join, relative } from 'node:path'
+import { resolve } from 'node:path'
 
 const args = process.argv.slice(2)
 const dir = args.find(arg => !arg.startsWith('--'))
@@ -37,7 +38,16 @@ if (!files.includes('en.json')) {
   throw new Error(`Sem en.json em ${dir}: ele é a referência das outras línguas.`)
 }
 
-const load = file => new Map(flatten(JSON.parse(readFileSync(join(dir, file), 'utf8'))))
+const resolvedDir = resolve(dir)
+const load = file => {
+  const resolvedBase = resolve(resolvedDir)
+  const resolvedTarget = resolve(resolvedBase, file)
+  const rel = relative(resolvedBase, resolvedTarget)
+  if (rel.startsWith('..') || resolve(rel) === rel) {
+    throw new Error('Invalid file path')
+  }
+  return new Map(flatten(JSON.parse(readFileSync(resolvedTarget, 'utf8'))))
+}
 const reference = load('en.json')
 const problems = []
 const warnings = []
@@ -113,8 +123,16 @@ for (const file of files) {
 }
 
 if (sources) {
-  const walk = path =>
-    statSync(path).isDirectory() ? readdirSync(path).flatMap(entry => walk(join(path, entry))) : [path]
+  const resolvedSources = resolve(sources)
+  const walk = path => {
+    const resolvedBase = resolve(resolvedSources)
+    const resolvedTarget = resolve(resolvedBase, path)
+    const rel = relative(resolvedBase, resolvedTarget)
+    if (rel.startsWith('..') || resolve(rel) === rel) {
+      throw new Error('Invalid file path')
+    }
+    return statSync(resolvedTarget).isDirectory() ? readdirSync(resolvedTarget).flatMap(entry => walk(join(path, entry))) : [resolvedTarget]
+  }
 
   const code = walk(sources).filter(file => ['.vue', '.ts'].includes(extname(file)) && !file.endsWith('.d.ts'))
   const namespaces = new Set([...reference.keys()].map(key => key.split('.', 1)[0]))
