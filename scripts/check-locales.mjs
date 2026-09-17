@@ -15,40 +15,31 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { extname, join, relative, resolve } from 'node:path'
+import { extname, join, relative } from 'node:path'
+import { resolve } from 'node:path'
 
 const args = process.argv.slice(2)
 const dir = args.find(arg => !arg.startsWith('--'))
-const sources = args
-  .find(arg => arg.startsWith('--sources='))
-  ?.slice('--sources='.length)
+const sources = args.find(arg => arg.startsWith('--sources='))?.slice('--sources='.length)
 
 if (!dir) {
-  throw new Error(
-    'Uso: node scripts/check-locales.mjs <pasta dos JSON> [--sources=<pasta do código>]',
-  )
+  throw new Error('Uso: node scripts/check-locales.mjs <pasta dos JSON> [--sources=<pasta do código>]')
 }
 
 function flatten (tree, prefix = '') {
   return Object.entries(tree).flatMap(([key, value]) =>
-    value && typeof value === 'object'
-      ? flatten(value, `${prefix}${key}.`)
-      : [[`${prefix}${key}`, value]],
+    value && typeof value === 'object' ? flatten(value, `${prefix}${key}.`) : [[`${prefix}${key}`, value]],
   )
 }
 
-const files = readdirSync(dir)
-  .filter(file => file.endsWith('.json'))
-  .toSorted()
+const files = readdirSync(dir).filter(file => file.endsWith('.json')).toSorted()
 
 if (!files.includes('en.json')) {
-  throw new Error(
-    `Sem en.json em ${dir}: ele é a referência das outras línguas.`,
-  )
+  throw new Error(`Sem en.json em ${dir}: ele é a referência das outras línguas.`)
 }
 
 const resolvedDir = resolve(dir)
-function load (file) {
+const load = file => {
   const resolvedBase = resolve(resolvedDir)
   const resolvedTarget = resolve(resolvedBase, file)
   const rel = relative(resolvedBase, resolvedTarget)
@@ -64,15 +55,7 @@ const warnings = []
 /* Literal do vue-i18n, `{'@'}`, não é parâmetro nem separador de plural. */
 const withoutLiterals = text => text.replace(/\{\s*'[^']*'\s*\}/g, '')
 function parameters (text) {
-  return [
-    ...new Set(
-      [...withoutLiterals(text).matchAll(/\{\s*(\w+)\s*\}/g)].map(
-        match => match[1],
-      ),
-    ),
-  ]
-    .toSorted()
-    .join(', ')
+  return [...new Set([...withoutLiterals(text).matchAll(/\{\s*(\w+)\s*\}/g)].map(match => match[1]))].toSorted().join(', ')
 }
 const forms = text => withoutLiterals(text).split('|').length
 
@@ -82,9 +65,7 @@ let compile = null
 try {
   ({ baseCompile: compile } = require('@intlify/message-compiler'))
 } catch {
-  warnings.push(
-    '@intlify/message-compiler não encontrado: a sintaxe das mensagens não foi conferida.',
-  )
+  warnings.push('@intlify/message-compiler não encontrado: a sintaxe das mensagens não foi conferida.')
 }
 
 function syntaxErrors (text) {
@@ -124,15 +105,11 @@ for (const file of files) {
     }
 
     if (parameters(text) !== parameters(english)) {
-      problems.push(
-        `${file}: "${key}" usa {${parameters(text)}}, e o inglês usa {${parameters(english)}}`,
-      )
+      problems.push(`${file}: "${key}" usa {${parameters(text)}}, e o inglês usa {${parameters(english)}}`)
     }
 
     if (forms(text) !== forms(english)) {
-      problems.push(
-        `${file}: "${key}" tem ${forms(text)} forma(s) de plural, e o inglês tem ${forms(english)}`,
-      )
+      problems.push(`${file}: "${key}" tem ${forms(text)} forma(s) de plural, e o inglês tem ${forms(english)}`)
     }
   }
 
@@ -154,26 +131,12 @@ if (sources) {
     if (rel.startsWith('..') || resolve(rel) === rel) {
       throw new Error('Invalid file path')
     }
-    return statSync(resolvedTarget).isDirectory()
-      ? readdirSync(resolvedTarget).flatMap(entry => walk(join(path, entry)))
-      : [resolvedTarget]
+    return statSync(resolvedTarget).isDirectory() ? readdirSync(resolvedTarget).flatMap(entry => walk(join(path, entry))) : [resolvedTarget]
   }
 
-  const code = walk(sources).filter(
-    file =>
-      ['.vue', '.ts'].includes(extname(file)) && !file.endsWith('.d.ts'),
-  )
-  const namespaces = new Set(
-    [...reference.keys()].map(key => key.split('.', 1)[0]),
-  )
-  const groups = new Set(
-    [...reference.keys()].flatMap(key =>
-      key
-        .split('.')
-        .slice(0, -1)
-        .map((_, index, parts) => parts.slice(0, index + 1).join('.')),
-    ),
-  )
+  const code = walk(sources).filter(file => ['.vue', '.ts'].includes(extname(file)) && !file.endsWith('.d.ts'))
+  const namespaces = new Set([...reference.keys()].map(key => key.split('.', 1)[0]))
+  const groups = new Set([...reference.keys()].flatMap(key => key.split('.').slice(0, -1).map((_, index, parts) => parts.slice(0, index + 1).join('.'))))
   const used = new Set()
   const prefixes = new Set()
 
@@ -181,9 +144,7 @@ if (sources) {
     const text = readFileSync(file, 'utf8')
 
     // Aspas simples ou crase. Aspas duplas, no template, são expressão do Vue: `:count="project.roles.length"`.
-    for (const match of text.matchAll(
-      /(['`])([a-z][A-Za-z0-9]*(?:\.\w+)+)\1/g,
-    )) {
+    for (const match of text.matchAll(/(['`])([a-z][A-Za-z0-9]*(?:\.\w+)+)\1/g)) {
       const key = match[2]
 
       if (!namespaces.has(key.split('.', 1)[0])) {
@@ -195,24 +156,17 @@ if (sources) {
       } else if (groups.has(key)) {
         prefixes.add(`${key}.`)
       } else {
-        problems.push(
-          `${relative(process.cwd(), file)}: "${key}" não existe no en.json`,
-        )
+        problems.push(`${relative(process.cwd(), file)}: "${key}" não existe no en.json`)
       }
     }
 
-    for (const match of text.matchAll(
-      /`([a-z][A-Za-z0-9]*(?:\.\w+)*\.)\$\{/g,
-    )) {
+    for (const match of text.matchAll(/`([a-z][A-Za-z0-9]*(?:\.\w+)*\.)\$\{/g)) {
       prefixes.add(match[1])
     }
   }
 
   for (const key of reference.keys()) {
-    if (
-      !used.has(key)
-      && ![...prefixes].some(prefix => key.startsWith(prefix))
-    ) {
+    if (!used.has(key) && ![...prefixes].some(prefix => key.startsWith(prefix))) {
       warnings.push(`"${key}" não é usado no código`)
     }
   }
@@ -229,7 +183,5 @@ if (problems.length > 0) {
   console.error(`\n${problems.length} problema(s) nas traduções.`)
   process.exitCode = 1
 } else {
-  console.log(
-    `Traduções conferidas: ${files.join(', ')}, ${reference.size} chaves cada.`,
-  )
+  console.log(`Traduções conferidas: ${files.join(', ')}, ${reference.size} chaves cada.`)
 }
