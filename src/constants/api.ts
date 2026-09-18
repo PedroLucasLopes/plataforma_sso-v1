@@ -10,6 +10,13 @@ export const API_PREFIX = '/sso'
  */
 export const CALLBACK_PATH = '/callback'
 
+/**
+ * De quanto em quanto tempo o console rele a sessao em `GET /sso/me`, enquanto a
+ * aba esta visivel. O SSO ja decide cada chamada pelo papel de agora; isto e o
+ * prazo para o menu e as acoes acompanharem uma troca feita por outra pessoa.
+ */
+export const SESSION_RECHECK_MS = 30_000
+
 /** Tela de login do IdP. So oferece login com um pedido pendente. */
 export const LOGIN_PATH = '/login'
 

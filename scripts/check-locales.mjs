@@ -38,7 +38,7 @@ if (!files.includes('en.json')) {
 }
 
 const resolvedDir = resolve(dir)
-const load = file => {
+function load (file) {
   const resolvedBase = resolve(resolvedDir)
   const resolvedTarget = resolve(resolvedBase, file)
   const rel = relative(resolvedBase, resolvedTarget)

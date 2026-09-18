@@ -93,6 +93,17 @@ function takeAttempt (): LoginAttempt | null {
   }
 }
 
+/** O que o papel alcanca, numa string comparavel: papel, raiz e rotas em ordem. */
+function accessKey (me: Me | null): string {
+  if (!me) {
+    return ''
+  }
+
+  const rotas = me.permissions.map(p => `${p.method} ${p.path}`).toSorted().join(',')
+
+  return `${me.role}|${me.root}|${rotas}`
+}
+
 /**
  * A sessao do console.
  *
@@ -181,6 +192,51 @@ export const useSessionStore = defineStore('session', () => {
     return ensure()
   }
 
+  /**
+   * Rele quem e a pessoa e o que o papel dela alcanca, sem tirar a tela do lugar.
+   *
+   * O SSO rele o papel a cada chamada, entao a API ja vale na hora; o que ficava
+   * para tras era a tela, carregada uma vez. `me` so e trocado quando a resposta
+   * chega, e o SSO fora do ar nao derruba ninguem: a tela fica como esta.
+   */
+  async function revalidate (): Promise<'same' | 'changed' | 'ended' | 'no-access' | 'unknown'> {
+    if (status.value !== 'authenticated' || pending) {
+      return 'unknown'
+    }
+
+    try {
+      const current = await sessionApi.me()
+      const changed = accessKey(current) !== accessKey(me.value)
+
+      me.value = current
+      identity.value = { name: current.name, email: current.email }
+      csrfToken.value = current.csrfToken ?? csrfToken.value
+
+      return changed ? 'changed' : 'same'
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        reset()
+        status.value = 'unauthenticated'
+
+        return 'ended'
+      }
+
+      if (error instanceof ApiError && error.status === 403) {
+        // Tirada do projeto SSO: a sessao continua, o console nao.
+        const view = await sessionApi.current().catch(() => null)
+
+        me.value = null
+        identity.value = view?.user ?? identity.value
+        csrfToken.value = view?.csrfToken ?? csrfToken.value
+        status.value = 'no-access'
+
+        return 'no-access'
+      }
+
+      return 'unknown'
+    }
+  }
+
   /** Navegacao de pagina ao SSO. Quem chama nao deve continuar a navegacao. */
   function beginLogin (returnTo: string): void {
     const state = randomState()
@@ -253,6 +309,7 @@ export const useSessionStore = defineStore('session', () => {
     can,
     ensure,
     refresh,
+    revalidate,
     beginLogin,
     completeLogin,
     signOut,

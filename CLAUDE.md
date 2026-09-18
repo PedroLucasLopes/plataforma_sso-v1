@@ -96,6 +96,17 @@ entrou sem papel, e fica só na memória do store. A camada HTTP anexa em todo m
 **Logout** é `POST /sso/session/logout`: encerra a sessão do SSO e derruba a renovação de todas as
 aplicações. Em seguida o console pede login de novo, e a pessoa cai na tela do IdP.
 
+**O que outra pessoa muda chega à tela sem recarregar.** O SSO relê o papel a cada chamada, então a
+API já respeitava uma troca feita por outra conta; a tela não, porque `GET /sso/me` era lido uma vez,
+na carga da página. `useSessionWatch`, montado no `ConsoleLayout`, relê a sessão a cada
+`SESSION_RECHECK_MS` (30 segundos) com a aba visível, e na volta a ela, por foco ou visibilidade:
+
+| O que mudou | O que o console faz |
+|---|---|
+| papel ou rotas do papel | menu, cabeçalho e ações acompanham sozinhos. Se a tela aberta deixou de ser alcançada, `/forbidden` |
+| a pessoa saiu do projeto `SSO` | `/no-access`: a sessão continua, o console não |
+| a sessão acabou | login, voltando para a mesma URL |
+
 A `redirect_uri` `http://localhost:5173/callback` vem do SQL de primeira subida do ambiente. Console
 em outro endereço precisa ter a sua `…/callback` registrada no projeto `SSO`, pela raiz.
 
@@ -191,7 +202,7 @@ Conceder e revogar moram em `composables/useGrants.ts`, usado pelos dois lados.
 ├─ 🗣️ locales/       # en.json (referência), es.json, pt-BR.json: todo texto de tela
 ├─ 🔧 plugins/       # i18n.ts (vue-i18n, língua inicial, `t` fora de componente) · vuetify.ts
 ├─ 🎨 constants/     # theme, layout, api, navigation, status, messages (códigos → chaves)
-├─ 🧰 composables/   # useCrudDialog · useConfirm · useGrants
+├─ 🧰 composables/   # useCrudDialog · useConfirm · useGrants · useSessionWatch (relê a sessão)
 ├─ 🔤 types/         # sso.ts, espelho dos DTOs do backend
 └─ 🛠️ utils/         # format.ts · forms.ts · routes.ts (rotas do overview no formato da árvore)
 ```
@@ -210,8 +221,13 @@ pelo `logo` do `DlAppShell` e à tela de login pelo do `DlSignIn`; `public/favic
 `primary` e o `onPrimary` da biblioteca, com a versão escura por `prefers-color-scheme`. Mudou a marca
 ou a paleta, mude o ícone da aba junto.
 
-`constants/layout.ts` guarda nome e marca da aplicação, largura do conteúdo, tamanho de página e
-debounce. `status.ts` guarda as
+**O painel não deixa buraco.** Cartões e gráficos são flex, com `flex: 1 1 <piso>` e `min-width: 0`:
+cabem quantos a largura permitir, e quem sobra na última linha cresce até a borda. A grade
+`repeat(auto-fit, minmax(...))` mantinha a largura das colunas na última linha e deixava o resto dela
+vazio. O piso dos cartões é `STAT_CARD_MIN_WIDTH`, em `constants/layout.ts`.
+
+`constants/layout.ts` guarda nome e marca da aplicação, largura do conteúdo, piso dos cartões do
+painel, tamanho de página e debounce. `status.ts` guarda as
 pastilhas de situação, papel, método e chave, e `navigation.ts` o que o banco não guarda do menu.
 
 ## 🗃️ Estado
@@ -297,6 +313,8 @@ que devia ter saído continua na tela. Confira o DOM antes de chamar de defeito.
   ou opção escrito no componente, na store ou na constante.
 - Rótulo que depende da língua é lido na hora de desenhar: `computed`, template ou getter.
 - Toda escrita passa por `services/http.ts`, que anexa o `X-CSRF-Token`.
+- `useSessionWatch` fica montado no `ConsoleLayout`. Sem ele, papel trocado por outra conta só chega ao
+  menu depois de recarregar.
 - Tela nova declara `meta.permission` com o mesmo método e caminho do catálogo do SSO.
 - Ação que o papel não alcança sai do DOM; desabilitar fica para bloqueio por estado.
 - Rota e papel de aplicação não ganham lista global. Aparecem dentro do projeto deles.
