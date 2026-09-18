@@ -145,9 +145,11 @@ Todo texto de tela mora em `src/locales`, um JSON por língua: `en.json`, `es.js
   `constants/status.ts` têm o rótulo num getter. Um array constante com `t()` ficaria na língua do boot.
 - **Data e número seguem a língua.** `formatDate` e `formatDateTime` usam a corrente, e `inferColumns`
   recebe `locale`.
-- **Mensagem do backend** é traduzida por `API_MESSAGE_KEYS` (texto exato do servidor → chave) e
-  `ERROR_CODES` (`errors.code.<código>`). A validação do class-validator vem em inglês e entra como
-  detalhe de `errors.status.badRequest`. O texto do erro é o da língua no momento da falha.
+- **Erro do backend é traduzido pelo código**, no campo `error`: `ERROR_CODES`, em
+  `constants/messages.ts`, lista os que o console conhece, e o texto mora em `errors.code.<código>`. A
+  recusa da validação traz o código de cada campo, com texto em `errors.field.<código>`. Código
+  desconhecido cai na mensagem do status, e o `message` do servidor **nunca** vai para a tela. O texto
+  do erro é o da língua no momento da falha.
 - **Plural** é do vue-i18n: `"{count} rota | {count} rotas"` e `t('counts.routes', n)`.
 - **`@` literal é `{'@'}`**, senão a mensagem não compila no vue-i18n.
 
@@ -249,7 +251,7 @@ pastilhas de situação, papel, método e chave, e `navigation.ts` o que o banco
 | Não há total de registros | tabela com paginação cega; no catálogo, `pageLimit` evita "Next" sem próxima |
 | `limit` com piso 10 e sem teto | `PAGE_SIZE = 20`, `LOOKUP_LIMIT = 500` |
 | Filtro `email` exige endereço completo | a busca manda texto com cara de e-mail como `email`, e o resto como `name` |
-| Mensagens de erro em português | `API_MESSAGE_KEYS` leva as conhecidas a uma chave de tradução; a validação do class-validator vem em inglês, como detalhe |
+| Erro sai com código em `error` | `apiErrorText`, em `constants/messages.ts`: código conhecido vira texto, o resto cai no status |
 | Apagar rota ou papel com permissão falha no banco | a ação fica desabilitada até a permissão sair |
 | Rota não guarda data nem autor | o detalhe do caminho sai inteiro do overview, sem chamada a mais |
 | Um papel por pessoa por projeto | trocar o papel e tirar do projeto são ações da linha, em `MembersPanel` |
@@ -313,12 +315,13 @@ que devia ter saído continua na tela. Confira o DOM antes de chamar de defeito.
   ou opção escrito no componente, na store ou na constante.
 - Rótulo que depende da língua é lido na hora de desenhar: `computed`, template ou getter.
 - Toda escrita passa por `services/http.ts`, que anexa o `X-CSRF-Token`.
+- Texto de erro sai do código em `error`, ou do status. O `message` do servidor nunca vai para a tela.
 - `useSessionWatch` fica montado no `ConsoleLayout`. Sem ele, papel trocado por outra conta só chega ao
   menu depois de recarregar.
 - Tela nova declara `meta.permission` com o mesmo método e caminho do catálogo do SSO.
 - Ação que o papel não alcança sai do DOM; desabilitar fica para bloqueio por estado.
 - Rota e papel de aplicação não ganham lista global. Aparecem dentro do projeto deles.
 - O console não oferece o que o servidor recusa no projeto `SSO`. A regra vale no servidor; a tela só
-  evita o caminho fechado, e a mensagem de cada recusa vem de `CODE_MESSAGES`.
+  evita o caminho fechado, e a mensagem de cada recusa vem do código dela, em `errors.code`.
 - Nome de papel é texto livre. Nada na tela depende de a lista de papéis ser fixa.
 - Rode `npm run type-check`, `npm run lint` e `npm run check:locales` antes de considerar pronto.

@@ -14,7 +14,7 @@
  * lingua corrente no momento da falha.
  */
 import { API_PREFIX } from '@/constants/api'
-import { API_MESSAGE_KEYS, ERROR_CODES, STATUS_MESSAGE_KEYS } from '@/constants/messages'
+import { apiErrorText, STATUS_MESSAGE_KEYS } from '@/constants/messages'
 import { t } from '@/plugins/i18n'
 
 export class ApiError extends Error {
@@ -84,37 +84,23 @@ async function readBody (response: Response): Promise<unknown> {
   }
 }
 
+/**
+ * O texto do erro sai do codigo, ou do status quando o codigo nao e conhecido.
+ * O `message` do servidor nunca: ele e para quem le a resposta crua, e mostra-lo
+ * poria na tela qualquer detalhe interno ou valor repetido da requisicao.
+ */
 function describe (status: number, payload: unknown): { message: string, code: string | null } {
   const body = payload && typeof payload === 'object' ? payload as Record<string, unknown> : {}
   const code = typeof body.error === 'string' ? body.error : null
+  const known = apiErrorText(code, body)
 
-  let raw: string | null = null
-
-  if (Array.isArray(body.message)) {
-    raw = body.message.map(String).join('. ')
-  } else if (typeof body.message === 'string') {
-    raw = body.message
-  }
-
-  if (code && ERROR_CODES.has(code)) {
-    return { message: t(`errors.code.${code}`), code }
-  }
-
-  const apiKey = raw ? API_MESSAGE_KEYS.get(raw) : undefined
-
-  if (apiKey) {
-    return { message: t(apiKey), code }
-  }
-
-  // A validacao do class-validator vem em ingles e nomeia o campo. O detalhe vai
-  // como veio, dentro de uma frase na lingua da tela.
-  if (status === 400 && raw) {
-    return { message: t('errors.status.badRequest', { detail: raw }), code }
+  if (known) {
+    return { message: known, code }
   }
 
   const byStatus = STATUS_MESSAGE_KEYS[status] ?? (status >= 500 ? STATUS_MESSAGE_KEYS[500] : undefined)
 
-  return { message: byStatus ? t(byStatus) : (raw ?? t('errors.fallback')), code }
+  return { message: byStatus ? t(byStatus) : t('errors.fallback'), code }
 }
 
 export async function request<T> (path: string, options: RequestOptions = {}): Promise<T> {

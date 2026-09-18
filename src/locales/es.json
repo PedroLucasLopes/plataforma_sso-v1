@@ -84,33 +84,50 @@
     "fallback": "No se pudo completar la solicitud.",
     "status": {
       "network": "El SSO no respondió. Revisa tu conexión e inténtalo de nuevo.",
-      "badRequest": "El SSO rechazó los valores enviados: {detail}",
+      "badRequest": "El SSO rechazó la solicitud.",
       "unauthorized": "Tu sesión terminó. Inicia sesión de nuevo para continuar.",
       "forbidden": "Tu rol no permite esta acción.",
       "notFound": "No se encontró el registro. Puede que se haya eliminado.",
       "conflict": "Ya existe un registro con estos valores.",
-      "server": "El SSO no pudo procesar la solicitud. No se cambió nada."
-    },
-    "api": {
-      "keyRequiredToActivate": "Registra al menos una clave de cliente antes de activar el proyecto.",
-      "projectHasMembers": "No agregues a nadie más y quita a los miembros de este proyecto antes de eliminarlo.",
-      "projectHasRoutes": "Elimina las rutas de este proyecto antes de eliminarlo.",
-      "userHasProjects": "Este usuario todavía tiene acceso a un proyecto. Quita sus vínculos primero.",
-      "roleAndRouteProjects": "El rol y la ruta pertenecen a proyectos distintos.",
-      "publicKeyNotPem": "Pega una clave pública en formato PEM, que empiece con -----BEGIN PUBLIC KEY-----.",
-      "publicKeyInvalid": "Esta no es una clave pública válida.",
-      "publicKeyNotRsa": "Solo se aceptan claves RSA (RS256).",
-      "publicKeyTooShort": "La clave RSA debe tener al menos 2048 bits.",
-      "keyNotFound": "No se encontró la clave, o ya estaba revocada.",
-      "noKeys": "Este proyecto todavía no tiene claves de cliente."
+      "server": "El SSO no pudo procesar la solicitud. No se cambió nada.",
+      "tooLarge": "La solicitud es demasiado grande.",
+      "tooManyRequests": "Demasiadas solicitudes en poco tiempo. Espera un momento e inténtalo de nuevo."
     },
     "code": {
+      "client_key_not_found": "No se encontró la clave, o ya estaba revocada.",
+      "client_key_required": "Registra al menos una clave de cliente antes de activar el proyecto.",
+      "client_keys_empty": "Este proyecto todavía no tiene claves de cliente.",
       "csrf_token_invalid": "Tu token de seguridad está desactualizado. Recarga la página e inténtalo de nuevo.",
+      "duplicate": "Ya existe un registro con estos valores.",
+      "internal_error": "El SSO no pudo procesar la solicitud. No se cambió nada.",
+      "member_not_found": "Esta persona ya no es miembro del proyecto.",
+      "no_results": "No se encontró nada.",
       "origin_not_allowed": "Esta solicitud no vino de la consola y fue rechazada.",
-      "sso_project_protected": "El proyecto SSO administra todas las aplicaciones. Solo su SUPERADMIN cambia sus rutas, roles, permisos, miembros, URI de redirección y claves, y algunos cambios se rechazan para todos.",
+      "permission_not_found": "Este permiso ya no existe.",
+      "project_has_members": "No agregues a nadie más y quita a los miembros de este proyecto antes de eliminarlo.",
+      "project_has_routes": "Elimina las rutas de este proyecto antes de eliminarlo.",
+      "project_not_found": "Este proyecto no existe. Puede que se haya eliminado.",
+      "public_key_invalid": "Esta no es una clave pública válida.",
+      "public_key_not_rsa": "Solo se aceptan claves RSA (RS256).",
+      "public_key_too_short": "La clave RSA debe tener al menos 2048 bits.",
+      "redirect_uri_not_found": "Esta redirect URI no existe. Puede que se haya eliminado.",
+      "role_not_found": "Este rol no existe. Puede que se haya eliminado.",
+      "role_not_in_project": "Este rol pertenece a otro proyecto.",
+      "role_route_project_mismatch": "El rol y la ruta pertenecen a proyectos distintos.",
+      "route_not_found": "Esta ruta no existe. Puede que se haya eliminado.",
+      "sso_access_denied": "Tu cuenta no tiene rol en el proyecto SSO.",
       "sso_last_superadmin": "El proyecto SSO necesita al menos un SUPERADMIN. Primero dale el rol a otra persona.",
+      "sso_project_protected": "El proyecto SSO administra todas las aplicaciones. Solo su SUPERADMIN cambia sus rutas, roles, permisos, miembros, URI de redirección y claves, y algunos cambios se rechazan para todos.",
+      "sso_redirect_uri_in_use": "Esta consola inicia sesión por esta dirección. Elimínala desde una consola que funcione en otra dirección.",
       "sso_redirect_uri_last": "El proyecto SSO necesita al menos una URI de redirección. Agrega la nueva dirección antes de eliminar esta.",
-      "sso_redirect_uri_in_use": "Esta consola inicia sesión por esta dirección. Elimínala desde una consola que funcione en otra dirección."
+      "user_has_projects": "Este usuario todavía tiene acceso a un proyecto. Quita sus vínculos primero.",
+      "user_not_found": "Este usuario no existe. Puede que se haya eliminado.",
+      "validation_failed": "El SSO rechazó algunos de los valores enviados. Revisa el formulario e inténtalo de nuevo."
+    },
+    "field": {
+      "email_invalid": "Ingresa un correo electrónico válido.",
+      "public_key_not_pem": "Pega una clave pública en formato PEM, que empiece con -----BEGIN PUBLIC KEY-----.",
+      "role_name_invalid": "Usa de 2 a 40 caracteres: una letra mayúscula y luego mayúsculas, dígitos o guiones bajos."
     }
   },
   "forms": {

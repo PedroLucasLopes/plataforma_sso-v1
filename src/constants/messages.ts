@@ -36,41 +36,108 @@ export const PROVIDER_ICONS: Record<string, string> = {
 }
 
 /**
- * Mensagens do backend escritas para quem opera a API, traduzidas para quem
- * usa o console. A chave e o texto exato que o servidor devolve; o valor, a
- * chave de traducao. `Map`, e nao objeto: o texto vem do servidor, e
- * `constructor` nao pode achar nada.
+ * Os codigos que o SSO manda no campo `error`, com o texto em
+ * `errors.code.<codigo>`. O backend diz qual erro foi; o console escolhe as
+ * palavras, na lingua dele.
+ *
+ * So codigo desta lista vira frase. O resto cai na mensagem do status, e o
+ * texto que o servidor escreve em `message` nunca vai para a tela: ele e para
+ * quem le a resposta crua, e e por ali que um detalhe interno ou um valor
+ * repetido da requisicao chegaria a quem usa.
+ *
+ * `login_required` e `invalid_token` nao estao aqui: todo 401 vira relogin
+ * antes de virar mensagem. Codigo novo no SSO precisa entrar aqui e nos JSON
+ * de traducao; sem isso, a tela mostra a mensagem do status.
  */
-export const API_MESSAGE_KEYS = new Map<string, string>([
-  ['cadastre ao menos uma chave publica em /clientkey antes de ativar', 'errors.api.keyRequiredToActivate'],
-  ['This project have ongoing permissions', 'errors.api.projectHasMembers'],
-  ['Some routes are associated with this project', 'errors.api.projectHasRoutes'],
-  ['This user have ongoing permissions', 'errors.api.userHasProjects'],
-  ['You cannot associate roles from different projects', 'errors.api.roleAndRouteProjects'],
-  ['publicKeyPem deve ser uma chave publica em PEM (SPKI)', 'errors.api.publicKeyNotPem'],
-  ['publicKeyPem nao e uma chave valida', 'errors.api.publicKeyInvalid'],
-  ['apenas chaves RSA sao aceitas (RS256)', 'errors.api.publicKeyNotRsa'],
-  ['a chave RSA precisa ter ao menos 2048 bits', 'errors.api.publicKeyTooShort'],
-  ['Chave nao encontrada ou ja revogada', 'errors.api.keyNotFound'],
-  ['Nenhuma chave cadastrada para este projeto', 'errors.api.noKeys'],
-])
-
-/** Codigos de erro nomeados que o backend manda, com texto em `errors.code`. */
-export const ERROR_CODES = new Set([
+export const ERROR_CODES: ReadonlySet<string> = new Set([
+  // gerais
+  'no_results',
+  'validation_failed',
+  'duplicate',
+  'internal_error',
+  // sessao e escrita
   'csrf_token_invalid',
   'origin_not_allowed',
+  'sso_access_denied',
+  // protecao do projeto SSO
   'sso_project_protected',
   'sso_last_superadmin',
   'sso_redirect_uri_last',
   'sso_redirect_uri_in_use',
+  // projeto, usuario e membro
+  'project_not_found',
+  'client_key_required',
+  'project_has_members',
+  'project_has_routes',
+  'user_not_found',
+  'user_has_projects',
+  'member_not_found',
+  // papel, rota, permissao e redirect URI
+  'role_not_found',
+  'role_not_in_project',
+  'route_not_found',
+  'permission_not_found',
+  'role_route_project_mismatch',
+  'redirect_uri_not_found',
+  // chave de cliente
+  'client_key_not_found',
+  'client_keys_empty',
+  'public_key_invalid',
+  'public_key_not_rsa',
+  'public_key_too_short',
 ])
 
-/** Ultimo recurso, por status HTTP. `0` e o SSO que nao respondeu. */
+/**
+ * Codigos de campo que a validacao dos DTOs manda em `fields`, com o texto em
+ * `errors.field.<codigo>`. Campo recusado sem codigo desta lista entra na
+ * recusa generica de `validation_failed`.
+ */
+const FIELD_ERROR_CODES: ReadonlySet<string> = new Set([
+  'role_name_invalid',
+  'public_key_not_pem',
+  'email_invalid',
+])
+
+/** A recusa da validacao: os campos com texto proprio, ou a recusa generica. */
+function validationMessage (body: Record<string, unknown>): string {
+  const fields = Array.isArray(body.fields) ? body.fields as unknown[] : []
+  const codes = new Set<string>()
+
+  for (const field of fields) {
+    const code = field && typeof field === 'object' ? (field as { error?: unknown }).error : null
+
+    if (typeof code === 'string' && FIELD_ERROR_CODES.has(code)) {
+      codes.add(code)
+    }
+  }
+
+  return codes.size > 0
+    ? [...codes].map(code => t(`errors.field.${code}`)).join(' ')
+    : t('errors.code.validation_failed')
+}
+
+/** O texto do erro na lingua da tela, ou `null` quando o codigo nao e desta lista. */
+export function apiErrorText (code: string | null, body: Record<string, unknown>): string | null {
+  if (!code || !ERROR_CODES.has(code)) {
+    return null
+  }
+
+  return code === 'validation_failed' ? validationMessage(body) : t(`errors.code.${code}`)
+}
+
+/**
+ * Quando o codigo nao e conhecido, por status HTTP. Cobre tambem o que o
+ * framework responde sozinho, sem codigo, como o 404 de caminho e o 429 do
+ * limite de requisicoes. `0` e o SSO que nao respondeu.
+ */
 export const STATUS_MESSAGE_KEYS: Readonly<Record<number, string>> = {
   0: 'errors.status.network',
+  400: 'errors.status.badRequest',
   401: 'errors.status.unauthorized',
   403: 'errors.status.forbidden',
   404: 'errors.status.notFound',
   409: 'errors.status.conflict',
+  413: 'errors.status.tooLarge',
+  429: 'errors.status.tooManyRequests',
   500: 'errors.status.server',
 }

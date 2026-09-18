@@ -84,33 +84,50 @@
     "fallback": "Não foi possível concluir a solicitação.",
     "status": {
       "network": "O SSO não respondeu. Confira sua conexão e tente de novo.",
-      "badRequest": "O SSO recusou os valores enviados: {detail}",
+      "badRequest": "O SSO recusou a requisição.",
       "unauthorized": "Sua sessão terminou. Entre de novo para continuar.",
       "forbidden": "Seu papel não permite esta ação.",
       "notFound": "O registro não foi encontrado. Ele pode ter sido removido.",
       "conflict": "Já existe um registro com esses valores.",
-      "server": "O SSO não conseguiu processar a solicitação. Nada foi alterado."
-    },
-    "api": {
-      "keyRequiredToActivate": "Cadastre ao menos uma chave de cliente antes de ativar o projeto.",
-      "projectHasMembers": "Não adicione mais ninguém e remova os membros deste projeto antes de excluí-lo.",
-      "projectHasRoutes": "Exclua as rotas deste projeto antes de excluí-lo.",
-      "userHasProjects": "Este usuário ainda tem acesso a um projeto. Remova os vínculos antes.",
-      "roleAndRouteProjects": "O papel e a rota pertencem a projetos diferentes.",
-      "publicKeyNotPem": "Cole uma chave pública em formato PEM, começando com -----BEGIN PUBLIC KEY-----.",
-      "publicKeyInvalid": "Esta não é uma chave pública válida.",
-      "publicKeyNotRsa": "Só chaves RSA são aceitas (RS256).",
-      "publicKeyTooShort": "A chave RSA precisa ter ao menos 2048 bits.",
-      "keyNotFound": "A chave não foi encontrada ou já foi revogada.",
-      "noKeys": "Este projeto ainda não tem chaves de cliente."
+      "server": "O SSO não conseguiu processar a solicitação. Nada foi alterado.",
+      "tooLarge": "A requisição é grande demais.",
+      "tooManyRequests": "Muitas requisições em pouco tempo. Aguarde um instante e tente de novo."
     },
     "code": {
+      "client_key_not_found": "A chave não foi encontrada ou já foi revogada.",
+      "client_key_required": "Cadastre ao menos uma chave de cliente antes de ativar o projeto.",
+      "client_keys_empty": "Este projeto ainda não tem chaves de cliente.",
       "csrf_token_invalid": "Seu token de segurança está desatualizado. Recarregue a página e tente de novo.",
+      "duplicate": "Já existe um registro com esses valores.",
+      "internal_error": "O SSO não conseguiu processar a solicitação. Nada foi alterado.",
+      "member_not_found": "Esta pessoa não é mais membro do projeto.",
+      "no_results": "Nada foi encontrado.",
       "origin_not_allowed": "Esta solicitação não veio do console e foi recusada.",
-      "sso_project_protected": "O projeto SSO administra todas as aplicações. Só o SUPERADMIN dele altera rotas, papéis, permissões, membros, redirect URIs e chaves, e algumas alterações são recusadas para todos.",
+      "permission_not_found": "Esta permissão não existe mais.",
+      "project_has_members": "Não adicione mais ninguém e remova os membros deste projeto antes de excluí-lo.",
+      "project_has_routes": "Exclua as rotas deste projeto antes de excluí-lo.",
+      "project_not_found": "Este projeto não existe. Ele pode ter sido removido.",
+      "public_key_invalid": "Esta não é uma chave pública válida.",
+      "public_key_not_rsa": "Só chaves RSA são aceitas (RS256).",
+      "public_key_too_short": "A chave RSA precisa ter ao menos 2048 bits.",
+      "redirect_uri_not_found": "Esta redirect URI não existe. Ela pode ter sido removida.",
+      "role_not_found": "Este papel não existe. Ele pode ter sido removido.",
+      "role_not_in_project": "Este papel pertence a outro projeto.",
+      "role_route_project_mismatch": "O papel e a rota pertencem a projetos diferentes.",
+      "route_not_found": "Esta rota não existe. Ela pode ter sido removida.",
+      "sso_access_denied": "Sua conta não tem papel no projeto SSO.",
       "sso_last_superadmin": "O projeto SSO precisa de ao menos um SUPERADMIN. Dê o papel a outra pessoa antes.",
+      "sso_project_protected": "O projeto SSO administra todas as aplicações. Só o SUPERADMIN dele altera rotas, papéis, permissões, membros, redirect URIs e chaves, e algumas alterações são recusadas para todos.",
+      "sso_redirect_uri_in_use": "Este console entra por este endereço. Exclua-o a partir de um console rodando em outro endereço.",
       "sso_redirect_uri_last": "O projeto SSO precisa de ao menos uma redirect URI. Adicione o novo endereço antes de excluir este.",
-      "sso_redirect_uri_in_use": "Este console entra por este endereço. Exclua-o a partir de um console rodando em outro endereço."
+      "user_has_projects": "Este usuário ainda tem acesso a um projeto. Remova os vínculos antes.",
+      "user_not_found": "Este usuário não existe. Ele pode ter sido removido.",
+      "validation_failed": "O SSO recusou alguns dos valores enviados. Confira o formulário e tente de novo."
+    },
+    "field": {
+      "email_invalid": "Informe um e-mail válido.",
+      "public_key_not_pem": "Cole uma chave pública em formato PEM, começando com -----BEGIN PUBLIC KEY-----.",
+      "role_name_invalid": "Use de 2 a 40 caracteres: uma letra maiúscula e depois maiúsculas, dígitos ou sublinhados."
     }
   },
   "forms": {
