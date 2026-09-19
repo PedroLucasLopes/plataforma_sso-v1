@@ -166,7 +166,7 @@
       @row-click="openUser"
     >
       <template #col-role="{ row }">
-        <DlStatusChip :map="ROLE_STATUS" :status="String(row.role)" />
+        <DlStatusChip :map="roleMap" :status="String(row.role)" />
       </template>
 
       <template #col-methods="{ row }">
@@ -222,9 +222,9 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useGrants } from '@/composables/useGrants'
   import { SELF_PROJECT_NAME } from '@/constants/api'
-  import { HTTP_METHODS, METHOD_STATUS, ROLE_STATUS } from '@/constants/status'
+  import { HTTP_METHODS, METHOD_STATUS } from '@/constants/status'
   import { useSessionStore } from '@/stores/session'
-  import { type ProjectRoute, roleLabel, rolesGranted, type RouteEntry, sortRoles } from '@/utils/routes'
+  import { type ProjectRoute, roleChips, roleLabel, rolesGranted, type RouteEntry, sortRoles } from '@/utils/routes'
 
   /**
    * O detalhe de um caminho: os metodos, quem pode chamar cada um e o que mora
@@ -366,6 +366,8 @@
     role: RoleName
     methods: HttpMethod[]
   }
+
+  const roleMap = computed(() => roleChips(props.project.roles.map(role => role.name)))
 
   const callers = computed<CallerRow[]>(() => {
     const reach = props.node.routes.map(item => ({

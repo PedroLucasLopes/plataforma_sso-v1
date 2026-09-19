@@ -118,10 +118,17 @@ ela entra num console completo. Os outros papéis veem o que `Permission` conced
 some da tela; se forçarem a chamada, o SSO responde 404.
 
 Papel tem **nome livre** em maiúsculas, dígitos e `_` (`ROLE_NAME_PATTERN`), e o campo converte o que
-se digita. Os quatro padrão aparecem com pastilha própria; os de nome livre, com o próprio nome, em
-tom neutro, depois dos padrão. Cada papel tem, no próprio painel do projeto, o atalho "Grant all GET
-routes" e as ações de renomear e apagar. No painel de membros, trocar o papel e tirar do projeto são
-ações da linha.
+se digita. O nome gravado é o identificador que o catálogo e o token carregam; a tela o escreve como os
+padrão aparecem, só com a primeira letra maiúscula e `_` como espaço (`customRoleLabel`:
+`GESTOR_FINANCEIRO` vira "Gestor financeiro"), com o ícone `CUSTOM_ROLE_ICON`, em tom neutro, depois dos
+padrão. O resumo do painel diz "Personalizado", porque o ícone sozinho não explica o que marca, e o
+campo de nome mostra como o papel vai aparecer.
+
+**Pastilha de papel usa `roleChips`, nunca `ROLE_STATUS` direto.** `ROLE_STATUS` só conhece os quatro
+padrão, e o `DlStatusChip` desenha o que não acha no mapa como texto cru, sem ícone.
+
+Cada papel tem, no próprio painel do projeto, o atalho "Grant all GET routes" e as ações de renomear e
+apagar. No painel de membros, trocar o papel e tirar do projeto são ações da linha.
 
 ---
 
@@ -262,6 +269,27 @@ pastilhas de situação, papel, método e chave, e `navigation.ts` o que o banco
 | `authId: null` em `PUT /user/:id` desfaz o vínculo com o Google | ação "Unlink Google account" |
 
 ---
+
+## 🚀 CI/CD
+
+`.github/workflows/ci.yml`, no GitHub Actions:
+
+| Quando | O que roda |
+|---|---|
+| pull request e push na `main` | `npm ci`, `npm audit` (produção sem aviso nenhum; o resto, sem alto), lint e build, que roda o type-check e confere as traduções |
+| pull request | a imagem é montada, sem publicar |
+| push na `main`, tag `v*` e à mão | a imagem do front, o nginx com o build, vai para o GitHub Container Registry, `ghcr.io/pedrolucaslopes/plataforma_sso-v1`, com a tag do commit, `main` e a versão, proveniência e SBOM |
+
+- **O pacote privado.** O `npm ci` e o build da imagem leem `@pedrolucaslopes/dotlog-ui` com o `GITHUB_TOKEN` da
+  execução, quando o pacote libera leitura a este repositório (nas configurações do pacote, "Manage
+  Actions access"), ou com o secret `PACKAGES_READ_TOKEN`, um token clássico com `read:packages`. Sem um
+  dos dois, o `npm ci` do pipeline responde 403.
+- **O pipeline é superfície de ataque.** Actions fixadas por commit, `permissions: {}` no topo e o
+  mínimo por job, checkout sem credencial persistida, sem `pull_request_target`, e o token do npm como
+  secret do BuildKit. O Dependabot (`.github/dependabot.yml`) abre pull request para as actions e a
+  imagem base toda semana; o npm fica de fora, porque o pacote privado pede um token próprio dele.
+- **O deploy ainda não existe.** A imagem publicada é o artefato. O alvo é o Firebase Hosting, com os
+  rewrites de `/api` e `/sso` numa origem só, e entra quando houver o projeto no GCP.
 
 ## 🐳 Container
 

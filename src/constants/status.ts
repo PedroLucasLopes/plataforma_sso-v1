@@ -32,7 +32,8 @@ export const PROJECT_STATUS = labelled<ProjectStatus>('project', {
 
 /**
  * Papel padrao. O de maior privilegio usa o tom de maior contraste, sem cor de
- * alerta. Papel de nome livre aparece com o proprio nome, em tom neutro.
+ * alerta. Papel de nome livre segue o mesmo desenho, em tom neutro e com o
+ * proprio icone: ver `roleDefinition`.
  */
 export const ROLE_STATUS = labelled<DefaultRoleName>('role', {
   SUPERADMIN: { tone: 'dark', icon: 'mdi-shield-crown-outline' },
@@ -40,6 +41,9 @@ export const ROLE_STATUS = labelled<DefaultRoleName>('role', {
   MANAGER: { tone: 'neutral', icon: 'mdi-account-tie-outline' },
   VIEWER: { tone: 'neutral', icon: 'mdi-eye-outline' },
 })
+
+/** Icone do papel de nome livre: o escudo dos padrao, com a marca de quem o desenhou. */
+export const CUSTOM_ROLE_ICON = 'mdi-shield-edit-outline'
 
 export type KeyState = 'ACTIVE' | 'EXPIRED' | 'REVOKED'
 

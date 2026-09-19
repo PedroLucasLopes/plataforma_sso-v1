@@ -58,7 +58,7 @@
           @row-click="row => router.push({ name: 'project', params: { id: row.id } })"
         >
           <template #col-role="{ row }">
-            <DlStatusChip :map="ROLE_STATUS" :status="String(row.role)" />
+            <DlStatusChip :map="roleMap" :status="String(row.role)" />
           </template>
 
           <template #col-status="{ row }">
@@ -178,14 +178,14 @@
   import { useConfirm } from '@/composables/useConfirm'
   import { useCrudDialog } from '@/composables/useCrudDialog'
   import { SELF_PROJECT_NAME } from '@/constants/api'
-  import { LINK_STATUS, type LinkState, PROJECT_STATUS, ROLE_STATUS } from '@/constants/status'
+  import { LINK_STATUS, type LinkState, PROJECT_STATUS } from '@/constants/status'
   import { errorMessage } from '@/services/http'
   import { useCatalogStore } from '@/stores/catalog'
   import { useProjectsStore } from '@/stores/projects'
   import { useSessionStore } from '@/stores/session'
   import { useUsersStore } from '@/stores/users'
   import { asOption, asText, EMAIL_PATTERN } from '@/utils/forms'
-  import { roleLabel, sortRoles } from '@/utils/routes'
+  import { roleChips, roleLabel, sortRoles } from '@/utils/routes'
 
   const { t } = useI18n()
   const route = useRoute()
@@ -256,6 +256,8 @@
       status: link.project.status,
     })),
   )
+
+  const roleMap = computed(() => roleChips(memberships.value.map(row => row.role)))
 
   const membershipColumns = computed<Column<MembershipRow>[]>(() => [
     { key: 'project', label: t('common.project') },

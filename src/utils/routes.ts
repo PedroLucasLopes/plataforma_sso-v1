@@ -1,6 +1,6 @@
 import type { DefaultRoleName, ProjectOverview } from '@/types/sso'
 import type { StatusDefinition } from '@pedrolucaslopes/dotlog-ui'
-import { DEFAULT_ROLE_NAMES, ROLE_STATUS } from '@/constants/status'
+import { CUSTOM_ROLE_ICON, DEFAULT_ROLE_NAMES, ROLE_STATUS } from '@/constants/status'
 import { t } from '@/plugins/i18n'
 
 export type ProjectRoute = ProjectOverview['routes'][number]
@@ -32,9 +32,30 @@ export function isDefaultRole (name: string): name is DefaultRoleName {
   return (DEFAULT_ROLE_NAMES as string[]).includes(name)
 }
 
-/** Pastilha do papel. O padrao tem desenho proprio; o de nome livre aparece como foi nomeado. */
+/**
+ * Nome livre escrito como os padrao aparecem: so a primeira letra maiuscula, e
+ * `_` vira espaco. `GESTOR_FINANCEIRO` vira "Gestor financeiro". O nome gravado
+ * continua o mesmo, em maiusculas: e ele que o catalogo e o token carregam.
+ */
+export function customRoleLabel (name: string): string {
+  const words = name.replaceAll('_', ' ').trim().toLowerCase()
+
+  return words.charAt(0).toUpperCase() + words.slice(1)
+}
+
+/** Pastilha do papel. O padrao tem desenho proprio; o de nome livre, o icone de personalizado. */
 export function roleDefinition (name: string): StatusDefinition {
-  return isDefaultRole(name) ? ROLE_STATUS[name] : { label: name, tone: 'neutral' }
+  return isDefaultRole(name)
+    ? ROLE_STATUS[name]
+    : { label: customRoleLabel(name), tone: 'neutral', icon: CUSTOM_ROLE_ICON }
+}
+
+/**
+ * Mapa de pastilhas para os papeis dados. `ROLE_STATUS` so conhece os padrao, e o
+ * `DlStatusChip` desenha o que nao acha como texto cru, sem icone.
+ */
+export function roleChips (names: readonly string[]): Record<string, StatusDefinition> {
+  return Object.fromEntries(names.map(name => [name, roleDefinition(name)]))
 }
 
 export const roleLabel = (name: string): string => roleDefinition(name).label

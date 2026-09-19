@@ -138,7 +138,7 @@
   >
     <DlTextField
       :error="nameError"
-      :hint="t('common.roleNameHint')"
+      :hint="nameHint(dialog.form.name)"
       :label="t('common.name')"
       :model-value="dialog.form.name"
       mono
@@ -160,7 +160,7 @@
   >
     <DlTextField
       :error="renameError"
-      :hint="t('common.roleNameHint')"
+      :hint="nameHint(renameDialog.form.name)"
       :label="t('common.name')"
       :model-value="renameDialog.form.name"
       mono
@@ -205,8 +205,8 @@
   import { METHOD_STATUS, ROOT_ROLE_NAME } from '@/constants/status'
   import { useProjectsStore } from '@/stores/projects'
   import { useSessionStore } from '@/stores/session'
-  import { asRoleName, roleNameError } from '@/utils/forms'
-  import { type ProjectRole, roleDefinition, roleLabel, sortRoles } from '@/utils/routes'
+  import { asRoleName, ROLE_NAME_PATTERN, roleNameError } from '@/utils/forms'
+  import { customRoleLabel, isDefaultRole, type ProjectRole, roleDefinition, roleLabel, sortRoles } from '@/utils/routes'
 
   /**
    * Papeis do projeto e as rotas que cada um libera, na mesma arvore da aba de
@@ -265,11 +265,15 @@
       title: roleLabel(role.name),
       summary: isRootRole(role)
         ? t('roles.summaryRoot', { members: t('counts.members', membersOf(role.name)) })
-        : t('roles.summary', {
-          granted: role.permissions.length,
-          routes: t('counts.routes', props.project.routes.length),
-          members: t('counts.members', membersOf(role.name)),
-        }),
+        : [
+          // O icone sozinho nao diz o que marca: o resumo diz, por escrito.
+          ...(isDefaultRole(role.name) ? [] : [t('roles.custom')]),
+          t('roles.summary', {
+            granted: role.permissions.length,
+            routes: t('counts.routes', props.project.routes.length),
+            members: t('counts.members', membersOf(role.name)),
+          }),
+        ].join(' · '),
       icon: roleDefinition(role.name).icon,
     })),
   )
@@ -305,6 +309,13 @@
 
   const dialog = useCrudDialog(() => ({ name: '' }))
   const renameDialog = useCrudDialog(() => ({ name: '' }))
+
+  /** Enquanto digita, a regra do nome; com o nome valido, como ele vai aparecer. */
+  function nameHint (name: string): string {
+    return ROLE_NAME_PATTERN.test(name)
+      ? t('roles.displayedAs', { label: customRoleLabel(name) })
+      : t('common.roleNameHint')
+  }
   const removal = useConfirm<ProjectRole>()
 
   const takenNames = computed(() => props.project.roles.map(role => role.name))

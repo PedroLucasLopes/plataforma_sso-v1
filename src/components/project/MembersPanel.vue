@@ -35,7 +35,7 @@
       @row-click="open"
     >
       <template #col-role="{ row }">
-        <DlStatusChip :map="ROLE_STATUS" :status="String(row.role)" />
+        <DlStatusChip :map="roleMap" :status="String(row.role)" />
       </template>
     </DlDataTable>
 
@@ -132,13 +132,13 @@
   import { useConfirm } from '@/composables/useConfirm'
   import { useCrudDialog } from '@/composables/useCrudDialog'
   import { SELF_PROJECT_NAME } from '@/constants/api'
-  import { ROLE_STATUS, ROOT_ROLE_NAME } from '@/constants/status'
+  import { ROOT_ROLE_NAME } from '@/constants/status'
   import { errorMessage } from '@/services/http'
   import { useCatalogStore } from '@/stores/catalog'
   import { useProjectsStore } from '@/stores/projects'
   import { useSessionStore } from '@/stores/session'
   import { asOption } from '@/utils/forms'
-  import { roleLabel, sortRoles } from '@/utils/routes'
+  import { roleChips, roleLabel, sortRoles } from '@/utils/routes'
 
   /**
    * Quem entra na aplicacao, com qual papel. Um papel por pessoa por projeto:
@@ -187,6 +187,8 @@
     { key: 'role', label: t('common.role'), width: '150px' },
     { key: 'routes', label: t('members.granted'), width: '120px', align: 'end' },
   ])
+
+  const roleMap = computed(() => roleChips(props.project.roles.map(role => role.name)))
 
   const rootCount = computed(() => props.project.users.filter(user => user.role === ROOT_ROLE_NAME).length)
 
