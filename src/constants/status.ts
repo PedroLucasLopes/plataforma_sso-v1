@@ -43,7 +43,7 @@ export const PROJECT_STATUS = labelled<ProjectStatus>("project", {
  * alerta. Papel de nome livre segue o mesmo desenho, em tom neutro e com o
  * proprio icone: ver `roleDefinition`.
  */
-export const ROLE_STATUS = {
+export const ROLE_STATUS: Record<DefaultRoleName, StatusDefinition> = {
   SUPERADMIN: {
     label: "SUPERADMIN",
     tone: "dark",

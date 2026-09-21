@@ -63,7 +63,7 @@ export function customRoleLabel(name: string): string {
 /** Pastilha do papel. O padrao tem desenho proprio; o de nome livre, o icone de personalizado. */
 export function roleDefinition(name: string): StatusDefinition {
   return isDefaultRole(name)
-    ? (ROLE_STATUS[name] as StatusDefinition)
+    ? { ...ROLE_STATUS[name], label: customRoleLabel(ROLE_STATUS[name].label) }
     : { label: customRoleLabel(name), tone: "neutral", icon: CUSTOM_ROLE_ICON };
 }
 
