@@ -43,12 +43,24 @@ export const PROJECT_STATUS = labelled<ProjectStatus>("project", {
  * alerta. Papel de nome livre segue o mesmo desenho, em tom neutro e com o
  * proprio icone: ver `roleDefinition`.
  */
-export const ROLE_STATUS = labelled<DefaultRoleName>("role", {
-  SUPERADMIN: { tone: "dark", icon: "mdi-shield-crown-outline" },
-  ADMIN: { tone: "info", icon: "mdi-shield-account-outline" },
-  MANAGER: { tone: "neutral", icon: "mdi-account-tie-outline" },
-  VIEWER: { tone: "neutral", icon: "mdi-eye-outline" },
-});
+export const ROLE_STATUS = {
+  SUPERADMIN: {
+    label: "SUPERADMIN",
+    tone: "dark",
+    icon: "mdi-shield-crown-outline",
+  },
+  ADMIN: {
+    label: "ADMIN",
+    tone: "info",
+    icon: "mdi-shield-account-outline",
+  },
+  MANAGER: {
+    label: "MANAGER",
+    tone: "neutral",
+    icon: "mdi-account-tie-outline",
+  },
+  VIEWER: { label: "VIEWER", tone: "neutral", icon: "mdi-eye-outline" },
+};
 
 /** Icone do papel de nome livre: o escudo dos padrao, com a marca de quem o desenhou. */
 export const CUSTOM_ROLE_ICON = "mdi-shield-edit-outline";
