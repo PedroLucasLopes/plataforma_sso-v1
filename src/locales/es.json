@@ -64,12 +64,6 @@
       "PENDING": "Pendiente",
       "SUSPENDED": "Suspendido"
     },
-    "role": {
-      "SUPERADMIN": "Superadmin",
-      "ADMIN": "Admin",
-      "MANAGER": "Gestor",
-      "VIEWER": "Lector"
-    },
     "key": {
       "ACTIVE": "Activa",
       "EXPIRED": "Vencida",
