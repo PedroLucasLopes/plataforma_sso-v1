@@ -24,9 +24,7 @@ function labelled<Key extends string>(
       {
         ...look,
         get label() {
-          return !t(`status.${group}.${key}`)
-            ? group
-            : t(`status.${group}.${key}`);
+          return t(`status.${group}.${key}`);
         },
       },
     ]),
