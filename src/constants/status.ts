@@ -24,7 +24,7 @@ function labelled<Key extends string>(
       {
         ...look,
         get label() {
-          return t(`status.${group}.${key}`) === undefined
+          return t(`status.${group}.${key}`) === null
             ? group
             : t(`status.${group}.${key}`);
         },
