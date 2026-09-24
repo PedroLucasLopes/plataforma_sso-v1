@@ -21,11 +21,43 @@ export interface SessionView {
   csrfToken?: string
 }
 
+export type LoginStage = 'credentials' | 'change_password' | 'enroll_mfa' | 'mfa'
+
 export interface LoginRequestView {
   kind: 'authorize' | 'session'
   application: string | null
   expiresAt: string
   providers: { id: string, label: string, url: string }[]
+  step: LoginStage
+  email: string | null
+}
+
+export interface LoginStepView {
+  next: LoginStage | 'done'
+  email?: string
+  redirectTo?: string
+  secret?: string
+  otpauth?: string
+  recoveryCodes?: string[]
+}
+
+export interface UserCredentialView {
+  password: {
+    issued: boolean
+    mustChange: boolean
+    lockedUntil: string | null
+    updatedAt: string | null
+  }
+  mfa: {
+    enrolled: boolean
+    confirmedAt: string | null
+    recoveryCodesLeft: number
+  }
+}
+
+export interface IssuedPassword {
+  email: string
+  password: string
 }
 
 export interface ProjectMembershipLink {

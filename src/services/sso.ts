@@ -1,8 +1,10 @@
 import type {
   ClientKey,
   GeneratedClientKey,
+  IssuedPassword,
   ListQuery,
   LoginRequestView,
+  LoginStepView,
   Me,
   Project,
   ProjectOverview,
@@ -14,6 +16,7 @@ import type {
   RouteInput,
   SessionView,
   User,
+  UserCredentialView,
   UserInput,
 } from '@/types/sso'
 import { API_PREFIX } from '@/constants/api'
@@ -26,6 +29,17 @@ export const sessionApi = {
   current: () => request<SessionView>('/session', { redirectOnUnauthorized: false }),
   loginRequest: () => request<LoginRequestView>('/login/request', { redirectOnUnauthorized: false }),
   logout: () => request<void>('/session/logout', { method: 'POST', redirectOnUnauthorized: false }),
+
+  loginPassword: (body: { email: string, password: string }) =>
+    request<LoginStepView>('/login/password', { method: 'POST', body, redirectOnUnauthorized: false }),
+  changePassword: (body: { password: string }) =>
+    request<LoginStepView>('/login/password/change', { method: 'POST', body, redirectOnUnauthorized: false }),
+  setupMfa: () =>
+    request<LoginStepView>('/login/mfa/setup', { method: 'POST', redirectOnUnauthorized: false }),
+  confirmMfa: (body: { code: string }) =>
+    request<LoginStepView>('/login/mfa/confirm', { method: 'POST', body, redirectOnUnauthorized: false }),
+  verifyMfa: (body: { code: string }) =>
+    request<LoginStepView>('/login/mfa', { method: 'POST', body, redirectOnUnauthorized: false }),
 
   loginUrl: (redirectUri: string, state: string): string =>
     `${API_PREFIX}/session/login?${new URLSearchParams({ redirect_uri: redirectUri, state })}`,
@@ -52,6 +66,15 @@ export const usersApi = {
   update: (userId: string, body: Partial<UserInput> & { authId?: null }) =>
     request<User>(`/user/${id(userId)}`, { method: 'PUT', body }),
   remove: (userId: string) => request<void>(`/user/${id(userId)}`, { method: 'DELETE' }),
+
+  credential: (userId: string) =>
+    request<UserCredentialView>(`/user/${id(userId)}/credential`),
+  issuePassword: (userId: string) =>
+    request<IssuedPassword>(`/user/${id(userId)}/password`, { method: 'POST' }),
+  revokePassword: (userId: string) =>
+    request<void>(`/user/${id(userId)}/password`, { method: 'DELETE' }),
+  resetMfa: (userId: string) =>
+    request<void>(`/user/${id(userId)}/mfa`, { method: 'DELETE' }),
 }
 
 export const routesApi = {
