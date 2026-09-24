@@ -72,6 +72,12 @@
     "link": {
       "LINKED": "Vinculada",
       "WAITING": "Aguardando o primeiro login"
+    },
+    "credential": {
+      "READY": "Pronta",
+      "PENDING": "Troca pendente",
+      "LOCKED": "Bloqueada",
+      "NONE": "Não emitida"
     }
   },
   "errors": {
@@ -116,7 +122,14 @@
       "sso_redirect_uri_last": "O projeto SSO precisa de ao menos uma redirect URI. Adicione o novo endereço antes de excluir este.",
       "user_has_projects": "Este usuário ainda tem acesso a um projeto. Remova os vínculos antes.",
       "user_not_found": "Este usuário não existe. Ele pode ter sido removido.",
-      "validation_failed": "O SSO recusou alguns dos valores enviados. Confira o formulário e tente de novo."
+      "validation_failed": "O SSO recusou alguns dos valores enviados. Confira o formulário e tente de novo.",
+      "invalid_credentials": "E-mail ou senha não conferem.",
+      "account_locked": "Muitas tentativas. Tente de novo em alguns minutos.",
+      "password_refused": "A nova senha foi recusada. Use pelo menos 12 caracteres variados.",
+      "password_not_issued": "Esta conta não tem senha emitida.",
+      "mfa_code_invalid": "Código não confere.",
+      "login_step_expired": "Esta etapa expirou. Comece o login de novo.",
+      "no_pending_request": "Não há pedido de login pendente neste navegador."
     },
     "field": {
       "email_invalid": "Informe um e-mail válido.",
@@ -166,6 +179,39 @@
     "unavailable": {
       "title": "O SSO não está respondendo",
       "description": "Nada foi alterado. Recarregue esta página em instantes."
+    },
+    "form": {
+      "email": "E-mail",
+      "password": "Senha",
+      "submit": "Entrar"
+    },
+    "change": {
+      "title": "Defina a sua senha",
+      "description": "A senha que você recebeu serve uma vez. A partir daqui, só você a conhece.",
+      "password": "Nova senha",
+      "repeat": "Repita a nova senha",
+      "hint": "Pelo menos 12 caracteres.",
+      "submit": "Salvar e continuar",
+      "mismatch": "As duas senhas não são iguais."
+    },
+    "enroll": {
+      "title": "Cadastre o segundo fator",
+      "description": "Leia o código com o aplicativo autenticador e digite os seis dígitos que ele mostrar.",
+      "qrAlt": "Código para o aplicativo autenticador",
+      "secret": "Sem câmera? Digite este código:",
+      "submit": "Confirmar"
+    },
+    "mfa": {
+      "title": "Verificação em duas etapas",
+      "description": "Digite o código do seu aplicativo autenticador.",
+      "code": "Código de seis dígitos",
+      "hint": "Sem o aplicativo? Use um código de recuperação.",
+      "submit": "Confirmar"
+    },
+    "recovery": {
+      "title": "Guarde os códigos de recuperação",
+      "description": "Cada um entra uma vez, e eles são a única volta se você perder o aplicativo. Aparecem só agora.",
+      "copy": "Copiar os códigos"
     }
   },
   "callback": {
@@ -525,6 +571,26 @@
       "description": "Onde esta pessoa pode entrar, e com qual papel.",
       "emptyTitle": "Nenhum projeto ainda",
       "emptyDescription": "Sem um projeto, esta pessoa não consegue entrar em lugar nenhum."
+    },
+    "credential": {
+      "title": "Credenciais",
+      "description": "A senha é emitida aqui e entregue à pessoa; o segundo fator ela cadastra no primeiro acesso.",
+      "password": "Senha",
+      "mfa": "Segundo fator",
+      "issue": "Emitir senha",
+      "reissue": "Emitir outra senha",
+      "revoke": "Revogar a senha",
+      "resetMfa": "Resetar o segundo fator",
+      "copy": "Copiar a senha",
+      "issuedTitle": "Senha emitida",
+      "issuedDescription": "Aparece só agora. Entregue por canal seguro: a pessoa vai trocá-la no primeiro acesso.",
+      "pendingHint": "Ainda é a senha emitida; será trocada no primeiro acesso.",
+      "lockedHint": "Bloqueada por tentativas até {until}.",
+      "mfaPendingHint": "Será cadastrado pela pessoa no próximo acesso.",
+      "recoveryLeft": "Nenhum código de recuperação | {count} código de recuperação | {count} códigos de recuperação",
+      "revoked": "Senha revogada.",
+      "mfaReset": "Segundo fator resetado.",
+      "failed": "Não foi possível concluir."
     }
   },
   "clientKeys": {

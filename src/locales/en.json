@@ -72,6 +72,12 @@
     "link": {
       "LINKED": "Linked",
       "WAITING": "Waiting first sign-in"
+    },
+    "credential": {
+      "READY": "Ready",
+      "PENDING": "Change pending",
+      "LOCKED": "Locked",
+      "NONE": "Not issued"
     }
   },
   "errors": {
@@ -116,7 +122,14 @@
       "sso_redirect_uri_last": "The SSO project needs at least one redirect URI. Add the new address before deleting this one.",
       "user_has_projects": "This user still has access to a project. Remove the memberships first.",
       "user_not_found": "This user does not exist. It may have been removed.",
-      "validation_failed": "The SSO refused some of the values sent. Check the form and try again."
+      "validation_failed": "The SSO refused some of the values sent. Check the form and try again.",
+      "invalid_credentials": "Email or password does not match.",
+      "account_locked": "Too many attempts. Try again in a few minutes.",
+      "password_refused": "The new password was refused. Use at least 12 varied characters.",
+      "password_not_issued": "This account has no password issued.",
+      "mfa_code_invalid": "The code does not match.",
+      "login_step_expired": "This step expired. Start the sign-in again.",
+      "no_pending_request": "There is no pending sign-in request in this browser."
     },
     "field": {
       "email_invalid": "Enter a valid email address.",
@@ -166,6 +179,39 @@
     "unavailable": {
       "title": "The SSO is not responding",
       "description": "Nothing was changed. Reload this page in a moment."
+    },
+    "form": {
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in"
+    },
+    "change": {
+      "title": "Set your password",
+      "description": "The password you received works once. From here on, only you know it.",
+      "password": "New password",
+      "repeat": "Repeat the new password",
+      "hint": "At least 12 characters.",
+      "submit": "Save and continue",
+      "mismatch": "The two passwords do not match."
+    },
+    "enroll": {
+      "title": "Set up the second factor",
+      "description": "Scan the code with your authenticator app and type the six digits it shows.",
+      "qrAlt": "Code for the authenticator app",
+      "secret": "No camera? Type this code:",
+      "submit": "Confirm"
+    },
+    "mfa": {
+      "title": "Two step verification",
+      "description": "Type the code from your authenticator app.",
+      "code": "Six digit code",
+      "hint": "No app at hand? Use a recovery code.",
+      "submit": "Confirm"
+    },
+    "recovery": {
+      "title": "Keep your recovery codes",
+      "description": "Each one works once, and they are the only way back if you lose the app. They show up only now.",
+      "copy": "Copy the codes"
     }
   },
   "callback": {
@@ -525,6 +571,26 @@
       "description": "Where this person can sign in, and with which role.",
       "emptyTitle": "No projects yet",
       "emptyDescription": "Without a project, this person cannot sign in anywhere."
+    },
+    "credential": {
+      "title": "Credentials",
+      "description": "The password is issued here and handed to the person; the second factor they enroll on first sign-in.",
+      "password": "Password",
+      "mfa": "Second factor",
+      "issue": "Issue password",
+      "reissue": "Issue another password",
+      "revoke": "Revoke the password",
+      "resetMfa": "Reset the second factor",
+      "copy": "Copy the password",
+      "issuedTitle": "Password issued",
+      "issuedDescription": "It shows up only now. Hand it over through a safe channel: they will change it on first sign-in.",
+      "pendingHint": "Still the issued password; it will be changed on first sign-in.",
+      "lockedHint": "Locked by failed attempts until {until}.",
+      "mfaPendingHint": "The person enrolls it on the next sign-in.",
+      "recoveryLeft": "No recovery code left | {count} recovery code left | {count} recovery codes left",
+      "revoked": "Password revoked.",
+      "mfaReset": "Second factor reset.",
+      "failed": "It was not possible to finish."
     }
   },
   "clientKeys": {

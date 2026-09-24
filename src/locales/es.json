@@ -72,6 +72,12 @@
     "link": {
       "LINKED": "Vinculada",
       "WAITING": "Esperando el primer inicio de sesión"
+    },
+    "credential": {
+      "READY": "Lista",
+      "PENDING": "Cambio pendiente",
+      "LOCKED": "Bloqueada",
+      "NONE": "No emitida"
     }
   },
   "errors": {
@@ -116,7 +122,14 @@
       "sso_redirect_uri_last": "El proyecto SSO necesita al menos una URI de redirección. Agrega la nueva dirección antes de eliminar esta.",
       "user_has_projects": "Este usuario todavía tiene acceso a un proyecto. Quita sus vínculos primero.",
       "user_not_found": "Este usuario no existe. Puede que se haya eliminado.",
-      "validation_failed": "El SSO rechazó algunos de los valores enviados. Revisa el formulario e inténtalo de nuevo."
+      "validation_failed": "El SSO rechazó algunos de los valores enviados. Revisa el formulario e inténtalo de nuevo.",
+      "invalid_credentials": "El correo o la contraseña no coinciden.",
+      "account_locked": "Demasiados intentos. Inténtelo de nuevo en unos minutos.",
+      "password_refused": "La nueva contraseña fue rechazada. Use al menos 12 caracteres variados.",
+      "password_not_issued": "Esta cuenta no tiene contraseña emitida.",
+      "mfa_code_invalid": "El código no coincide.",
+      "login_step_expired": "Este paso expiró. Empiece el inicio de sesión de nuevo.",
+      "no_pending_request": "No hay ninguna solicitud de inicio de sesión pendiente en este navegador."
     },
     "field": {
       "email_invalid": "Ingresa un correo electrónico válido.",
@@ -166,6 +179,39 @@
     "unavailable": {
       "title": "El SSO no responde",
       "description": "No se cambió nada. Recarga esta página en un momento."
+    },
+    "form": {
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "submit": "Entrar"
+    },
+    "change": {
+      "title": "Defina su contraseña",
+      "description": "La contraseña que recibió sirve una vez. A partir de aquí, solo usted la conoce.",
+      "password": "Nueva contraseña",
+      "repeat": "Repita la nueva contraseña",
+      "hint": "Al menos 12 caracteres.",
+      "submit": "Guardar y continuar",
+      "mismatch": "Las dos contraseñas no coinciden."
+    },
+    "enroll": {
+      "title": "Registre el segundo factor",
+      "description": "Escanee el código con su aplicación de autenticación y escriba los seis dígitos que muestre.",
+      "qrAlt": "Código para la aplicación de autenticación",
+      "secret": "¿Sin cámara? Escriba este código:",
+      "submit": "Confirmar"
+    },
+    "mfa": {
+      "title": "Verificación en dos pasos",
+      "description": "Escriba el código de su aplicación de autenticación.",
+      "code": "Código de seis dígitos",
+      "hint": "¿Sin la aplicación? Use un código de recuperación.",
+      "submit": "Confirmar"
+    },
+    "recovery": {
+      "title": "Guarde los códigos de recuperación",
+      "description": "Cada uno sirve una vez, y son la única vuelta si pierde la aplicación. Aparecen solo ahora.",
+      "copy": "Copiar los códigos"
     }
   },
   "callback": {
@@ -525,6 +571,26 @@
       "description": "Dónde puede iniciar sesión esta persona, y con qué rol.",
       "emptyTitle": "Todavía no hay proyectos",
       "emptyDescription": "Sin un proyecto, esta persona no puede iniciar sesión en ningún lugar."
+    },
+    "credential": {
+      "title": "Credenciales",
+      "description": "La contraseña se emite aquí y se entrega a la persona; el segundo factor lo registra ella en el primer acceso.",
+      "password": "Contraseña",
+      "mfa": "Segundo factor",
+      "issue": "Emitir contraseña",
+      "reissue": "Emitir otra contraseña",
+      "revoke": "Revocar la contraseña",
+      "resetMfa": "Restablecer el segundo factor",
+      "copy": "Copiar la contraseña",
+      "issuedTitle": "Contraseña emitida",
+      "issuedDescription": "Aparece solo ahora. Entréguela por un canal seguro: la persona la cambiará en el primer acceso.",
+      "pendingHint": "Todavía es la contraseña emitida; se cambiará en el primer acceso.",
+      "lockedHint": "Bloqueada por intentos hasta {until}.",
+      "mfaPendingHint": "La persona lo registrará en el próximo acceso.",
+      "recoveryLeft": "Ningún código de recuperación | {count} código de recuperación | {count} códigos de recuperación",
+      "revoked": "Contraseña revocada.",
+      "mfaReset": "Segundo factor restablecido.",
+      "failed": "No fue posible concluir."
     }
   },
   "clientKeys": {

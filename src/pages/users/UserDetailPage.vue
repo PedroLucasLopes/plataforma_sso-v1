@@ -31,6 +31,8 @@
         </DlDescriptionList>
       </DlSectionCard>
 
+      <CredentialPanel :user-id="userId" />
+
       <DlSectionCard
         :count="memberships.length"
         :description="t('user.projects.description')"
@@ -175,6 +177,7 @@
   import { computed, onMounted, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
+  import CredentialPanel from '@/components/user/CredentialPanel.vue'
   import { useConfirm } from '@/composables/useConfirm'
   import { useCrudDialog } from '@/composables/useCrudDialog'
   import { SELF_PROJECT_NAME } from '@/constants/api'
