@@ -119,7 +119,6 @@
   import { useUsersStore } from '@/stores/users'
   import { asText, EMAIL_PATTERN } from '@/utils/forms'
 
-  /** Pessoas cadastradas. Lista que cresce com o uso, entao pagina no servidor. */
   const { t, locale } = useI18n()
   const router = useRouter()
   const users = useUsersStore()
@@ -168,12 +167,9 @@
       method: 'DELETE',
       path: '/user/:id',
       color: 'error',
-      // O SSO recusa apagar quem ainda tem acesso a algum projeto.
       unavailable: row => row.projects > 0,
     },
   ])
-
-  /* -------------------------------- busca -------------------------------- */
 
   const term = ref(users.search)
 
@@ -192,8 +188,6 @@
   onMounted(() => {
     void users.load()
   })
-
-  /* ------------------------------ gravacao ------------------------------ */
 
   const dialog = useCrudDialog(() => ({ name: '', email: '' }))
   const removal = useConfirm<UserRow>()

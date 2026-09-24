@@ -11,14 +11,6 @@ import {
 } from '@/services/sso'
 import { useCatalogStore } from './catalog'
 
-/**
- * Um projeto e tudo o que mora dentro dele: redirect URIs, rotas, papeis,
- * permissoes e membros.
- *
- * Toda escrita relê o `overview` depois de salvar, em vez de remendar o estado
- * local. O overview e a fonte que o backend monta cruzando cinco tabelas;
- * reproduzir essa conta no navegador seria uma segunda verdade para envelhecer.
- */
 export const useProjectsStore = defineStore('projects', () => {
   const catalog = useCatalogStore()
 
@@ -41,7 +33,6 @@ export const useProjectsStore = defineStore('projects', () => {
     return overview
   }
 
-  /** Relê o que a tela mostra. O overview so para quem pode ve-lo. */
   async function refresh (projectId: string, withOverview: boolean): Promise<void> {
     await Promise.all([
       fetchProject(projectId),
@@ -132,11 +123,6 @@ export const useProjectsStore = defineStore('projects', () => {
     await fetchOverview(projectId)
   }
 
-  /**
-   * Varias rotas para o mesmo papel, uma chamada por rota, em sequencia. Para
-   * na primeira falha, e o overview e relido uma vez so, no fim, inclusive
-   * quando algo falha: a tela mostra o que de fato ficou gravado.
-   */
   async function grantMany (projectId: string, roleId: string, routeIds: string[]): Promise<number> {
     let granted = 0
     let failure: unknown = null

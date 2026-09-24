@@ -12,12 +12,6 @@ import {
 import { ApiError } from '@/services/http'
 import { sessionApi } from '@/services/sso'
 
-/**
- * - `authenticated`: sessao valida e papel no console.
- * - `no-access`: sessao valida, sem papel no projeto SSO.
- * - `unauthenticated`: sem sessao; o console manda ao login.
- * - `unavailable`: o SSO nao respondeu, e nao da para afirmar nada.
- */
 export type SessionStatus = 'unknown' | 'authenticated' | 'no-access' | 'unauthenticated' | 'unavailable'
 
 export type LoginOutcome
@@ -30,7 +24,6 @@ interface LoginAttempt {
   createdAt: number
 }
 
-/** 24 bytes em base64url: 32 caracteres do conjunto unreserved, como o SSO exige. */
 function randomState (): string {
   const bytes = crypto.getRandomValues(new Uint8Array(24))
 
@@ -40,16 +33,11 @@ function randomState (): string {
     .replace(/=+$/, '')
 }
 
-/**
- * Destino da volta do login. So caminho interno: `//host` e `/\host` o
- * navegador leria como outro site, e isto viraria um redirect aberto.
- */
 export function safeReturnPath (path: string | null | undefined): string {
   if (!path || !path.startsWith('/') || path.startsWith('//') || path.startsWith('/\\')) {
     return '/'
   }
 
-  // Voltar para a propria tela de entrada so recomecaria o ciclo.
   if ([CALLBACK_PATH, LOGIN_PATH, '/no-access'].some(entry => path.startsWith(entry))) {
     return '/'
   }
@@ -57,15 +45,16 @@ export function safeReturnPath (path: string | null | undefined): string {
   return path
 }
 
-function saveAttempt (attempt: LoginAttempt): void {
+function saveAttempt (attempt: LoginAttempt): boolean {
   try {
     sessionStorage.setItem(LOGIN_ATTEMPT_STORAGE_KEY, JSON.stringify(attempt))
+
+    return true
   } catch {
-    /* Sem armazenamento a volta falha na conferencia do state, que e o lado certo de errar. */
+    return false
   }
 }
 
-/** Le e apaga: o state vale para uma volta so. */
 function takeAttempt (): LoginAttempt | null {
   try {
     const raw = sessionStorage.getItem(LOGIN_ATTEMPT_STORAGE_KEY)
@@ -93,29 +82,16 @@ function takeAttempt (): LoginAttempt | null {
   }
 }
 
-/** O que o papel alcanca, numa string comparavel: papel, raiz e rotas em ordem. */
 function accessKey (me: Me | null): string {
   if (!me) {
     return ''
   }
 
-  const rotas = me.permissions.map(p => `${p.method} ${p.path}`).toSorted().join(',')
+  const routes = me.permissions.map(p => `${p.method} ${p.path}`).toSorted().join(',')
 
-  return `${me.role}|${me.root}|${rotas}`
+  return `${me.role}|${me.root}|${routes}`
 }
 
-/**
- * A sessao do console.
- *
- * O console se autentica pela sessao do proprio SSO, na mesma origem da API
- * (RFC 10017 secao 7.1). Nenhum token de acesso passa por aqui: o que o store
- * guarda e quem entrou, o que o papel alcanca e a copia legivel do token
- * anti-CSRF, que so vale junto do cookie HttpOnly.
- *
- * Para entrar, o console faz o que qualquer aplicacao faz: manda a pessoa ao
- * SSO com a `redirect_uri` registrada e um `state` dele, e confere o `state`
- * na volta. A tela de login do IdP nunca abre sem esse pedido.
- */
 export const useSessionStore = defineStore('session', () => {
   const me = ref<Me | null>(null)
   const identity = ref<{ name: string, email: string } | null>(null)
@@ -127,14 +103,8 @@ export const useSessionStore = defineStore('session', () => {
 
   const permissions = computed(() => me.value?.permissions ?? [])
 
-  /**
-   * SUPERADMIN do projeto `SSO`. O servidor manda para ela, em `permissions`,
-   * toda rota administrativa que existe, entao `can` ja responde que sim; `root`
-   * serve ao que so ela pode dentro do proprio SSO.
-   */
   const root = computed(() => me.value?.root === true)
 
-  /** Mesma pergunta do servidor, com o mesmo matcher. So controla interface. */
   const can = (method: string, path: string): boolean =>
     permits(permissions.value, method, path, API_PREFIX)
 
@@ -157,8 +127,6 @@ export const useSessionStore = defineStore('session', () => {
         reset()
         status.value = 'unauthenticated'
       } else if (error instanceof ApiError && error.status === 403) {
-        // Sessao valida, sem papel no console. O token anti-CSRF vem da sessao,
-        // senao a pessoa nem conseguiria sair para entrar com outra conta.
         const view = await sessionApi.current().catch(() => null)
 
         me.value = null
@@ -173,7 +141,6 @@ export const useSessionStore = defineStore('session', () => {
     return status.value
   }
 
-  /** Carrega uma vez; chamadas simultaneas esperam a mesma resposta. */
   function ensure (): Promise<SessionStatus> {
     if (status.value !== 'unknown') {
       return Promise.resolve(status.value)
@@ -192,13 +159,6 @@ export const useSessionStore = defineStore('session', () => {
     return ensure()
   }
 
-  /**
-   * Rele quem e a pessoa e o que o papel dela alcanca, sem tirar a tela do lugar.
-   *
-   * O SSO rele o papel a cada chamada, entao a API ja vale na hora; o que ficava
-   * para tras era a tela, carregada uma vez. `me` so e trocado quando a resposta
-   * chega, e o SSO fora do ar nao derruba ninguem: a tela fica como esta.
-   */
   async function revalidate (): Promise<'same' | 'changed' | 'ended' | 'no-access' | 'unknown'> {
     if (status.value !== 'authenticated' || pending) {
       return 'unknown'
@@ -222,7 +182,6 @@ export const useSessionStore = defineStore('session', () => {
       }
 
       if (error instanceof ApiError && error.status === 403) {
-        // Tirada do projeto SSO: a sessao continua, o console nao.
         const view = await sessionApi.current().catch(() => null)
 
         me.value = null
@@ -237,7 +196,6 @@ export const useSessionStore = defineStore('session', () => {
     }
   }
 
-  /** Navegacao de pagina ao SSO. Quem chama nao deve continuar a navegacao. */
   function beginLogin (returnTo: string): void {
     const state = randomState()
 
@@ -246,7 +204,6 @@ export const useSessionStore = defineStore('session', () => {
     window.location.assign(sessionApi.loginUrl(`${window.location.origin}${CALLBACK_PATH}`, state))
   }
 
-  /** Confere a volta do SSO. So o `state` que este navegador gerou e aceito. */
   function completeLogin (query: { state?: string | null, error?: string | null }): LoginOutcome {
     const attempt = takeAttempt()
 
@@ -267,27 +224,18 @@ export const useSessionStore = defineStore('session', () => {
     return { ok: true, returnTo: attempt.returnTo }
   }
 
-  /**
-   * Encerra a sessao no SSO, que derruba tambem os refresh tokens de todos os
-   * projetos, e volta ao login. Sem sessao, o SSO pede login de novo.
-   */
   async function signOut (): Promise<void> {
     signingOut.value = true
 
-    try {
-      await sessionApi.logout()
-    } catch {
-      /* Sessao que ja caiu nao tem o que encerrar. */
-    } finally {
-      signingOut.value = false
-    }
+    await sessionApi.logout().catch(() => null)
+
+    signingOut.value = false
 
     reset()
     status.value = 'unauthenticated'
     beginLogin('/')
   }
 
-  /** Sessao que cai no meio do uso. A pessoa volta para a tela onde estava. */
   function handleUnauthorized (): void {
     if (status.value === 'unauthenticated') {
       return

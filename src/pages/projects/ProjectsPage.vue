@@ -151,11 +151,6 @@
   import { shortId } from '@/utils/format'
   import { asOptions, asText } from '@/utils/forms'
 
-  /**
-   * Projetos sao poucos por natureza, um por aplicacao do ecossistema. A lista
-   * inteira vem do catalogo e filtra no navegador, o que permite filtrar por
-   * situacao e por membros, coisa que o backend nao oferece.
-   */
   const { t, locale } = useI18n()
   const router = useRouter()
   const session = useSessionStore()
@@ -182,7 +177,6 @@
     })),
   )
 
-  /** Colunas descobertas pela resposta, com rotulo ajustado onde o palpite erraria. */
   const columns = computed(() =>
     inferColumns(rows.value, {
       only: ['name', 'status', 'members', 'clientId', 'createdAt'],
@@ -197,8 +191,6 @@
     }),
   )
 
-  /* -------------------------------- filtros -------------------------------- */
-
   const filtersOpen = ref<string[]>([])
   const search = ref('')
   const statuses = ref<string[]>([])
@@ -207,7 +199,6 @@
   const maxMembers = computed(() => Math.max(1, ...rows.value.map(row => row.members)))
   const members = ref<[number, number]>([0, 1])
 
-  // A faixa acompanha o maior projeto conforme os dados chegam.
   watch(maxMembers, max => {
     members.value = [0, max]
   }, { immediate: true })
@@ -262,21 +253,14 @@
 
   const pageRows = computed(() => filtered.value.slice((page.value - 1) * PAGE_SIZE, page.value * PAGE_SIZE))
 
-  /**
-   * A tabela decide "ha proxima" por pagina cheia, porque o backend nao conta.
-   * Aqui o total e conhecido: a pagina so conta como cheia quando ha mais.
-   */
   const pageLimit = computed(() =>
     filtered.value.length > page.value * PAGE_SIZE ? pageRows.value.length : pageRows.value.length + 1,
   )
-
-  /* -------------------------------- acoes -------------------------------- */
 
   const headerActions = computed<HeaderAction[]>(() => [
     { key: 'create', label: t('projects.new'), icon: 'mdi-plus', method: 'POST', path: '/project' },
   ])
 
-  /** O projeto do proprio SSO nao se renomeia nem se apaga. O servidor recusa; a tela nem oferece. */
   const isSelf = (row: ProjectRow): boolean => row.name === SELF_PROJECT_NAME
 
   const rowActions = computed<RowAction<ProjectRow>[]>(() => [
@@ -338,7 +322,6 @@
   }
 
   onMounted(() => {
-    // A falha aparece pelo estado do catalogo, no lugar da tabela.
     catalog.ensure('projects').catch(() => {})
   })
 </script>

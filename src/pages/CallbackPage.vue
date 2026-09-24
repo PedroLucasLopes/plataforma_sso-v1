@@ -29,14 +29,6 @@
   import { useSessionStore } from '@/stores/session'
   import { queryString } from '@/utils/format'
 
-  /**
-   * Volta do login do console. E a `redirect_uri` registrada no projeto SSO.
-   *
-   * Nao ha code a trocar: o console usa a sessao do SSO. O que se confere e o
-   * `state`, que precisa ser o que este navegador gerou ao sair. Sem isso,
-   * qualquer link externo apontando para ca poderia empurrar a pessoa para uma
-   * tela escolhida por outro.
-   */
   const { t } = useI18n()
   const route = useRoute()
   const router = useRouter()

@@ -226,17 +226,9 @@
   import { useSessionStore } from '@/stores/session'
   import { type ProjectRoute, roleChips, roleLabel, rolesGranted, type RouteEntry, sortRoles } from '@/utils/routes'
 
-  /**
-   * O detalhe de um caminho: os metodos, quem pode chamar cada um e o que mora
-   * abaixo dele.
-   *
-   * Tudo sai do overview que a tela ja tem. A rota nao guarda data nem autor,
-   * entao nao ha o que buscar a mais.
-   */
   const props = defineProps<{
     project: ProjectOverview
     node: RouteTreeNode<RouteEntry>
-    /** Caminho do no acima, na arvore. `null` no topo. */
     parentKey: string | null
   }>()
 
@@ -253,7 +245,6 @@
   const session = useSessionStore()
   const { canManage, permissionOf, isBusy, toggle } = useGrants(() => props.project)
 
-  /** O catalogo do proprio SSO so a raiz muda. O servidor recusa os outros; a tela nem oferece. */
   const catalogLocked = computed(() => props.project.name === SELF_PROJECT_NAME && !session.root)
 
   const canCreate = computed(() => !catalogLocked.value && session.can('POST', '/route'))
@@ -262,7 +253,6 @@
 
   const params = computed(() => routeParams(props.node.key))
 
-  /** Sub-rota comeca com o caminho e uma barra. Na raiz, so a barra. */
   const childPrefix = computed(() => (props.node.key === '/' ? '/' : `${props.node.key}/`))
 
   const missingMethods = computed(() =>
@@ -279,15 +269,12 @@
       { key: 'below', label: t('routeDetail.facts.pathsBelow'), value: node.descendants > 0 ? t('counts.paths', node.descendants) : t('common.none') },
     ]
 
-    // O id e o que se passa para a API ou para um script. Um por metodo, porque cada metodo e uma linha.
     for (const item of node.routes) {
       items.push({ key: `id-${item.id}`, label: t('routeDetail.facts.routeId', { method: item.method }), value: item.id, mono: true, copyable: true })
     }
 
     return items
   })
-
-  /* ------------------------------- acesso ------------------------------- */
 
   interface AccessRow extends Record<string, unknown> {
     id: string
@@ -313,7 +300,6 @@
 
   const granted = computed(() => accessRows.value.some(row => row.granted))
 
-  // A tabela procura o slot `col-<key>`: a coluna e `role-<id>`, e o slot, `col-role-<id>`.
   const roleSlot = (roleId: string): string => `col-role-${roleId}`
 
   const accessColumns = computed<Column<AccessRow>[]>(() => [
@@ -338,7 +324,6 @@
       method: 'DELETE',
       path: '/route/:id',
       color: 'error',
-      // A permissao aponta para a rota: apagar antes de revogar falharia no banco.
       unavailable: row => catalogLocked.value || row.granted,
     },
   ])
@@ -356,8 +341,6 @@
       emit('remove', target)
     }
   }
-
-  /* ------------------------------ quem chama ----------------------------- */
 
   interface CallerRow extends Record<string, unknown> {
     id: string
@@ -392,8 +375,6 @@
     { key: 'role', label: t('common.role'), width: '140px' },
     { key: 'methods', label: t('routeDetail.callers.methods') },
   ])
-
-  /* ------------------------------ navegacao ------------------------------ */
 
   function addMethod (): void {
     const [method] = missingMethods.value

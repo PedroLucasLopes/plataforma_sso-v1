@@ -10,7 +10,6 @@ body {
   color: var(--dl-on-surface);
 }
 
-/* Estrutura comum das telas do console. */
 .page {
   display: flex;
   flex-direction: column;
@@ -31,10 +30,6 @@ body {
   gap: 16px;
 }
 
-/*
-  Troca de tela. Curta e so de opacidade com um deslocamento pequeno: tela de
-  gestao nao deve fazer esperar, mas a mudanca precisa ser percebida.
-*/
 .page-enter-active,
 .page-leave-active {
   transition:
@@ -51,7 +46,6 @@ body {
   opacity: 0;
 }
 
-/* O estado fica, o movimento sai. */
 @media (prefers-reduced-motion: reduce) {
   .page-enter-active,
   .page-leave-active {

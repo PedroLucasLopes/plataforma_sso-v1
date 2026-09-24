@@ -1,18 +1,3 @@
-/**
- * Chamadas ao SSO.
- *
- * Tres coisas deste backend que a camada resolve uma vez, para nenhuma tela
- * precisar lembrar:
- *
- * - **Listagem vazia responde 404.** Com `emptyOn404`, vira lista vazia.
- * - **A credencial e o cookie de sessao**, anexado pelo navegador na mesma
- *   origem. Escrita leva o header `X-CSRF-Token`; sem ele o SSO recusa.
- * - **Sessao que cai no meio do uso** dispara o relogin, e a pessoa volta para
- *   a tela onde estava.
- *
- * O erro sai como `ApiError`, com mensagem pronta para mostrar a uma pessoa, na
- * lingua corrente no momento da falha.
- */
 import { API_PREFIX } from '@/constants/api'
 import { apiErrorText, STATUS_MESSAGE_KEYS } from '@/constants/messages'
 import { t } from '@/plugins/i18n'
@@ -31,11 +16,8 @@ export class ApiError extends Error {
 export interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   body?: unknown
-  /** Filtros da listagem. So texto, numero e booleano viram parametro; vazio e ignorado. */
   query?: object
-  /** Este backend responde 404 para lista vazia. Com isto, vira `[]`. */
   emptyOn404?: boolean
-  /** `false` onde a propria chamada decide o que fazer com o 401. */
   redirectOnUnauthorized?: boolean
   signal?: AbortSignal
 }
@@ -45,7 +27,6 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
 let readCsrfToken: () => string | null = () => null
 let onUnauthorized: () => void = () => {}
 
-/** Liga a camada a sessao. Chamado uma vez, no registro dos plugins. */
 export function configureHttp (options: {
   csrfToken: () => string | null
   unauthorized: () => void
@@ -84,11 +65,6 @@ async function readBody (response: Response): Promise<unknown> {
   }
 }
 
-/**
- * O texto do erro sai do codigo, ou do status quando o codigo nao e conhecido.
- * O `message` do servidor nunca: ele e para quem le a resposta crua, e mostra-lo
- * poria na tela qualquer detalhe interno ou valor repetido da requisicao.
- */
 function describe (status: number, payload: unknown): { message: string, code: string | null } {
   const body = payload && typeof payload === 'object' ? payload as Record<string, unknown> : {}
   const code = typeof body.error === 'string' ? body.error : null
@@ -160,7 +136,6 @@ export async function request<T> (path: string, options: RequestOptions = {}): P
   return payload as T
 }
 
-/** Mensagem de qualquer falha, para toast e para erro dentro de modal. */
 export function errorMessage (error: unknown): string {
   return error instanceof ApiError ? error.message : t('errors.fallback')
 }

@@ -140,14 +140,6 @@
   import { asOption } from '@/utils/forms'
   import { roleChips, roleLabel, sortRoles } from '@/utils/routes'
 
-  /**
-   * Quem entra na aplicacao, com qual papel. Um papel por pessoa por projeto:
-   * trocar substitui o anterior, e tirar do projeto revoga os refresh tokens
-   * da pessoa ali.
-   *
-   * No projeto `SSO`, vincular alguem e dar poder administrativo, entao so a
-   * raiz mexe nos membros, e o ultimo SUPERADMIN nao troca de papel nem sai.
-   */
   const props = defineProps<{ project: ProjectOverview }>()
 
   const { t } = useI18n()
@@ -158,7 +150,6 @@
 
   const isSelf = computed(() => props.project.name === SELF_PROJECT_NAME)
 
-  /** Membros do SSO so a raiz muda. O servidor recusa os outros; a tela nem oferece. */
   const locked = computed(() => isSelf.value && !session.root)
 
   const canAdd = computed(() => !locked.value && session.can('POST', '/projectuser') && session.can('GET', '/user'))
@@ -192,7 +183,6 @@
 
   const rootCount = computed(() => props.project.users.filter(user => user.role === ROOT_ROLE_NAME).length)
 
-  /** O SSO nunca fica sem SUPERADMIN. O servidor recusa; a tela deixa a acao indisponivel. */
   const isLastRoot = (row: MemberRow): boolean => isSelf.value && row.role === ROOT_ROLE_NAME && rootCount.value <= 1
 
   const actions = computed<RowAction<MemberRow>[]>(() => (locked.value
@@ -245,8 +235,6 @@
 
   const isYou = (row: MemberRow): boolean => row.id === session.me?.id
 
-  /* -------------------------------- adicionar -------------------------------- */
-
   const dialog = useCrudDialog(() => ({ userId: '', roleId: '' }))
 
   async function openAdd (): Promise<void> {
@@ -268,8 +256,6 @@
       toast.success(t('members.added'))
     }
   }
-
-  /* ------------------------------ trocar papel ------------------------------ */
 
   const roleDialog = useCrudDialog(() => ({ name: '', roleId: '' }))
 
@@ -295,8 +281,6 @@
       })
     }
   }
-
-  /* --------------------------------- remover --------------------------------- */
 
   const removal = useConfirm<MemberRow>()
 
@@ -329,7 +313,6 @@
 
     toast.success(t('members.removed'), { description: t('members.removedDescription', { name: target.name, project: props.project.name }) })
 
-    // Quem tirou a si mesmo do SSO perde o console agora: o guard leva a tela de sem acesso.
     if (isSelf.value && isYou(target)) {
       await session.refresh()
       await router.replace('/')

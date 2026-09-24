@@ -18,7 +18,8 @@ estilo do scaffold em `AGENTS.md`; o ESLint decide o formato.
 A revisão de segurança deste front está em [`PENTEST.md`](PENTEST.md).
 
 A interface fala **inglês, espanhol e português do Brasil**, e a pessoa troca pelo menu com o nome dela,
-no canto da barra. Comentário continua em português, como no resto do repositório. Ver "Traduções".
+no canto da barra. Ver "Traduções". **O código não leva comentário**: nome de variável, função e tipo
+em inglês, e o que precisa de explicação mora no  do repositório.
 
 ---
 

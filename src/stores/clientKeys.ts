@@ -3,15 +3,6 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { clientKeysApi } from '@/services/sso'
 
-/**
- * Chaves de cliente por projeto.
- *
- * ⚠️ **A chave privada gerada nunca entra aqui.** `generate` a devolve para
- * quem chamou, e quem chamou a mostra uma vez e esquece. Estado de store e
- * visivel no devtools, sobrevive a troca de tela e e o primeiro lugar que um
- * plugin de persistencia gravaria. Nada disso pode acontecer com material de
- * chave.
- */
 export const useClientKeysStore = defineStore('clientKeys', () => {
   const byProject = ref<Record<string, ClientKey[]>>({})
   const loading = ref(false)

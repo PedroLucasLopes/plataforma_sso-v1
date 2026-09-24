@@ -201,12 +201,6 @@
   import { asOption, asText, ROUTE_PATH_PATTERN } from '@/utils/forms'
   import { type ProjectRoute, routeEntries } from '@/utils/routes'
 
-  /**
-   * As rotas do projeto em arvore, com o detalhe do caminho escolhido ao lado.
-   *
-   * O caminho escolhido mora na URL, em `?route=`: recarregar, voltar ou
-   * compartilhar o link abre o mesmo detalhe.
-   */
   const props = defineProps<{ project: ProjectOverview }>()
 
   const { t } = useI18n()
@@ -215,7 +209,6 @@
   const session = useSessionStore()
   const projects = useProjectsStore()
 
-  /** O catalogo do proprio SSO so a raiz muda. O servidor recusa os outros; a tela nem oferece. */
   const catalogLocked = computed(() => props.project.name === SELF_PROJECT_NAME && !session.root)
 
   const canCreate = computed(() => !catalogLocked.value && session.can('POST', '/route'))
@@ -225,19 +218,14 @@
 
   const treeView = ref<{ expandAll: () => void, collapseAll: () => void } | null>(null)
 
-  /* ------------------------------- filtro ------------------------------- */
-
   const query = ref('')
   const methods = ref<string[]>([])
 
   const METHOD_ORDER: HttpMethod[] = ['GET', 'POST', 'PUT', 'PATCH', 'UPDATE', 'DELETE']
 
-  /** So os metodos que o projeto usa. Filtro por metodo que nao existe so esvazia a arvore. */
   const presentMethods = computed(() =>
     METHOD_ORDER.filter(method => props.project.routes.some(item => item.method === method)),
   )
-
-  /* ------------------------------- selecao ------------------------------- */
 
   const narrow = ref(false)
 
@@ -253,11 +241,6 @@
     selectedKey.value ? (routeAncestorKeys(tree.value, selectedKey.value).at(-1) ?? null) : null,
   )
 
-  /**
-   * No estreito o detalhe toma o lugar da arvore, entao abrir entra no
-   * historico: o voltar do navegador, ou do telefone, volta para a arvore.
-   * Lado a lado, trocar de caminho nao empilha uma entrada por clique.
-   */
   let openedWithPush = false
 
   function select (key: string | null): void {
@@ -294,8 +277,6 @@
     }
   })
 
-  /* ------------------------------ gravacao ------------------------------ */
-
   const dialog = useCrudDialog(() => ({ method: 'GET' as HttpMethod, path: '' }))
   const removal = useConfirm<ProjectRoute>()
 
@@ -328,13 +309,11 @@
 
     if (ok) {
       toast.success(editingId ? t('routes.updated') : t('routes.added'), { description: `${method} ${path}` })
-      // O detalhe acompanha a rota gravada, inclusive quando o caminho mudou.
       select(normalizeRoutePath(path))
     }
   }
 
   async function remove (): Promise<void> {
-    // Guardado antes: se o metodo apagado era o ultimo do caminho, o no some da arvore.
     const fallback = parentKey.value
 
     const ok = await removal.confirm(target => projects.removeRoute(props.project.id, target.id))

@@ -1,35 +1,15 @@
-/** Nome da aplicacao no menu e no titulo da aba. E nome proprio: nao se traduz. */
 export const APP_NAME = 'SSO'
 
-/**
- * Marca do SSO no topo do menu e na tela de login: o escudo com chave que
- * `public/favicon.svg` desenha na aba. Arquivo estatico nao le constante; trocou a
- * marca aqui, troque o icone da aba.
- */
 export const APP_LOGO = 'mdi-shield-key-outline'
 
-/** Largura maxima do conteudo. Acima disso sobra margem, nao linha comprida. */
 export const CONTENT_MAX_WIDTH = 1280
 
-/** Linhas por pagina nas listas paginadas pelo servidor. O backend tem piso de 10. */
 export const PAGE_SIZE = 20
 
-/**
- * Teto das consultas de apoio: seletor de projeto, nome no lugar de id, painel.
- * O backend nao impoe teto ao `limit`; este e o nosso.
- */
 export const LOOKUP_LIMIT = 500
 
-/** Espera antes de buscar enquanto a pessoa digita um filtro. */
 export const FILTER_DEBOUNCE_MS = 350
 
-/**
- * Largura minima de cada cartao de indicador. A linha e flex: este e o ponto a
- * partir do qual o cartao cresce para preencher o que sobra. Em 170px cabem
- * cinco numa tela de conteudo com 960px, que e onde a quebra deixava um cartao
- * sozinho na segunda linha.
- */
 export const STAT_CARD_MIN_WIDTH = '170px'
 
-/** Preferencia de menu recolhido, por navegador. */
 export const NAV_COLLAPSED_STORAGE_KEY = 'sso.console.nav-collapsed'

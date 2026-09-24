@@ -208,20 +208,6 @@
   import { asRoleName, ROLE_NAME_PATTERN, roleNameError } from '@/utils/forms'
   import { customRoleLabel, isDefaultRole, type ProjectRole, roleDefinition, roleLabel, sortRoles } from '@/utils/routes'
 
-  /**
-   * Papeis do projeto e as rotas que cada um libera, na mesma arvore da aba de
-   * rotas. Com trezentas rotas, uma lista plana por papel viraria rolagem sem
-   * fim; em arvore, cada ramo fecha.
-   *
-   * A linha so abre e fecha. Marcar fica na caixa, e ver o detalhe do caminho
-   * fica no botao ao lado: um clique distraido na linha nao tira a pessoa do
-   * papel que ela estava editando.
-   *
-   * E o unico lugar do console onde papel se cria, renomeia e apaga: nao ha
-   * tela global de papeis, que buscaria os de todos os projetos de uma vez.
-   * Todo projeto nasce com SUPERADMIN, ADMIN, MANAGER e VIEWER, vazios. Os
-   * outros papeis tem nome livre, como ARQUITETO, e tambem nascem vazios.
-   */
   const props = defineProps<{ project: ProjectOverview }>()
 
   const { t } = useI18n()
@@ -233,7 +219,6 @@
 
   const isSelf = computed(() => props.project.name === SELF_PROJECT_NAME)
 
-  /** O catalogo do proprio SSO so a raiz muda. O servidor recusa os outros; a tela nem oferece. */
   const catalogLocked = computed(() => isSelf.value && !session.root)
 
   const canCreate = computed(() => !catalogLocked.value && session.can('POST', '/role'))
@@ -242,7 +227,6 @@
 
   const openPanels = ref<string[]>([])
 
-  /** O SUPERADMIN do SSO e a raiz: nao se renomeia nem se apaga, nem por ela. */
   const isRootRole = (role: ProjectRole): boolean => isSelf.value && role.name === ROOT_ROLE_NAME
 
   const membersOf = (roleName: string): number => props.project.users.filter(user => user.role === roleName).length
@@ -266,7 +250,6 @@
       summary: isRootRole(role)
         ? t('roles.summaryRoot', { members: t('counts.members', membersOf(role.name)) })
         : [
-          // O icone sozinho nao diz o que marca: o resumo diz, por escrito.
           ...(isDefaultRole(role.name) ? [] : [t('roles.custom')]),
           t('roles.summary', {
             granted: role.permissions.length,
@@ -277,8 +260,6 @@
       icon: roleDefinition(role.name).icon,
     })),
   )
-
-  /* ---------------------------- atalho de leitura ---------------------------- */
 
   const getRouteCount = computed(() => props.project.routes.filter(item => item.method === 'GET').length)
 
@@ -300,17 +281,13 @@
     }
   }
 
-  /** Detalhe do caminho, na aba de rotas. Entra no historico: voltar retorna a este papel. */
   function openRoute (key: string): void {
     void router.push({ query: { ...route.query, tab: 'routes', route: key } })
   }
 
-  /* --------------------------------- gravacao -------------------------------- */
-
   const dialog = useCrudDialog(() => ({ name: '' }))
   const renameDialog = useCrudDialog(() => ({ name: '' }))
 
-  /** Enquanto digita, a regra do nome; com o nome valido, como ele vai aparecer. */
   function nameHint (name: string): string {
     return ROLE_NAME_PATTERN.test(name)
       ? t('roles.displayedAs', { label: customRoleLabel(name) })
@@ -364,7 +341,6 @@
 </script>
 
 <style scoped>
-/* A linha da arvore traz o proprio respiro lateral; o do painel ja basta. */
 .roles__tree {
   margin: -6px -12px 0;
 }

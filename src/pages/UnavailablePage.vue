@@ -20,10 +20,6 @@
   import { safeReturnPath, useSessionStore } from '@/stores/session'
   import { queryString } from '@/utils/format'
 
-  /**
-   * O SSO nao respondeu, e sem ele nao da para afirmar se a pessoa tem sessao.
-   * A tela nao manda ao login, que tambem depende do SSO: so oferece tentar.
-   */
   const { t } = useI18n()
   const route = useRoute()
   const router = useRouter()

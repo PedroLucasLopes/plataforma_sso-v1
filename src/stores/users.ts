@@ -5,16 +5,8 @@ import { membersApi, usersApi } from '@/services/sso'
 import { useCatalogStore } from './catalog'
 import { usePagedList } from './helpers/pagedList'
 
-/** O backend valida `email` como endereco completo. Parcial vai como nome. */
 const EMAIL = /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/
 
-/**
- * Pessoas cadastradas no SSO. Paginado no servidor: e a lista que cresce.
- *
- * A busca e uma caixa so. O filtro `email` do backend exige endereco
- * completo, entao texto com cara de e-mail vai como `email` e o resto como
- * `name`, que aceita trecho.
- */
 export const useUsersStore = defineStore('users', () => {
   const catalog = useCatalogStore()
 

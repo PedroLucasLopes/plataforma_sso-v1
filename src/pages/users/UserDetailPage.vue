@@ -281,8 +281,6 @@
       actions.push({ key: 'unlink', label: t('user.unlink'), icon: 'mdi-link-variant-off', method: 'PUT', path, variant: 'text' })
     }
 
-    // Com acesso a algum projeto o SSO recusa apagar. O vinculo sai antes, na
-    // aba de membros do projeto; ate la, o botao so criaria um erro garantido.
     if (memberships.value.length === 0) {
       actions.push({ key: 'delete', label: t('common.delete'), icon: 'mdi-delete-outline', method: 'DELETE', path, color: 'error', variant: 'text' })
     }
@@ -332,14 +330,10 @@
     }
   }
 
-  /* ------------------------------ projetos ------------------------------ */
-
-  /** Os papeis vem do overview do projeto escolhido: a tela nunca busca os papeis de todos os projetos. */
   const canAddMembership = computed(() =>
     session.can('POST', '/projectuser') && session.can('GET', '/project') && session.can('GET', '/project/:id/overview'),
   )
 
-  /** Colocar alguem no projeto `SSO` e dar poder administrativo: so a raiz. */
   const projectOptions = computed(() =>
     catalog.projects
       .filter(project => !memberships.value.some(row => row.id === project.id))
@@ -354,7 +348,6 @@
 
   const rolesLoading = ref(false)
 
-  /** Ultima escolha de projeto: a resposta de uma escolha anterior nao encerra o carregamento da atual. */
   let selection = 0
 
   async function selectProject (projectId: string): Promise<void> {

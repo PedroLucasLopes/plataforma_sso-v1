@@ -40,7 +40,6 @@
   import { queryString } from '@/utils/format'
   import { asOption } from '@/utils/forms'
 
-  /** O projeto escolhido fica na URL: o link leva direto as chaves dele. */
   const { t } = useI18n()
   const route = useRoute()
   const router = useRouter()

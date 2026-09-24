@@ -149,11 +149,6 @@
   import { useSessionStore } from '@/stores/session'
   import { firstName } from '@/utils/format'
 
-  /**
-   * Painel de entrada. Cada indicador e grafico so aparece para quem pode ler
-   * o recurso de onde ele sai; um cartao com "—" para quem nao pode ver usuarios
-   * so apontaria o que a pessoa nao alcanca.
-   */
   const { t, locale } = useI18n()
   const router = useRouter()
   const session = useSessionStore()
@@ -181,7 +176,6 @@
   const projectsState = computed(() => stateOf('projects'))
   const projects = computed(() => catalog.projects)
 
-  /** O catalogo vem com teto. No teto, o numero exato e desconhecido e a tela diz isso. */
   const count = (length: number): number | string => (length >= LOOKUP_LIMIT ? `${LOOKUP_LIMIT}+` : length)
 
   interface Stat {
@@ -245,7 +239,6 @@
         value: stateOf('routes').error ? null : count(catalog.routes.length),
         icon: 'mdi-sitemap-outline',
         tone: 'neutral',
-        // Sem link: rota nao tem tela propria. Ela mora dentro de cada projeto, em arvore.
         hint: t('dashboard.stats.routesHint'),
         loading: stateOf('routes').loading,
       })
@@ -254,8 +247,6 @@
     return list
   })
 
-  /* ---------------------------- por situacao ---------------------------- */
-
   const STATUS_TONE = { ACTIVE: 'success', PENDING: 'warning', SUSPENDED: 'error' } as const
 
   const statusCounts = computed(() =>
@@ -263,7 +254,6 @@
       status,
       label: PROJECT_STATUS[status].label,
       value: projects.value.filter(project => project.status === status).length,
-      // A mesma cor da pastilha de situacao: o grafico e a tabela contam a mesma historia.
       color: toneColor(STATUS_TONE[status], theme.value),
     })),
   )
@@ -280,8 +270,6 @@
 
   const statusRows = computed(() => statusCounts.value.map(item => [item.label, String(item.value), share(item.value)]))
 
-  /* ----------------------------- membros ----------------------------- */
-
   const memberColor = computed(() => seriesColor(0, preferences.isDark))
 
   const memberBars = computed(() =>
@@ -296,11 +284,8 @@
 
   const memberRows = computed(() => memberBars.value.map(item => [item.label, String(item.value)]))
 
-  /* ---------------------------- crescimento ---------------------------- */
-
   const months = computed(() => {
     const now = new Date()
-    // Na lingua da tela: o eixo e a tabela trocam de mes junto com o resto.
     const MONTH = new Intl.DateTimeFormat(locale.value, { month: 'short' })
     const MONTH_YEAR = new Intl.DateTimeFormat(locale.value, { month: 'short', year: 'numeric' })
 
@@ -326,8 +311,6 @@
   ])
 
   const growthRows = computed(() => months.value.map((month, index) => [month.long, String(growthValues.value[index] ?? 0)]))
-
-  /* ----------------------------- pendentes ----------------------------- */
 
   interface PendingRow extends Record<string, unknown> {
     id: string
@@ -377,12 +360,6 @@
   gap: 16px;
 }
 
-/*
- * Flex, e nao grid. Com `repeat(auto-fit, minmax(...))` a ultima linha mantem a
- * largura das colunas e o que sobra vira buraco: o cartao que fica sozinho na
- * segunda linha deixava o resto dela vazio. No flex, ele cresce e ocupa a
- * largura inteira.
- */
 .stats {
   display: flex;
   flex-wrap: wrap;
@@ -401,8 +378,6 @@
 }
 
 .charts > * {
-  /* `min-width: 0` para o grafico poder encolher: sem isso o conteudo define o
-     piso e a linha estoura para a direita. */
   flex: 1 1 320px;
   min-width: 0;
 }

@@ -1,10 +1,3 @@
-/**
- * Endpoints do SSO, um grupo por recurso.
- *
- * O caminho e o do catalogo de rotas do SSO, sem o prefixo global. E o mesmo
- * texto que as permissoes usam, o que deixa a tela perguntar `can('POST',
- * '/project')` com a mesma string que vai na chamada.
- */
 import type {
   ClientKey,
   GeneratedClientKey,
@@ -34,7 +27,6 @@ export const sessionApi = {
   loginRequest: () => request<LoginRequestView>('/login/request', { redirectOnUnauthorized: false }),
   logout: () => request<void>('/session/logout', { method: 'POST', redirectOnUnauthorized: false }),
 
-  /** Navegacao de pagina, nunca fetch: o SSO responde com redirect. */
   loginUrl: (redirectUri: string, state: string): string =>
     `${API_PREFIX}/session/login?${new URLSearchParams({ redirect_uri: redirectUri, state })}`,
 }
@@ -57,7 +49,6 @@ export const usersApi = {
     request<User[]>('/user', { query, emptyOn404: true }),
   get: (userId: string) => request<User>(`/user/${id(userId)}`),
   create: (body: UserInput) => request<User>('/user', { method: 'POST', body }),
-  /** `authId: null` desfaz o vinculo com a conta Google; o proximo login fixa outro. */
   update: (userId: string, body: Partial<UserInput> & { authId?: null }) =>
     request<User>(`/user/${id(userId)}`, { method: 'PUT', body }),
   remove: (userId: string) => request<void>(`/user/${id(userId)}`, { method: 'DELETE' }),
@@ -72,7 +63,6 @@ export const routesApi = {
   remove: (routeId: string) => request<void>(`/route/${id(routeId)}`, { method: 'DELETE' }),
 }
 
-/** Sem listagem: papel mora no projeto, e chega no overview dele. */
 export const rolesApi = {
   create: (body: RoleInput) => request<Role>('/role', { method: 'POST', body }),
   update: (roleId: string, body: Partial<RoleInput>) =>
@@ -87,14 +77,11 @@ export const permissionsApi = {
     request<void>(`/permission/${id(permissionId)}`, { method: 'DELETE' }),
 }
 
-/** O vinculo e identificado pelo par projeto e pessoa, que e a chave dele no banco. */
 export const membersApi = {
   add: (body: { userId: string, projectId: string, roleId: string }) =>
     request<void>('/projectuser', { method: 'POST', body }),
-  /** Um papel por pessoa por projeto: o novo substitui o anterior. */
   changeRole: (projectId: string, userId: string, roleId: string) =>
     request<void>(`/projectuser/${id(projectId)}/${id(userId)}`, { method: 'PUT', body: { roleId } }),
-  /** Tira a pessoa do projeto e revoga os refresh tokens dela ali. */
   remove: (projectId: string, userId: string) =>
     request<void>(`/projectuser/${id(projectId)}/${id(userId)}`, { method: 'DELETE' }),
 }

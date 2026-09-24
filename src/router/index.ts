@@ -1,11 +1,3 @@
-/**
- * router/index.ts
- *
- * Rotas declaradas a mao. Cada tela do console diz qual permissao a libera,
- * com o mesmo metodo e caminho do catalogo de rotas do SSO. O guard pergunta
- * isso antes de montar a tela, e o backend pergunta de novo em cada chamada.
- */
-
 import type { RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
 import { watch } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -16,13 +8,9 @@ import { routeLoading } from './loading'
 
 declare module 'vue-router' {
   interface RouteMeta {
-    /** Chave de traducao do titulo da aba. */
     title?: string
-    /** Nao exige sessao: login do IdP, volta do login, sem acesso, indisponivel. */
     public?: boolean
-    /** `key` do item de menu que fica ativo. */
     nav?: string
-    /** Permissao que libera a tela. Sem ela, a tela de "nao permitido". */
     permission?: { method: string, path: string }
   }
 }
@@ -124,8 +112,6 @@ router.beforeEach(async to => {
   const session = useSessionStore()
   const status = await session.ensure()
 
-  // Sem sessao, o console faz o que qualquer aplicacao faz: manda ao SSO com a
-  // redirect_uri registrada, e volta para esta mesma URL depois.
   if (status === 'unauthenticated') {
     session.beginLogin(to.fullPath)
 
@@ -158,7 +144,6 @@ router.afterEach(to => {
   applyTitle(to)
 })
 
-// O titulo da aba acompanha a troca de lingua, sem esperar a proxima navegacao.
 watch(i18n.global.locale, () => applyTitle(router.currentRoute.value))
 
 router.onError(() => {

@@ -165,11 +165,9 @@
   const session = useSessionStore()
   const keys = useClientKeysStore()
 
-  /** Chave do projeto `SSO` autentica o proprio SSO como cliente: so a raiz mexe nela. */
   const locked = computed(() => props.projectName === SELF_PROJECT_NAME && !session.root)
 
   const canRegister = computed(() => !locked.value && session.can('POST', '/clientkey'))
-  // Material de chave: quem alcanca e o que o catalogo concede ao papel.
   const canGenerate = computed(() => !locked.value && session.can('POST', '/clientkey/generate'))
 
   const loadError = ref<string | null>(null)
@@ -233,8 +231,6 @@
       },
     ]))
 
-  /* ------------------------------ registrar ------------------------------ */
-
   const registerDialog = useCrudDialog(() => ({ publicKeyPem: '', expiresOn: '' }))
 
   const pemError = computed(() =>
@@ -245,7 +241,6 @@
 
   async function register (): Promise<void> {
     const pem = registerDialog.form.publicKeyPem.trim()
-    // Fim do dia escolhido, no fuso de quem cadastra.
     const expiresAt = registerDialog.form.expiresOn
       ? new Date(`${registerDialog.form.expiresOn}T23:59:59`).toISOString()
       : undefined
@@ -257,14 +252,8 @@
     }
   }
 
-  /* -------------------------------- gerar -------------------------------- */
-
   const generation = useConfirm<string>()
 
-  /**
-   * A chave privada vive so aqui, num ref local, pelo tempo em que o dialogo
-   * esta aberto. Nao vai para store, log nem armazenamento, e some ao fechar.
-   */
   const secret = ref('')
   const secretOpen = ref(false)
 
@@ -280,8 +269,6 @@
   function forgetSecret (): void {
     secret.value = ''
   }
-
-  /* ------------------------------- revogar ------------------------------- */
 
   const revocation = useConfirm<KeyRow>()
 

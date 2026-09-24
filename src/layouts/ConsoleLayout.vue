@@ -46,14 +46,6 @@
   import { useSessionStore } from '@/stores/session'
   import { roleLabel as labelOf } from '@/utils/routes'
 
-  /**
-   * Casca do console. O menu sai das permissoes do papel, e todo componente
-   * abaixo pergunta `can()` pelo mesmo contexto: menu, cabecalho, tabela e
-   * abas escondem juntos o que a pessoa nao alcanca.
-   *
-   * As linguas do menu do usuario sao os JSON de `src/locales`: o `DlUserMenu`
-   * lista e troca sozinho, e menu, cabecalho e telas mudam juntos.
-   */
   const { t } = useI18n()
   const session = useSessionStore()
   const preferences = usePreferencesStore()
@@ -62,7 +54,6 @@
 
   providePermissions(toRef(session, 'permissions'), ref(API_PREFIX))
 
-  // O que outra pessoa mudar no SSO chega ao menu e as acoes sem recarregar.
   useSessionWatch()
 
   const navOpen = ref(false)

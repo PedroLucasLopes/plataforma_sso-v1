@@ -26,13 +26,6 @@
   import GateLayout from '@/layouts/GateLayout.vue'
   import { useSessionStore } from '@/stores/session'
 
-  /**
-   * Sessao valida, sem papel no projeto SSO.
-   *
-   * A pessoa entrou de verdade: a conta existe e o Google confirmou. Ela so nao
-   * administra nada aqui. Dizer com qual conta ela entrou evita o engano mais
-   * comum, que e ter usado a conta pessoal no lugar da do trabalho.
-   */
   const { t } = useI18n()
   const router = useRouter()
   const session = useSessionStore()
@@ -44,7 +37,6 @@
   )
 
   onMounted(async () => {
-    // Aberta direto por quem tem acesso, a tela so atrapalharia.
     if ((await session.ensure()) === 'authenticated') {
       await router.replace('/')
     }

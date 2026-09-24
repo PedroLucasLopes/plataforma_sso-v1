@@ -7,11 +7,6 @@
 </template>
 
 <script lang="ts" setup>
-  /**
-   * Moldura das telas fora do console: volta do login, sem acesso, SSO fora do
-   * ar. Um cartao centralizado sobre o fundo, sem menu, porque nessas telas a
-   * pessoa ainda nao tem para onde navegar.
-   */
 </script>
 
 <style scoped>

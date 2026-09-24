@@ -40,14 +40,6 @@
   import { useI18n } from 'vue-i18n'
   import { keyState } from '@/utils/format'
 
-  /**
-   * O que falta para o projeto funcionar, em ordem.
-   *
-   * O backend so recusa ativar sem chave de cliente. Sem redirect URI, porem, o
-   * authorize recusa todo pedido, e ativar produziria um projeto "ativo" que nao
-   * autentica ninguem. Por isso as duas sao exigidas aqui antes do botao liberar:
-   * e bloqueio por estado, temporario, que e o caso de desabilitar e nao esconder.
-   */
   const props = defineProps<{
     overview: ProjectOverview
     canActivate: boolean

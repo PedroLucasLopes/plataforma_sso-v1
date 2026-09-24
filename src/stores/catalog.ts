@@ -16,20 +16,6 @@ interface LoadState {
 
 const idle = (): LoadState => ({ loading: false, loaded: false, error: null })
 
-/**
- * Catalogo inteiro de cada recurso, ate `LOOKUP_LIMIT`.
- *
- * Serve ao que precisa de tudo de uma vez: seletor de projeto, nome no lugar
- * de id e painel. Projetos filtram e paginam no navegador. Usuarios crescem com
- * o uso e paginam no servidor, no store proprio.
- *
- * Papeis nao tem lista global: moram dentro de cada projeto, e chegam no
- * overview dele. Rotas tambem moram no projeto, em arvore, e aqui entram so
- * para a contagem do painel.
- *
- * Quem altera um recurso chama `invalidate`; a proxima tela que precisar
- * busca de novo.
- */
 export const useCatalogStore = defineStore('catalog', () => {
   const projects = shallowRef<Project[]>([])
   const users = shallowRef<User[]>([])

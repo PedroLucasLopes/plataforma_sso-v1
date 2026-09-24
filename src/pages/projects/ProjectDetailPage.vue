@@ -149,13 +149,6 @@
   import { formatDate, formatDateTime, keyState, queryString } from '@/utils/format'
   import { asText } from '@/utils/forms'
 
-  /**
-   * Um projeto e tudo o que ele precisa para funcionar, na ordem do fluxo:
-   * identidade, redirect URIs, rotas, papeis e permissoes, membros e chaves.
-   *
-   * O overview, que alimenta as abas de gestao, exige papel de administracao.
-   * Quem so le o catalogo ve a identidade e mais nada, e as abas somem juntas.
-   */
   const { t } = useI18n()
   const route = useRoute()
   const router = useRouter()
@@ -167,7 +160,6 @@
 
   const project = computed(() => projects.projects[projectId.value] ?? null)
 
-  /** O projeto do proprio SSO: nao se renomeia, nao se suspende e nao se apaga. */
   const isSelf = computed(() => project.value?.name === SELF_PROJECT_NAME)
   const overview = computed(() => projects.overviews[projectId.value] ?? null)
 
@@ -192,14 +184,11 @@
 
   onMounted(load)
 
-  /** A aba mora na URL: recarregar ou compartilhar o link volta ao mesmo lugar. */
   const tab = computed({
     get: () => queryString(route.query.tab) ?? 'overview',
     set: value => {
       const { route: path, ...others } = route.query
 
-      // O caminho escolhido so vale na aba de rotas. Levado para outra aba,
-      // reabriria um detalhe na volta sem ninguem ter pedido.
       void router.replace({ query: value === 'routes' ? { ...others, route: path, tab: value } : { ...others, tab: value } })
     },
   })
@@ -266,7 +255,6 @@
     const statusPath = `/project/${current.id}/status`
     const activate: HeaderAction = { key: 'activate', label: t('project.activate'), icon: 'mdi-play-circle-outline', method: 'PATCH', path: statusPath, color: 'success' }
 
-    // O servidor recusa renomear, suspender e apagar o projeto do proprio SSO; a tela nem oferece.
     if (isSelf.value) {
       return current.status === 'ACTIVE' ? [] : [activate]
     }

@@ -105,14 +105,8 @@
 
   const columns = computed<Column<UriRow>[]>(() => [{ key: 'redirectUri', label: t('redirectUris.address'), mono: true }])
 
-  /**
-   * No projeto do proprio SSO estas URIs sao por onde o console entra. O servidor
-   * recusa editar qualquer uma, apagar a ultima e apagar a da origem de onde o
-   * pedido sai; a tela so deixa de oferecer o que seria recusado.
-   */
   const isSelf = computed(() => props.project.name === SELF_PROJECT_NAME)
 
-  /** No SSO, cadastrar ou apagar redirect URI e abrir ou fechar a porta do console: so a raiz. */
   const locked = computed(() => isSelf.value && !session.root)
 
   const canAdd = computed(() => !locked.value && session.can('POST', '/redirecturi'))
