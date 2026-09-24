@@ -1,0 +1,569 @@
+{
+  "app": {
+    "subtitle": "Console de administração"
+  },
+  "pageTitles": {
+    "login": "Entrar",
+    "callback": "Entrando",
+    "noAccess": "Sem acesso",
+    "unavailable": "Indisponível",
+    "dashboard": "Visão geral",
+    "projects": "Projetos",
+    "project": "Projeto",
+    "users": "Usuários",
+    "user": "Usuário",
+    "clientKeys": "Chaves de cliente",
+    "forbidden": "Não permitido",
+    "notFound": "Não encontrado"
+  },
+  "nav": {
+    "overview": "Visão geral",
+    "projects": "Projetos",
+    "users": "Usuários",
+    "clientKeys": "Chaves de cliente",
+    "catalogue": "Catálogo",
+    "credentials": "Credenciais"
+  },
+  "common": {
+    "tryAgain": "Tentar de novo",
+    "goToOverview": "Ir para a visão geral",
+    "name": "Nome",
+    "email": "E-mail",
+    "status": "Situação",
+    "project": "Projeto",
+    "projects": "Projetos",
+    "role": "Papel",
+    "members": "Membros",
+    "registered": "Cadastro",
+    "clientId": "Client ID",
+    "edit": "Editar",
+    "rename": "Renomear",
+    "delete": "Excluir",
+    "never": "Nunca",
+    "none": "Nenhum",
+    "unknownProject": "Projeto desconhecido",
+    "enterName": "Informe um nome.",
+    "enterEmail": "Informe um e-mail completo.",
+    "chooseProject": "Escolha um projeto.",
+    "chooseRole": "Escolha um papel.",
+    "projectsLoadFailed": "Não foi possível carregar os projetos",
+    "roleNameHint": "Letras maiúsculas, dígitos e sublinhados, começando por uma letra.",
+    "googleEmailHint": "O e-mail da conta Google com que esta pessoa entra."
+  },
+  "counts": {
+    "projects": "{count} projeto | {count} projetos",
+    "members": "{count} membro | {count} membros",
+    "routes": "{count} rota | {count} rotas",
+    "paths": "{count} caminho | {count} caminhos",
+    "addresses": "{count} endereço | {count} endereços",
+    "activeKeys": "{count} chave ativa | {count} chaves ativas"
+  },
+  "status": {
+    "project": {
+      "ACTIVE": "Ativo",
+      "PENDING": "Pendente",
+      "SUSPENDED": "Suspenso"
+    },
+    "key": {
+      "ACTIVE": "Ativa",
+      "EXPIRED": "Expirada",
+      "REVOKED": "Revogada"
+    },
+    "link": {
+      "LINKED": "Vinculada",
+      "WAITING": "Aguardando o primeiro login"
+    }
+  },
+  "errors": {
+    "fallback": "Não foi possível concluir a solicitação.",
+    "status": {
+      "network": "O SSO não respondeu. Confira sua conexão e tente de novo.",
+      "badRequest": "O SSO recusou a requisição.",
+      "unauthorized": "Sua sessão terminou. Entre de novo para continuar.",
+      "forbidden": "Seu papel não permite esta ação.",
+      "notFound": "O registro não foi encontrado. Ele pode ter sido removido.",
+      "conflict": "Já existe um registro com esses valores.",
+      "server": "O SSO não conseguiu processar a solicitação. Nada foi alterado.",
+      "tooLarge": "A requisição é grande demais.",
+      "tooManyRequests": "Muitas requisições em pouco tempo. Aguarde um instante e tente de novo."
+    },
+    "code": {
+      "client_key_not_found": "A chave não foi encontrada ou já foi revogada.",
+      "client_key_required": "Cadastre ao menos uma chave de cliente antes de ativar o projeto.",
+      "client_keys_empty": "Este projeto ainda não tem chaves de cliente.",
+      "csrf_token_invalid": "Seu token de segurança está desatualizado. Recarregue a página e tente de novo.",
+      "duplicate": "Já existe um registro com esses valores.",
+      "internal_error": "O SSO não conseguiu processar a solicitação. Nada foi alterado.",
+      "member_not_found": "Esta pessoa não é mais membro do projeto.",
+      "no_results": "Nada foi encontrado.",
+      "origin_not_allowed": "Esta solicitação não veio do console e foi recusada.",
+      "permission_not_found": "Esta permissão não existe mais.",
+      "project_has_members": "Não adicione mais ninguém e remova os membros deste projeto antes de excluí-lo.",
+      "project_has_routes": "Exclua as rotas deste projeto antes de excluí-lo.",
+      "project_not_found": "Este projeto não existe. Ele pode ter sido removido.",
+      "public_key_invalid": "Esta não é uma chave pública válida.",
+      "public_key_not_rsa": "Só chaves RSA são aceitas (RS256).",
+      "public_key_too_short": "A chave RSA precisa ter ao menos 2048 bits.",
+      "redirect_uri_not_found": "Esta redirect URI não existe. Ela pode ter sido removida.",
+      "role_not_found": "Este papel não existe. Ele pode ter sido removido.",
+      "role_not_in_project": "Este papel pertence a outro projeto.",
+      "role_route_project_mismatch": "O papel e a rota pertencem a projetos diferentes.",
+      "route_not_found": "Esta rota não existe. Ela pode ter sido removida.",
+      "sso_access_denied": "Sua conta não tem papel no projeto SSO.",
+      "sso_last_superadmin": "O projeto SSO precisa de ao menos um SUPERADMIN. Dê o papel a outra pessoa antes.",
+      "sso_project_protected": "O projeto SSO administra todas as aplicações. Só o SUPERADMIN dele altera rotas, papéis, permissões, membros, redirect URIs e chaves, e algumas alterações são recusadas para todos.",
+      "sso_redirect_uri_in_use": "Este console entra por este endereço. Exclua-o a partir de um console rodando em outro endereço.",
+      "sso_redirect_uri_last": "O projeto SSO precisa de ao menos uma redirect URI. Adicione o novo endereço antes de excluir este.",
+      "user_has_projects": "Este usuário ainda tem acesso a um projeto. Remova os vínculos antes.",
+      "user_not_found": "Este usuário não existe. Ele pode ter sido removido.",
+      "validation_failed": "O SSO recusou alguns dos valores enviados. Confira o formulário e tente de novo."
+    },
+    "field": {
+      "email_invalid": "Informe um e-mail válido.",
+      "public_key_not_pem": "Cole uma chave pública em formato PEM, começando com -----BEGIN PUBLIC KEY-----.",
+      "role_name_invalid": "Use de 2 a 40 caracteres: uma letra maiúscula e depois maiúsculas, dígitos ou sublinhados."
+    }
+  },
+  "forms": {
+    "roleNamePattern": "Use de 2 a 40 letras maiúsculas, dígitos ou sublinhados, começando por uma letra.",
+    "roleNameTaken": "Este projeto já tem um papel com este nome."
+  },
+  "login": {
+    "errors": {
+      "no_pending_request": {
+        "title": "Não há login aguardando aqui",
+        "description": "Abra a aplicação que você quer usar. Ela trará você de volta a esta página."
+      },
+      "request_expired": {
+        "title": "O pedido de login expirou",
+        "description": "Um pedido dura cinco minutos. Volte à aplicação e comece de novo."
+      },
+      "account_not_registered": {
+        "title": "Esta conta Google não está cadastrada",
+        "description": "Peça a um administrador para cadastrar seu e-mail no SSO e tente de novo."
+      },
+      "email_not_verified": {
+        "title": "Seu e-mail do Google não está verificado",
+        "description": "Verifique o endereço na sua conta Google e tente de novo."
+      },
+      "account_mismatch": {
+        "title": "Esta não é a conta Google vinculada a você",
+        "description": "Use a conta Google do seu primeiro login, ou peça a um administrador para desfazer o vínculo."
+      },
+      "provider_denied": {
+        "title": "O login foi cancelado",
+        "description": "O Google não compartilhou sua identidade. Escolha o provedor de novo quando estiver pronto."
+      },
+      "provider_error": {
+        "title": "O Google não conseguiu concluir o login",
+        "description": "Nada foi alterado. Tente de novo em instantes."
+      }
+    },
+    "generic": {
+      "title": "Não foi possível concluir o login",
+      "description": "Volte à aplicação e tente de novo."
+    },
+    "unavailable": {
+      "title": "O SSO não está respondendo",
+      "description": "Nada foi alterado. Recarregue esta página em instantes."
+    }
+  },
+  "callback": {
+    "working": "Entrando…",
+    "failedTitle": "Não foi possível concluir este login",
+    "failedDescription": "O link que trouxe você até aqui não vale mais. Comece de novo e você voltará ao console.",
+    "signInAgain": "Entrar de novo"
+  },
+  "noAccess": {
+    "title": "Você não tem acesso ao console do SSO",
+    "descriptionAs": "Você entrou como {name} ({email}), mas esta conta não tem papel no projeto SSO. Peça acesso a um administrador.",
+    "description": "Sua conta não tem papel no projeto SSO. Peça acesso a um administrador.",
+    "useAnotherAccount": "Usar outra conta"
+  },
+  "unavailable": {
+    "title": "O SSO não está respondendo",
+    "description": "O console não conseguiu falar com o SSO. Nada foi alterado. Tente de novo em instantes.",
+    "stillTitle": "O SSO continua sem responder",
+    "stillDescription": "Confira se o serviço está no ar e tente de novo."
+  },
+  "forbidden": {
+    "title": "Você não pode abrir esta página",
+    "description": "Seu papel não inclui esta área. Peça a um administrador se precisar dela."
+  },
+  "notFound": {
+    "title": "Esta página não existe",
+    "description": "O endereço pode ter sido digitado errado, ou a página mudou de lugar. O menu ao lado tem tudo o que seu papel pode abrir."
+  },
+  "dashboard": {
+    "welcome": "Boas-vindas, {name}",
+    "description": "A situação do catálogo do SSO, a partir do que seu papel pode ler.",
+    "totals": "Totais do catálogo",
+    "charts": "Gráficos de projetos",
+    "nothingTitle": "Nada para mostrar ainda",
+    "nothingDescription": "Seu papel abre o console, mas não lê nenhuma parte do catálogo.",
+    "loadFailed": "Não foi possível carregar parte da visão geral",
+    "stats": {
+      "projects": "Projetos",
+      "waiting": "{count} aguardando ativação",
+      "noneWaiting": "Nenhum aguardando ativação",
+      "activeProjects": "Projetos ativos",
+      "users": "Usuários",
+      "signedIn": "{count} já entraram ao menos uma vez",
+      "routes": "Rotas",
+      "routesHint": "Gerenciadas dentro de cada projeto"
+    },
+    "byStatus": {
+      "title": "Projetos por situação",
+      "empty": "Nenhum projeto cadastrado ainda.",
+      "share": "Participação"
+    },
+    "members": {
+      "title": "Membros por projeto",
+      "description": "Os 8 com mais membros",
+      "empty": "Nenhum projeto tem membros ainda."
+    },
+    "growth": {
+      "title": "Projetos cadastrados",
+      "description": "Últimos 12 meses",
+      "month": "Mês"
+    },
+    "pending": {
+      "title": "Aguardando ativação",
+      "description": "Cadastrados no catálogo, mas sem poder usar o SSO até um administrador ativá-los.",
+      "emptyTitle": "Nada aguardando",
+      "emptyDescription": "Todo projeto cadastrado está ativo, ou foi suspenso de propósito."
+    }
+  },
+  "projects": {
+    "description": "Aplicações conectadas ao SSO. Um projeto nasce pendente e só usa o SSO depois que um administrador o ativa.",
+    "new": "Novo projeto",
+    "emptyTitle": "Nenhum projeto encontrado",
+    "emptyFiltered": "Nenhum projeto corresponde a estes filtros.",
+    "emptyDescription": "Cadastre a primeira aplicação que vai fazer login pelo SSO.",
+    "createDescription": "Ele nasce pendente. Depois de criar, adicione uma redirect URI e uma chave de cliente, e então ative.",
+    "renameTitle": "Renomear projeto",
+    "renameDescription": "O nome aparece na tela de login, como a aplicação em que as pessoas estão entrando.",
+    "nameHint": "Único no SSO.",
+    "namePlaceholder": "Painel Financeiro",
+    "deleteTitle": "Excluir projeto",
+    "deleteMessage": "O projeto sai do catálogo com a identidade dele. O SSO recusa enquanto ele ainda tiver rotas ou membros.",
+    "created": "Projeto criado",
+    "createdDescription": "A seguir: uma redirect URI e uma chave de cliente, e então a ativação.",
+    "renamed": "Projeto renomeado",
+    "deleted": "Projeto excluído",
+    "filters": {
+      "title": "Filtros",
+      "namePlaceholder": "Buscar pelo nome",
+      "anyStatus": "Qualquer situação",
+      "membersHint": "Filtra os projetos já carregados.",
+      "nameHas": "nome contém \"{term}\"",
+      "membersRange": "de {min} a {max} membros",
+      "none": "{count} projeto, sem filtro | {count} projetos, sem filtro"
+    }
+  },
+  "project": {
+    "loadFailed": "Não foi possível carregar o projeto",
+    "headerDescription": "{status} · cadastrado em {date}",
+    "activate": "Ativar",
+    "suspend": "Suspender",
+    "activateProject": "Ativar projeto",
+    "suspendProject": "Suspender projeto",
+    "activateTitle": "Ativar {name}?",
+    "suspendTitle": "Suspender {name}?",
+    "activateMessage": "Aplicações com este client ID podem começar a fazer login das pessoas na hora.",
+    "suspendMessage": "Toda aplicação com este client ID para de fazer login das pessoas, e os refresh tokens param de renovar. O catálogo fica como está.",
+    "activated": "Projeto ativado",
+    "suspended": "Projeto suspenso",
+    "tabs": {
+      "overview": "Visão geral",
+      "redirects": "Redirect URIs",
+      "routes": "Rotas",
+      "roles": "Papéis e permissões",
+      "members": "Membros",
+      "keys": "Chaves de cliente"
+    },
+    "identity": {
+      "title": "Identidade",
+      "description": "Como aplicações e pessoas identificam este projeto.",
+      "clientIdHint": "Identificador público. As aplicações o enviam como client_id; a prova é a chave privada delas.",
+      "lastActivated": "Última ativação",
+      "lastSuspended": "Última suspensão",
+      "selfNote": "Este é o projeto do próprio SSO: é por ele que entram os administradores de todas as aplicações. Ele não pode ser renomeado, suspenso nem excluído, e só o SUPERADMIN dele altera rotas, papéis, permissões, membros, redirect URIs e chaves."
+    }
+  },
+  "checklist": {
+    "title": "Pronto para usar o SSO",
+    "required": "Obrigatório",
+    "active": "Este projeto está ativo. Aplicações com o client ID dele podem fazer login das pessoas.",
+    "ready": "Tudo o que é obrigatório está no lugar. Ativar deixa a aplicação começar a fazer login das pessoas.",
+    "notReady": "Um projeto só usa o SSO depois da ativação, e a ativação precisa dos itens obrigatórios abaixo.",
+    "redirect": {
+      "label": "Redirect URI cadastrada",
+      "empty": "O SSO só devolve um login para um endereço cadastrado."
+    },
+    "key": {
+      "label": "Chave de cliente ativa",
+      "empty": "A aplicação prova quem é assinando com a metade privada."
+    },
+    "routes": {
+      "label": "Rotas cadastradas",
+      "empty": "Uma rota que não está no catálogo responde 404 para todo mundo, como se não existisse."
+    },
+    "grants": {
+      "label": "Rotas concedidas a um papel",
+      "done": "{count} papel com permissões | {count} papéis com permissões",
+      "empty": "As permissões ligam um papel às rotas que ele libera."
+    },
+    "members": {
+      "label": "Pessoas com acesso",
+      "empty": "Só membros podem entrar nesta aplicação."
+    }
+  },
+  "redirectUris": {
+    "title": "Redirect URIs",
+    "description": "O SSO só devolve um login para estes endereços, comparados caractere por caractere. Cadastre cada ambiente separadamente.",
+    "add": "Adicionar redirect URI",
+    "editTitle": "Editar redirect URI",
+    "emptyTitle": "Nenhuma redirect URI ainda",
+    "emptyDescription": "Sem uma, nenhuma aplicação consegue concluir um login com este projeto.",
+    "selfNote": "Este console entra por estes endereços, então eles nunca são editados: adicione o novo endereço e depois exclua o antigo. O último endereço, e o que este console está usando agora, não podem ser excluídos. Só um SUPERADMIN do SSO os adiciona ou exclui.",
+    "dialogDescription": "Esquema, host, porta e caminho, exatamente como a aplicação envia. Uma barra no fim torna o endereço diferente.",
+    "field": "Redirect URI",
+    "fieldHint": "Exemplo: https://app.example.com/api/auth/callback",
+    "address": "Endereço",
+    "enterAddress": "Informe o endereço.",
+    "useHttp": "Use um endereço http ou https completo.",
+    "deleteTitle": "Excluir redirect URI",
+    "deleteOnly": "{uri} é o único endereço de {project}. Até outro ser adicionado, ninguém consegue entrar nele.",
+    "deleteMessage": "Aplicações que ainda enviam {uri} param de fazer login, e os codes já emitidos para ele são recusados.",
+    "added": "Redirect URI adicionada",
+    "updated": "Redirect URI atualizada",
+    "deleted": "Redirect URI excluída"
+  },
+  "routes": {
+    "title": "Rotas",
+    "description": "O que esta aplicação expõe, agrupado por caminho. Escolha qualquer caminho para ver os métodos e quem pode chamá-lo.",
+    "add": "Adicionar rota",
+    "editTitle": "Editar rota",
+    "allRoutes": "Todas as rotas",
+    "filterPlaceholder": "Filtrar por caminho",
+    "filterByMethod": "Filtrar por método",
+    "expandAll": "Expandir tudo",
+    "collapseAll": "Recolher tudo",
+    "emptyDescription": "Cadastre as rotas da aplicação e depois conceda-as aos papéis.",
+    "treeLabel": "Rotas de {project}",
+    "selfNote": "Estas são as rotas do próprio SSO. Só um SUPERADMIN do SSO as altera.",
+    "notFoundTitle": "Rota não encontrada",
+    "notFoundDescription": "{path} não está no catálogo de {project}. Ela pode ter sido renomeada ou excluída.",
+    "backToRoutes": "Voltar às rotas",
+    "selectTitle": "Selecione uma rota",
+    "selectDescription": "Escolha qualquer caminho na árvore para ver os métodos, os papéis que o alcançam e quem pode chamá-lo.",
+    "dialogDescription": "O caminho como a aplicação o declara, sem o prefixo global. Use :nome para parâmetros.",
+    "method": "Método",
+    "path": "Caminho",
+    "pathError": "Comece com uma barra e não deixe espaços, como em /equipment/:id.",
+    "deleteTitle": "Excluir rota",
+    "deleteMessage": "{method} {path} sai do catálogo. A aplicação passa a responder 404 a todo mundo nela, como se não existisse.",
+    "noRoleGranted": "Nenhum papel concedido",
+    "added": "Rota adicionada",
+    "updated": "Rota atualizada",
+    "deleted": "Rota excluída"
+  },
+  "routeDetail": {
+    "registerPath": "Cadastrar este caminho",
+    "addMethod": "Adicionar método",
+    "addSubRoute": "Adicionar sub-rota",
+    "groupLead": "Não é uma rota cadastrada. Reúne o {count} caminho abaixo que começa com este prefixo, e não responde a nenhuma requisição sozinho. | Não é uma rota cadastrada. Reúne os {count} caminhos abaixo que começam com este prefixo, e não responde a nenhuma requisição sozinho.",
+    "topLevel": "Nível superior",
+    "facts": {
+      "path": "Caminho",
+      "parameters": "Parâmetros",
+      "parent": "Pai",
+      "pathsBelow": "Caminhos abaixo",
+      "routeId": "ID da rota {method}"
+    },
+    "access": {
+      "title": "Acesso",
+      "description": "Qual papel pode chamar cada método deste caminho. Um método que nenhum papel alcança responde 404 a todo mundo, como se não existisse, e um método concedido só pode ser excluído depois que as concessões saírem.",
+      "emptyTitle": "Nenhum papel ainda",
+      "emptyDescription": "Crie um papel em Papéis e permissões e depois conceda este caminho a ele aqui.",
+      "method": "Método",
+      "canCall": "Podem chamar",
+      "granted": "Concedido",
+      "notGranted": "Não concedido",
+      "nobody": "Ninguém",
+      "editRoute": "Editar rota",
+      "deleteRoute": "Excluir rota"
+    },
+    "callers": {
+      "title": "Quem pode chamar",
+      "description": "Membros cujo papel alcança ao menos um método deste caminho, e quais métodos.",
+      "emptyTitle": "Ninguém pode chamar ainda",
+      "emptyGranted": "Os papéis que alcançam este caminho ainda não têm membros.",
+      "emptyNotGranted": "Conceda a um papel acima. Até lá, todo método responde 404.",
+      "openMembers": "Abrir membros",
+      "methods": "Métodos"
+    },
+    "below": {
+      "title": "Abaixo deste caminho",
+      "description": "Caminhos que começam com este. Escolha qualquer um para abri-lo.",
+      "treeLabel": "Rotas abaixo de {path}"
+    }
+  },
+  "grants": {
+    "canCall": "{role} pode chamar {method} {path}",
+    "grantFailed": "Não foi possível conceder a rota",
+    "revokeFailed": "Não foi possível remover a permissão",
+    "bulkFailed": "Nem todas as rotas {method} puderam ser concedidas"
+  },
+  "roles": {
+    "title": "Papéis e permissões",
+    "description": "Cada papel libera as rotas marcadas abaixo, agrupadas por caminho. As mudanças valem na próxima requisição, sem ninguém precisar entrar de novo.",
+    "add": "Adicionar papel",
+    "emptyTitle": "Nenhum papel ainda",
+    "emptyDescription": "Crie os papéis que esta aplicação usa e depois marque as rotas que cada um libera.",
+    "rootLead": "O SUPERADMIN do SSO é a raiz: alcança toda rota administrativa sem nenhuma estar marcada, e não pode ser renomeado nem excluído.",
+    "noRoutes": "Cadastre as rotas antes. Um papel só libera rotas que existem no catálogo.",
+    "grantAllGet": "Conceder todas as rotas GET",
+    "allGetGranted": "Toda rota GET está concedida a {role}.",
+    "getMissing": "{count} rota GET ainda não concedida a {role}. | {count} rotas GET ainda não concedidas a {role}.",
+    "getGranted": "{count} rota GET concedida | {count} rotas GET concedidas",
+    "treeLabel": "Rotas que o papel {role} libera",
+    "openInRoutes": "Abrir {path} em Rotas",
+    "deleteBlocked": "Desmarque todas as rotas e mova os membros para outro papel antes de excluí-lo.",
+    "rename": "Renomear papel",
+    "delete": "Excluir papel",
+    "selfNote": "Estes são os papéis e as permissões do próprio SSO. Só um SUPERADMIN do SSO os altera.",
+    "addDescription": "Todo projeto nasce com SUPERADMIN, ADMIN, MANAGER e VIEWER. Adicione os papéis de que {project} precisa; um papel novo nasce sem rotas.",
+    "namePlaceholder": "ARQUITETO",
+    "displayedAs": "Aparece como “{label}”, com o ícone de papel personalizado.",
+    "renameDescription": "Membros e permissões continuam com o papel. As aplicações só conhecem o nome novo quando os access tokens renovam, então os membros podem ser recusados por até 15 minutos.",
+    "deleteMessage": "O papel {role} sai de {project}.",
+    "summaryRoot": "Alcança todas as rotas · {members}",
+    "custom": "Personalizado",
+    "summary": "{granted} de {routes} · {members}",
+    "inProject": "{role} em {project}",
+    "added": "Papel adicionado",
+    "renamed": "Papel renomeado",
+    "renamedDescription": "{previous} agora é {name} em {project}",
+    "deleted": "Papel excluído"
+  },
+  "members": {
+    "title": "Membros",
+    "description": "Quem pode entrar nesta aplicação, e com qual papel. Cada pessoa tem um papel por projeto.",
+    "add": "Adicionar membro",
+    "emptyTitle": "Nenhum membro ainda",
+    "emptyDescription": "Ninguém pode entrar nesta aplicação ainda.",
+    "emptyNoRoles": "Crie um papel antes. Todo membro entra com um.",
+    "addDescription": "A pessoa entra em {project} com o papel escolhido aqui.",
+    "person": "Pessoa",
+    "personHint": "Só pessoas cadastradas que ainda não são membros.",
+    "choosePerson": "Escolha uma pessoa.",
+    "granted": "Concedidas",
+    "changeRole": "Trocar papel",
+    "changeRoleTitle": "Trocar o papel de {name}",
+    "removeFromProject": "Remover do projeto",
+    "remove": "Remover membro",
+    "removeTitle": "Remover {name}?",
+    "lockedNote": "Os membros do projeto SSO administram todas as aplicações. Só um SUPERADMIN do SSO os altera.",
+    "lastRootNote": "O SSO mantém sempre ao menos um SUPERADMIN: o último não troca de papel nem sai.",
+    "peopleLoadFailed": "Não foi possível carregar a lista de pessoas",
+    "changeNoteSelf": "O papel novo substitui o atual e vale no console a partir da próxima requisição.",
+    "changeNote": "O papel novo substitui o atual. As aplicações o aplicam quando o access token renova, em até 15 minutos.",
+    "removeSelf": "Você perde o acesso a este console na hora.",
+    "removeFromSso": "{name} perde o acesso ao console do SSO na próxima requisição.",
+    "removeMessage": "{name} deixa de entrar em {project}. Os refresh tokens dessa pessoa ali são revogados agora, e um access token já emitido expira em até 15 minutos.",
+    "added": "Membro adicionado",
+    "roleChanged": "Papel trocado",
+    "roleChangedDescription": "{name} agora é {role} em {project}",
+    "removed": "Membro removido",
+    "removedDescription": "{name} saiu de {project}"
+  },
+  "users": {
+    "description": "Pessoas que podem entrar pelo SSO. Ninguém entra sem antes estar cadastrado aqui.",
+    "search": "Buscar",
+    "searchHint": "Parte de um nome, ou um e-mail completo.",
+    "searchPlaceholder": "Marina, ou marina{'@'}example.com",
+    "loadFailed": "Não foi possível carregar os usuários",
+    "emptyTitle": "Nenhum usuário encontrado",
+    "emptySearch": "Nenhum usuário corresponde a esta busca.",
+    "emptyDescription": "Cadastre a primeira pessoa que vai entrar pelo SSO.",
+    "register": "Cadastrar usuário",
+    "registerDescription": "Cadastrar ainda não dá acesso. Depois, adicione a pessoa a um projeto.",
+    "editTitle": "Editar usuário",
+    "namePlaceholder": "Marina Albuquerque",
+    "emailPlaceholder": "marina{'@'}example.com",
+    "googleAccount": "Conta Google",
+    "deleteTitle": "Excluir usuário",
+    "deleteMessage": "{name} não poderá mais entrar, e as sessões abertas no SSO terminam agora. Cadastrar o mesmo e-mail de novo cria um usuário novo.",
+    "updated": "Usuário atualizado",
+    "registered": "Usuário cadastrado",
+    "registeredDescription": "A pessoa consegue entrar assim que for adicionada a um projeto.",
+    "deleted": "Usuário excluído"
+  },
+  "user": {
+    "loadFailed": "Não foi possível carregar o usuário",
+    "userId": "ID do usuário",
+    "linkedHint": "Vinculada no primeiro login. Outra conta Google com este e-mail é recusada.",
+    "waitingHint": "O primeiro login com Google usando este e-mail vincula a conta.",
+    "projectStatus": "Situação do projeto",
+    "addToProject": "Adicionar a um projeto",
+    "addDescription": "{name} entra no projeto escolhido com o papel escolhido.",
+    "noRoles": "Este projeto ainda não tem papéis.",
+    "rolesLoadFailed": "Não foi possível carregar os papéis deste projeto",
+    "added": "Adicionado ao projeto",
+    "unlink": "Desvincular conta Google",
+    "unlinkConfirm": "Desvincular conta",
+    "unlinkMessage": "O próximo login com Google usando este e-mail vincula uma conta nova. Use quando a pessoa trocou de conta Google.",
+    "unlinked": "Conta Google desvinculada",
+    "unlinkedDescription": "O próximo login com Google usando este e-mail vincula uma conta nova.",
+    "profile": {
+      "title": "Perfil",
+      "description": "Como esta pessoa é identificada ao entrar."
+    },
+    "projects": {
+      "description": "Onde esta pessoa pode entrar, e com qual papel.",
+      "emptyTitle": "Nenhum projeto ainda",
+      "emptyDescription": "Sem um projeto, esta pessoa não consegue entrar em lugar nenhum."
+    }
+  },
+  "clientKeys": {
+    "title": "Chaves de cliente",
+    "pageDescription": "Chaves com que as aplicações assinam para provar ao SSO quem são. Cada chave pertence a um projeto.",
+    "choosePlaceholder": "Escolha um projeto",
+    "noProjectTitle": "Nenhum projeto selecionado",
+    "noProjectDescription": "Escolha um projeto acima para ver e gerenciar as chaves dele.",
+    "description": "Metades públicas que o SSO usa para verificar as asserções assinadas da aplicação. A metade privada nunca volta ao SSO.",
+    "registerPublic": "Cadastrar chave pública",
+    "generatePair": "Gerar par de chaves",
+    "loadFailed": "Não foi possível carregar as chaves",
+    "emptyTitle": "Nenhuma chave ainda",
+    "emptyDescription": "A aplicação não consegue se autenticar no SSO sem uma chave ativa.",
+    "registerDescription": "Gerada na máquina do dono da aplicação. Só a metade pública é enviada; a privada fica com ele.",
+    "registerKey": "Cadastrar chave",
+    "publicKey": "Chave pública",
+    "publicKeyHint": "RSA, com ao menos 2048 bits, em formato PEM (SPKI).",
+    "pemError": "Cole a chave inteira, de -----BEGIN PUBLIC KEY----- até -----END PUBLIC KEY-----.",
+    "expiresOn": "Expira em",
+    "expiresHint": "Opcional. Deixe vazio para uma chave sem validade.",
+    "generateKey": "Gerar chave",
+    "generateTitle": "Gerar um par de chaves",
+    "generateMessage": "O SSO cria o par, guarda só a metade pública e mostra a chave privada uma única vez. Entregue-a ao dono de {project} por um canal seguro.",
+    "secretTitle": "Copie a chave privada agora",
+    "secretDescription": "Chave privada de {project}. A aplicação a carrega do próprio ambiente, como APP_PRIVATE_KEY_BASE64.",
+    "secretLabel": "Chave privada (base64, PKCS#8)",
+    "secretWarning": "Esta chave aparece uma única vez e não fica guardada no SSO. Se ela passar por chat, ticket, commit ou log de CI, revogue-a e gere outra.",
+    "secretAcknowledge": "Guardei esta chave em um lugar seguro",
+    "revoke": "Revogar",
+    "revokeKey": "Revogar chave",
+    "revokeTitle": "Revogar chave de cliente",
+    "revokeMessage": "As aplicações que assinam com esta chave deixam de se autenticar na hora. Uma chave revogada não pode ser restaurada.",
+    "columns": {
+      "key": "Chave",
+      "created": "Criada em",
+      "expires": "Expira em"
+    },
+    "registered": "Chave pública cadastrada",
+    "revoked": "Chave de cliente revogada"
+  }
+}

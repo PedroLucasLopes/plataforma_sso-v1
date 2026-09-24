@@ -1,0 +1,569 @@
+{
+  "app": {
+    "subtitle": "Consola de administración"
+  },
+  "pageTitles": {
+    "login": "Iniciar sesión",
+    "callback": "Iniciando sesión",
+    "noAccess": "Sin acceso",
+    "unavailable": "No disponible",
+    "dashboard": "Resumen",
+    "projects": "Proyectos",
+    "project": "Proyecto",
+    "users": "Usuarios",
+    "user": "Usuario",
+    "clientKeys": "Claves de cliente",
+    "forbidden": "No permitido",
+    "notFound": "No encontrado"
+  },
+  "nav": {
+    "overview": "Resumen",
+    "projects": "Proyectos",
+    "users": "Usuarios",
+    "clientKeys": "Claves de cliente",
+    "catalogue": "Catálogo",
+    "credentials": "Credenciales"
+  },
+  "common": {
+    "tryAgain": "Reintentar",
+    "goToOverview": "Ir al resumen",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "status": "Estado",
+    "project": "Proyecto",
+    "projects": "Proyectos",
+    "role": "Rol",
+    "members": "Miembros",
+    "registered": "Registro",
+    "clientId": "Client ID",
+    "edit": "Editar",
+    "rename": "Renombrar",
+    "delete": "Eliminar",
+    "never": "Nunca",
+    "none": "Ninguna",
+    "unknownProject": "Proyecto desconocido",
+    "enterName": "Escribe un nombre.",
+    "enterEmail": "Escribe un correo electrónico completo.",
+    "chooseProject": "Elige un proyecto.",
+    "chooseRole": "Elige un rol.",
+    "projectsLoadFailed": "No se pudieron cargar los proyectos",
+    "roleNameHint": "Letras mayúsculas, dígitos y guiones bajos, empezando por una letra.",
+    "googleEmailHint": "El correo de la cuenta de Google con la que esta persona inicia sesión."
+  },
+  "counts": {
+    "projects": "{count} proyecto | {count} proyectos",
+    "members": "{count} miembro | {count} miembros",
+    "routes": "{count} ruta | {count} rutas",
+    "paths": "{count} ruta | {count} rutas",
+    "addresses": "{count} dirección | {count} direcciones",
+    "activeKeys": "{count} clave activa | {count} claves activas"
+  },
+  "status": {
+    "project": {
+      "ACTIVE": "Activo",
+      "PENDING": "Pendiente",
+      "SUSPENDED": "Suspendido"
+    },
+    "key": {
+      "ACTIVE": "Activa",
+      "EXPIRED": "Vencida",
+      "REVOKED": "Revocada"
+    },
+    "link": {
+      "LINKED": "Vinculada",
+      "WAITING": "Esperando el primer inicio de sesión"
+    }
+  },
+  "errors": {
+    "fallback": "No se pudo completar la solicitud.",
+    "status": {
+      "network": "El SSO no respondió. Revisa tu conexión e inténtalo de nuevo.",
+      "badRequest": "El SSO rechazó la solicitud.",
+      "unauthorized": "Tu sesión terminó. Inicia sesión de nuevo para continuar.",
+      "forbidden": "Tu rol no permite esta acción.",
+      "notFound": "No se encontró el registro. Puede que se haya eliminado.",
+      "conflict": "Ya existe un registro con estos valores.",
+      "server": "El SSO no pudo procesar la solicitud. No se cambió nada.",
+      "tooLarge": "La solicitud es demasiado grande.",
+      "tooManyRequests": "Demasiadas solicitudes en poco tiempo. Espera un momento e inténtalo de nuevo."
+    },
+    "code": {
+      "client_key_not_found": "No se encontró la clave, o ya estaba revocada.",
+      "client_key_required": "Registra al menos una clave de cliente antes de activar el proyecto.",
+      "client_keys_empty": "Este proyecto todavía no tiene claves de cliente.",
+      "csrf_token_invalid": "Tu token de seguridad está desactualizado. Recarga la página e inténtalo de nuevo.",
+      "duplicate": "Ya existe un registro con estos valores.",
+      "internal_error": "El SSO no pudo procesar la solicitud. No se cambió nada.",
+      "member_not_found": "Esta persona ya no es miembro del proyecto.",
+      "no_results": "No se encontró nada.",
+      "origin_not_allowed": "Esta solicitud no vino de la consola y fue rechazada.",
+      "permission_not_found": "Este permiso ya no existe.",
+      "project_has_members": "No agregues a nadie más y quita a los miembros de este proyecto antes de eliminarlo.",
+      "project_has_routes": "Elimina las rutas de este proyecto antes de eliminarlo.",
+      "project_not_found": "Este proyecto no existe. Puede que se haya eliminado.",
+      "public_key_invalid": "Esta no es una clave pública válida.",
+      "public_key_not_rsa": "Solo se aceptan claves RSA (RS256).",
+      "public_key_too_short": "La clave RSA debe tener al menos 2048 bits.",
+      "redirect_uri_not_found": "Esta redirect URI no existe. Puede que se haya eliminado.",
+      "role_not_found": "Este rol no existe. Puede que se haya eliminado.",
+      "role_not_in_project": "Este rol pertenece a otro proyecto.",
+      "role_route_project_mismatch": "El rol y la ruta pertenecen a proyectos distintos.",
+      "route_not_found": "Esta ruta no existe. Puede que se haya eliminado.",
+      "sso_access_denied": "Tu cuenta no tiene rol en el proyecto SSO.",
+      "sso_last_superadmin": "El proyecto SSO necesita al menos un SUPERADMIN. Primero dale el rol a otra persona.",
+      "sso_project_protected": "El proyecto SSO administra todas las aplicaciones. Solo su SUPERADMIN cambia sus rutas, roles, permisos, miembros, URI de redirección y claves, y algunos cambios se rechazan para todos.",
+      "sso_redirect_uri_in_use": "Esta consola inicia sesión por esta dirección. Elimínala desde una consola que funcione en otra dirección.",
+      "sso_redirect_uri_last": "El proyecto SSO necesita al menos una URI de redirección. Agrega la nueva dirección antes de eliminar esta.",
+      "user_has_projects": "Este usuario todavía tiene acceso a un proyecto. Quita sus vínculos primero.",
+      "user_not_found": "Este usuario no existe. Puede que se haya eliminado.",
+      "validation_failed": "El SSO rechazó algunos de los valores enviados. Revisa el formulario e inténtalo de nuevo."
+    },
+    "field": {
+      "email_invalid": "Ingresa un correo electrónico válido.",
+      "public_key_not_pem": "Pega una clave pública en formato PEM, que empiece con -----BEGIN PUBLIC KEY-----.",
+      "role_name_invalid": "Usa de 2 a 40 caracteres: una letra mayúscula y luego mayúsculas, dígitos o guiones bajos."
+    }
+  },
+  "forms": {
+    "roleNamePattern": "Usa de 2 a 40 letras mayúsculas, dígitos o guiones bajos, empezando por una letra.",
+    "roleNameTaken": "Este proyecto ya tiene un rol con este nombre."
+  },
+  "login": {
+    "errors": {
+      "no_pending_request": {
+        "title": "No hay ningún inicio de sesión pendiente aquí",
+        "description": "Abre la aplicación que quieres usar. Te traerá de vuelta a esta página."
+      },
+      "request_expired": {
+        "title": "La solicitud de inicio de sesión venció",
+        "description": "Una solicitud dura cinco minutos. Vuelve a la aplicación y empieza de nuevo."
+      },
+      "account_not_registered": {
+        "title": "Esta cuenta de Google no está registrada",
+        "description": "Pide a un administrador que agregue tu correo al SSO y vuelve a intentarlo."
+      },
+      "email_not_verified": {
+        "title": "Tu correo de Google no está verificado",
+        "description": "Verifica la dirección en tu cuenta de Google y vuelve a intentarlo."
+      },
+      "account_mismatch": {
+        "title": "Esta no es la cuenta de Google vinculada a ti",
+        "description": "Usa la cuenta de Google de tu primer inicio de sesión, o pide a un administrador que la desvincule."
+      },
+      "provider_denied": {
+        "title": "Se canceló el inicio de sesión",
+        "description": "Google no compartió tu identidad. Elige el proveedor de nuevo cuando estés listo."
+      },
+      "provider_error": {
+        "title": "Google no pudo completar el inicio de sesión",
+        "description": "No se cambió nada. Inténtalo de nuevo en un momento."
+      }
+    },
+    "generic": {
+      "title": "No se pudo completar el inicio de sesión",
+      "description": "Vuelve a la aplicación e inténtalo de nuevo."
+    },
+    "unavailable": {
+      "title": "El SSO no responde",
+      "description": "No se cambió nada. Recarga esta página en un momento."
+    }
+  },
+  "callback": {
+    "working": "Iniciando sesión…",
+    "failedTitle": "No se pudo completar este inicio de sesión",
+    "failedDescription": "El enlace que te trajo aquí ya no es válido. Empieza de nuevo y volverás a la consola.",
+    "signInAgain": "Iniciar sesión de nuevo"
+  },
+  "noAccess": {
+    "title": "No tienes acceso a la consola del SSO",
+    "descriptionAs": "Iniciaste sesión como {name} ({email}), pero esta cuenta no tiene rol en el proyecto SSO. Pide acceso a un administrador.",
+    "description": "Tu cuenta no tiene rol en el proyecto SSO. Pide acceso a un administrador.",
+    "useAnotherAccount": "Usar otra cuenta"
+  },
+  "unavailable": {
+    "title": "El SSO no responde",
+    "description": "La consola no pudo comunicarse con el SSO. No se cambió nada. Inténtalo de nuevo en un momento.",
+    "stillTitle": "El SSO sigue sin responder",
+    "stillDescription": "Comprueba que el servicio esté funcionando e inténtalo de nuevo."
+  },
+  "forbidden": {
+    "title": "No puedes abrir esta página",
+    "description": "Tu rol no incluye esta área. Pide acceso a un administrador si lo necesitas."
+  },
+  "notFound": {
+    "title": "Esta página no existe",
+    "description": "Puede que la dirección esté mal escrita o que la página se haya movido. El menú lateral tiene todo lo que tu rol puede abrir."
+  },
+  "dashboard": {
+    "welcome": "Hola de nuevo, {name}",
+    "description": "El estado del catálogo del SSO, según lo que tu rol puede leer.",
+    "totals": "Totales del catálogo",
+    "charts": "Gráficos de proyectos",
+    "nothingTitle": "Todavía no hay nada que mostrar",
+    "nothingDescription": "Tu rol abre la consola, pero no lee ninguna parte del catálogo.",
+    "loadFailed": "No se pudo cargar parte del resumen",
+    "stats": {
+      "projects": "Proyectos",
+      "waiting": "{count} esperando activación",
+      "noneWaiting": "Ninguno esperando activación",
+      "activeProjects": "Proyectos activos",
+      "users": "Usuarios",
+      "signedIn": "{count} ya iniciaron sesión alguna vez",
+      "routes": "Rutas",
+      "routesHint": "Se gestionan dentro de cada proyecto"
+    },
+    "byStatus": {
+      "title": "Proyectos por estado",
+      "empty": "Todavía no hay proyectos registrados.",
+      "share": "Proporción"
+    },
+    "members": {
+      "title": "Miembros por proyecto",
+      "description": "Los 8 con más miembros",
+      "empty": "Ningún proyecto tiene miembros todavía."
+    },
+    "growth": {
+      "title": "Proyectos registrados",
+      "description": "Últimos 12 meses",
+      "month": "Mes"
+    },
+    "pending": {
+      "title": "Esperando activación",
+      "description": "Registrados en el catálogo, pero sin poder usar el SSO hasta que un administrador los active.",
+      "emptyTitle": "Nada pendiente",
+      "emptyDescription": "Todos los proyectos registrados están activos, o se suspendieron a propósito."
+    }
+  },
+  "projects": {
+    "description": "Aplicaciones conectadas al SSO. Un proyecto empieza pendiente y solo usa el SSO después de que un administrador lo active.",
+    "new": "Nuevo proyecto",
+    "emptyTitle": "No se encontraron proyectos",
+    "emptyFiltered": "Ningún proyecto coincide con estos filtros.",
+    "emptyDescription": "Registra la primera aplicación que iniciará sesión a través del SSO.",
+    "createDescription": "Empieza pendiente. Después de crearlo, agrega una URI de redirección y una clave de cliente, y luego actívalo.",
+    "renameTitle": "Renombrar proyecto",
+    "renameDescription": "El nombre aparece en la pantalla de inicio de sesión, como la aplicación en la que las personas están entrando.",
+    "nameHint": "Único en el SSO.",
+    "namePlaceholder": "Panel Financiero",
+    "deleteTitle": "Eliminar proyecto",
+    "deleteMessage": "El proyecto sale del catálogo junto con su identidad. El SSO lo rechaza mientras todavía tenga rutas o miembros.",
+    "created": "Proyecto creado",
+    "createdDescription": "Siguiente: una URI de redirección y una clave de cliente, y luego la activación.",
+    "renamed": "Proyecto renombrado",
+    "deleted": "Proyecto eliminado",
+    "filters": {
+      "title": "Filtros",
+      "namePlaceholder": "Buscar por nombre",
+      "anyStatus": "Cualquier estado",
+      "membersHint": "Filtra los proyectos ya cargados.",
+      "nameHas": "el nombre contiene \"{term}\"",
+      "membersRange": "de {min} a {max} miembros",
+      "none": "{count} proyecto, sin filtro | {count} proyectos, sin filtro"
+    }
+  },
+  "project": {
+    "loadFailed": "No se pudo cargar el proyecto",
+    "headerDescription": "{status} · registrado el {date}",
+    "activate": "Activar",
+    "suspend": "Suspender",
+    "activateProject": "Activar proyecto",
+    "suspendProject": "Suspender proyecto",
+    "activateTitle": "¿Activar {name}?",
+    "suspendTitle": "¿Suspender {name}?",
+    "activateMessage": "Las aplicaciones con este client ID pueden empezar a iniciar la sesión de las personas de inmediato.",
+    "suspendMessage": "Todas las aplicaciones con este client ID dejan de iniciar la sesión de las personas, y los refresh tokens dejan de renovarse. El catálogo queda como está.",
+    "activated": "Proyecto activado",
+    "suspended": "Proyecto suspendido",
+    "tabs": {
+      "overview": "Resumen",
+      "redirects": "URI de redirección",
+      "routes": "Rutas",
+      "roles": "Roles y permisos",
+      "members": "Miembros",
+      "keys": "Claves de cliente"
+    },
+    "identity": {
+      "title": "Identidad",
+      "description": "Cómo las aplicaciones y las personas identifican este proyecto.",
+      "clientIdHint": "Identificador público. Las aplicaciones lo envían como client_id; la prueba es su clave privada.",
+      "lastActivated": "Última activación",
+      "lastSuspended": "Última suspensión",
+      "selfNote": "Este es el proyecto del propio SSO: por él inician sesión los administradores de todas las aplicaciones. No se puede renombrar, suspender ni eliminar, y solo su SUPERADMIN cambia sus rutas, roles, permisos, miembros, URI de redirección y claves."
+    }
+  },
+  "checklist": {
+    "title": "Listo para usar el SSO",
+    "required": "Obligatorio",
+    "active": "Este proyecto está activo. Las aplicaciones con su client ID pueden iniciar la sesión de las personas.",
+    "ready": "Todo lo obligatorio está listo. Al activarlo, la aplicación puede empezar a iniciar la sesión de las personas.",
+    "notReady": "Un proyecto solo usa el SSO después de la activación, y la activación necesita los elementos obligatorios de abajo.",
+    "redirect": {
+      "label": "URI de redirección registrada",
+      "empty": "El SSO solo devuelve un inicio de sesión a una dirección registrada."
+    },
+    "key": {
+      "label": "Clave de cliente activa",
+      "empty": "La aplicación demuestra quién es firmando con la mitad privada."
+    },
+    "routes": {
+      "label": "Rutas registradas",
+      "empty": "Una ruta que no está en el catálogo responde 404 a todos, como si no existiera."
+    },
+    "grants": {
+      "label": "Rutas concedidas a un rol",
+      "done": "{count} rol con permisos | {count} roles con permisos",
+      "empty": "Los permisos conectan un rol con las rutas que desbloquea."
+    },
+    "members": {
+      "label": "Personas con acceso",
+      "empty": "Solo los miembros pueden iniciar sesión en esta aplicación."
+    }
+  },
+  "redirectUris": {
+    "title": "URI de redirección",
+    "description": "El SSO solo devuelve un inicio de sesión a estas direcciones, comparadas carácter por carácter. Registra cada entorno por separado.",
+    "add": "Agregar URI de redirección",
+    "editTitle": "Editar URI de redirección",
+    "emptyTitle": "Todavía no hay URI de redirección",
+    "emptyDescription": "Sin una, ninguna aplicación puede completar un inicio de sesión con este proyecto.",
+    "selfNote": "Esta consola inicia sesión por estas direcciones, así que nunca se editan: agrega la nueva dirección y luego elimina la antigua. La última dirección, y la que esta consola está usando ahora, no se pueden eliminar. Solo un SUPERADMIN del SSO las agrega o elimina.",
+    "dialogDescription": "Esquema, host, puerto y ruta, exactamente como los envía la aplicación. Una barra al final la convierte en otra dirección.",
+    "field": "URI de redirección",
+    "fieldHint": "Ejemplo: https://app.example.com/api/auth/callback",
+    "address": "Dirección",
+    "enterAddress": "Escribe la dirección.",
+    "useHttp": "Usa una dirección http o https completa.",
+    "deleteTitle": "Eliminar URI de redirección",
+    "deleteOnly": "{uri} es la única dirección de {project}. Hasta que se agregue otra, nadie podrá iniciar sesión en él.",
+    "deleteMessage": "Las aplicaciones que todavía envían {uri} dejan de iniciar sesión, y los codes ya emitidos para ella se rechazan.",
+    "added": "URI de redirección agregada",
+    "updated": "URI de redirección actualizada",
+    "deleted": "URI de redirección eliminada"
+  },
+  "routes": {
+    "title": "Rutas",
+    "description": "Lo que esta aplicación expone, agrupado por ruta. Elige cualquier ruta para ver sus métodos y quién puede llamarla.",
+    "add": "Agregar ruta",
+    "editTitle": "Editar ruta",
+    "allRoutes": "Todas las rutas",
+    "filterPlaceholder": "Filtrar por ruta",
+    "filterByMethod": "Filtrar por método",
+    "expandAll": "Expandir todo",
+    "collapseAll": "Contraer todo",
+    "emptyDescription": "Registra las rutas de la aplicación y luego concédelas a los roles.",
+    "treeLabel": "Rutas de {project}",
+    "selfNote": "Estas son las rutas del propio SSO. Solo un SUPERADMIN del SSO las cambia.",
+    "notFoundTitle": "Ruta no encontrada",
+    "notFoundDescription": "{path} no está en el catálogo de {project}. Puede que se haya renombrado o eliminado.",
+    "backToRoutes": "Volver a las rutas",
+    "selectTitle": "Selecciona una ruta",
+    "selectDescription": "Elige cualquier ruta del árbol para ver sus métodos, los roles que la alcanzan y quién puede llamarla.",
+    "dialogDescription": "La ruta tal como la declara la aplicación, sin el prefijo global. Usa :nombre para los parámetros.",
+    "method": "Método",
+    "path": "Ruta",
+    "pathError": "Empieza con una barra y no dejes espacios, como en /equipment/:id.",
+    "deleteTitle": "Eliminar ruta",
+    "deleteMessage": "{method} {path} sale del catálogo. La aplicación pasa a responder 404 a todos en ella, como si no existiera.",
+    "noRoleGranted": "Ningún rol concedido",
+    "added": "Ruta agregada",
+    "updated": "Ruta actualizada",
+    "deleted": "Ruta eliminada"
+  },
+  "routeDetail": {
+    "registerPath": "Registrar esta ruta",
+    "addMethod": "Agregar método",
+    "addSubRoute": "Agregar subruta",
+    "groupLead": "No es una ruta registrada. Agrupa la {count} ruta de abajo que empieza con este prefijo, y no responde a ninguna solicitud por sí sola. | No es una ruta registrada. Agrupa las {count} rutas de abajo que empiezan con este prefijo, y no responde a ninguna solicitud por sí sola.",
+    "topLevel": "Nivel superior",
+    "facts": {
+      "path": "Ruta",
+      "parameters": "Parámetros",
+      "parent": "Padre",
+      "pathsBelow": "Rutas debajo",
+      "routeId": "ID de la ruta {method}"
+    },
+    "access": {
+      "title": "Acceso",
+      "description": "Qué rol puede llamar a cada método de esta ruta. Un método que ningún rol alcanza responde 404 a todos, como si no existiera, y un método concedido no se puede eliminar hasta quitar sus concesiones.",
+      "emptyTitle": "Todavía no hay roles",
+      "emptyDescription": "Crea un rol en Roles y permisos y luego concédele esta ruta aquí.",
+      "method": "Método",
+      "canCall": "Pueden llamar",
+      "granted": "Concedido",
+      "notGranted": "No concedido",
+      "nobody": "Nadie",
+      "editRoute": "Editar ruta",
+      "deleteRoute": "Eliminar ruta"
+    },
+    "callers": {
+      "title": "Quién puede llamarla",
+      "description": "Miembros cuyo rol alcanza al menos un método de esta ruta, y qué métodos.",
+      "emptyTitle": "Nadie puede llamarla todavía",
+      "emptyGranted": "Los roles que alcanzan esta ruta todavía no tienen miembros.",
+      "emptyNotGranted": "Concédela a un rol arriba. Hasta entonces, todos los métodos responden 404.",
+      "openMembers": "Abrir miembros",
+      "methods": "Métodos"
+    },
+    "below": {
+      "title": "Debajo de esta ruta",
+      "description": "Rutas que empiezan con esta. Elige cualquiera para abrirla.",
+      "treeLabel": "Rutas debajo de {path}"
+    }
+  },
+  "grants": {
+    "canCall": "{role} puede llamar {method} {path}",
+    "grantFailed": "No se pudo conceder la ruta",
+    "revokeFailed": "No se pudo quitar el permiso",
+    "bulkFailed": "No se pudieron conceder todas las rutas {method}"
+  },
+  "roles": {
+    "title": "Roles y permisos",
+    "description": "Cada rol desbloquea las rutas marcadas abajo, agrupadas por ruta base. Los cambios valen desde la siguiente solicitud, sin que nadie tenga que volver a iniciar sesión.",
+    "add": "Agregar rol",
+    "emptyTitle": "Todavía no hay roles",
+    "emptyDescription": "Crea los roles que usa esta aplicación y luego marca las rutas que desbloquea cada uno.",
+    "rootLead": "El SUPERADMIN del SSO es la raíz: alcanza todas las rutas administrativas sin que ninguna esté marcada, y no se puede renombrar ni eliminar.",
+    "noRoutes": "Registra las rutas primero. Un rol solo desbloquea rutas que existen en el catálogo.",
+    "grantAllGet": "Conceder todas las rutas GET",
+    "allGetGranted": "Todas las rutas GET están concedidas a {role}.",
+    "getMissing": "{count} ruta GET todavía no concedida a {role}. | {count} rutas GET todavía no concedidas a {role}.",
+    "getGranted": "{count} ruta GET concedida | {count} rutas GET concedidas",
+    "treeLabel": "Rutas que desbloquea el rol {role}",
+    "openInRoutes": "Abrir {path} en Rutas",
+    "deleteBlocked": "Desmarca todas las rutas y mueve a los miembros a otro rol antes de eliminarlo.",
+    "rename": "Renombrar rol",
+    "delete": "Eliminar rol",
+    "selfNote": "Estos son los roles y permisos del propio SSO. Solo un SUPERADMIN del SSO los cambia.",
+    "addDescription": "Todo proyecto empieza con SUPERADMIN, ADMIN, MANAGER y VIEWER. Agrega los roles que necesita {project}; un rol nuevo empieza sin rutas.",
+    "namePlaceholder": "ARQUITECTO",
+    "displayedAs": "Aparece como “{label}”, con el ícono de papel personalizado.",
+    "renameDescription": "Los miembros y permisos se quedan con el rol. Las aplicaciones solo conocen el nombre nuevo cuando se renuevan los access tokens, así que los miembros pueden ser rechazados hasta por 15 minutos.",
+    "deleteMessage": "El rol {role} sale de {project}.",
+    "summaryRoot": "Alcanza todas las rutas · {members}",
+    "custom": "Personalizado",
+    "summary": "{granted} de {routes} · {members}",
+    "inProject": "{role} en {project}",
+    "added": "Rol agregado",
+    "renamed": "Rol renombrado",
+    "renamedDescription": "{previous} ahora es {name} en {project}",
+    "deleted": "Rol eliminado"
+  },
+  "members": {
+    "title": "Miembros",
+    "description": "Quién puede iniciar sesión en esta aplicación, y con qué rol. Cada persona tiene un rol por proyecto.",
+    "add": "Agregar miembro",
+    "emptyTitle": "Todavía no hay miembros",
+    "emptyDescription": "Nadie puede iniciar sesión en esta aplicación todavía.",
+    "emptyNoRoles": "Crea un rol primero. Cada miembro entra con uno.",
+    "addDescription": "La persona inicia sesión en {project} con el rol elegido aquí.",
+    "person": "Persona",
+    "personHint": "Solo personas registradas que todavía no son miembros.",
+    "choosePerson": "Elige una persona.",
+    "granted": "Concedidas",
+    "changeRole": "Cambiar rol",
+    "changeRoleTitle": "Cambiar el rol de {name}",
+    "removeFromProject": "Quitar del proyecto",
+    "remove": "Quitar miembro",
+    "removeTitle": "¿Quitar a {name}?",
+    "lockedNote": "Los miembros del proyecto SSO administran todas las aplicaciones. Solo un SUPERADMIN del SSO los cambia.",
+    "lastRootNote": "El SSO siempre conserva al menos un SUPERADMIN: el último no puede cambiar de rol ni salir.",
+    "peopleLoadFailed": "No se pudo cargar la lista de personas",
+    "changeNoteSelf": "El rol nuevo reemplaza al actual y vale en la consola desde la siguiente solicitud.",
+    "changeNote": "El rol nuevo reemplaza al actual. Las aplicaciones lo aplican cuando se renueva el access token, en un máximo de 15 minutos.",
+    "removeSelf": "Pierdes el acceso a esta consola de inmediato.",
+    "removeFromSso": "{name} pierde el acceso a la consola del SSO en la siguiente solicitud.",
+    "removeMessage": "{name} deja de iniciar sesión en {project}. Sus refresh tokens para ese proyecto se revocan ahora, y un access token ya emitido vence en un máximo de 15 minutos.",
+    "added": "Miembro agregado",
+    "roleChanged": "Rol cambiado",
+    "roleChangedDescription": "{name} ahora es {role} en {project}",
+    "removed": "Miembro quitado",
+    "removedDescription": "{name} salió de {project}"
+  },
+  "users": {
+    "description": "Personas que pueden iniciar sesión a través del SSO. Nadie inicia sesión sin estar registrado aquí primero.",
+    "search": "Buscar",
+    "searchHint": "Parte de un nombre, o un correo electrónico completo.",
+    "searchPlaceholder": "Marina, o marina{'@'}example.com",
+    "loadFailed": "No se pudieron cargar los usuarios",
+    "emptyTitle": "No se encontraron usuarios",
+    "emptySearch": "Ningún usuario coincide con esta búsqueda.",
+    "emptyDescription": "Registra a la primera persona que iniciará sesión a través del SSO.",
+    "register": "Registrar usuario",
+    "registerDescription": "Registrar todavía no da acceso. Después, agrega a la persona a un proyecto.",
+    "editTitle": "Editar usuario",
+    "namePlaceholder": "Marina Albuquerque",
+    "emailPlaceholder": "marina{'@'}example.com",
+    "googleAccount": "Cuenta de Google",
+    "deleteTitle": "Eliminar usuario",
+    "deleteMessage": "{name} ya no podrá iniciar sesión, y las sesiones abiertas en el SSO terminan ahora. Registrar el mismo correo de nuevo crea un usuario nuevo.",
+    "updated": "Usuario actualizado",
+    "registered": "Usuario registrado",
+    "registeredDescription": "Podrá iniciar sesión cuando se agregue a un proyecto.",
+    "deleted": "Usuario eliminado"
+  },
+  "user": {
+    "loadFailed": "No se pudo cargar el usuario",
+    "userId": "ID de usuario",
+    "linkedHint": "Vinculada en el primer inicio de sesión. Otra cuenta de Google con este correo se rechaza.",
+    "waitingHint": "El primer inicio de sesión con Google usando este correo vincula la cuenta.",
+    "projectStatus": "Estado del proyecto",
+    "addToProject": "Agregar a un proyecto",
+    "addDescription": "{name} inicia sesión en el proyecto elegido con el rol elegido.",
+    "noRoles": "Este proyecto todavía no tiene roles.",
+    "rolesLoadFailed": "No se pudieron cargar los roles de este proyecto",
+    "added": "Agregado al proyecto",
+    "unlink": "Desvincular cuenta de Google",
+    "unlinkConfirm": "Desvincular cuenta",
+    "unlinkMessage": "El siguiente inicio de sesión con Google usando este correo vincula una cuenta nueva. Úsalo cuando la persona cambió de cuenta de Google.",
+    "unlinked": "Cuenta de Google desvinculada",
+    "unlinkedDescription": "El siguiente inicio de sesión con Google usando este correo vincula una cuenta nueva.",
+    "profile": {
+      "title": "Perfil",
+      "description": "Cómo se identifica a esta persona al iniciar sesión."
+    },
+    "projects": {
+      "description": "Dónde puede iniciar sesión esta persona, y con qué rol.",
+      "emptyTitle": "Todavía no hay proyectos",
+      "emptyDescription": "Sin un proyecto, esta persona no puede iniciar sesión en ningún lugar."
+    }
+  },
+  "clientKeys": {
+    "title": "Claves de cliente",
+    "pageDescription": "Claves con las que las aplicaciones firman para demostrar al SSO quiénes son. Cada clave pertenece a un proyecto.",
+    "choosePlaceholder": "Elige un proyecto",
+    "noProjectTitle": "Ningún proyecto seleccionado",
+    "noProjectDescription": "Elige un proyecto arriba para ver y gestionar sus claves.",
+    "description": "Mitades públicas que el SSO usa para verificar las aserciones firmadas de la aplicación. La mitad privada nunca vuelve al SSO.",
+    "registerPublic": "Registrar clave pública",
+    "generatePair": "Generar par de claves",
+    "loadFailed": "No se pudieron cargar las claves",
+    "emptyTitle": "Todavía no hay claves",
+    "emptyDescription": "La aplicación no puede autenticarse en el SSO sin una clave activa.",
+    "registerDescription": "Generada en la máquina del dueño de la aplicación. Solo se envía la mitad pública; la privada se queda con él.",
+    "registerKey": "Registrar clave",
+    "publicKey": "Clave pública",
+    "publicKeyHint": "RSA, de al menos 2048 bits, en formato PEM (SPKI).",
+    "pemError": "Pega la clave completa, desde -----BEGIN PUBLIC KEY----- hasta -----END PUBLIC KEY-----.",
+    "expiresOn": "Vence el",
+    "expiresHint": "Opcional. Déjalo vacío para una clave sin vencimiento.",
+    "generateKey": "Generar clave",
+    "generateTitle": "Generar un par de claves",
+    "generateMessage": "El SSO crea el par, guarda solo la mitad pública y te muestra la clave privada una sola vez. Entrégala al dueño de {project} por un canal seguro.",
+    "secretTitle": "Copia la clave privada ahora",
+    "secretDescription": "Clave privada de {project}. La aplicación la carga desde su propio entorno, como APP_PRIVATE_KEY_BASE64.",
+    "secretLabel": "Clave privada (base64, PKCS#8)",
+    "secretWarning": "Esta clave se muestra una sola vez y no se guarda en el SSO. Si pasa por un chat, un ticket, un commit o un log de CI, revócala y genera otra.",
+    "secretAcknowledge": "Guardé esta clave en un lugar seguro",
+    "revoke": "Revocar",
+    "revokeKey": "Revocar clave",
+    "revokeTitle": "Revocar clave de cliente",
+    "revokeMessage": "Las aplicaciones que firman con esta clave dejan de autenticarse de inmediato. Una clave revocada no se puede restaurar.",
+    "columns": {
+      "key": "Clave",
+      "created": "Creada",
+      "expires": "Vence"
+    },
+    "registered": "Clave pública registrada",
+    "revoked": "Clave de cliente revocada"
+  }
+}

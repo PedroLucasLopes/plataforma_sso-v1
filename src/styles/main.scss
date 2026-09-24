@@ -1,0 +1,58 @@
+@layer vuetify-overrides {
+  code, pre, .v-code {
+    font-family: var(--font-mono);
+  }
+}
+
+html,
+body {
+  background: var(--dl-background);
+  color: var(--dl-on-surface);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition:
+    opacity var(--dl-motion-normal, 200ms) var(--dl-easing, ease),
+    transform var(--dl-motion-normal, 200ms) var(--dl-easing, ease);
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.page-leave-to {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-active,
+  .page-leave-active {
+    transition: opacity 1ms linear;
+  }
+
+  .page-enter-from {
+    transform: none;
+  }
+}
