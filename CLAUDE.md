@@ -72,6 +72,22 @@ próprio console.
   navegador (`pageshow` com `persisted`).
 - **Não é embutível.** `X-Frame-Options: DENY` e `frame-ancestors 'none'`, no Vite e no nginx.
 
+### As etapas do login
+
+A tela é uma só, o `DlSignIn`, e o que muda é o que ela pede. `GET /sso/login/request` devolve, além
+do pedido pendente, **em que etapa a pessoa está**: `credentials`, `change_password`, `enroll_mfa` ou
+`mfa`. Cada envio devolve a próxima etapa, e só a última traz `redirectTo`, para a tela navegar.
+
+- **O formulário mora no slot do `DlSignIn`** (biblioteca 0.6.0): e-mail e senha em cima, o divisor
+  "ou" e o botão do provedor embaixo. Nas etapas seguintes não há provedor, e o título e a descrição
+  do cartão trocam pelas props `heading` e `description`.
+- **O QR do segundo fator é desenhado no navegador**, pelo `qrcode`, a partir do `otpauth://` que o
+  servidor devolve. O segredo também aparece escrito, para quem digita à mão.
+- **Os códigos de recuperação aparecem uma vez**, no `DlSecretDialog`, e a navegação para a aplicação
+  só acontece quando a pessoa fecha o diálogo.
+- **Erro vem por código** e é traduzido como qualquer outro: `invalid_credentials`, `account_locked`,
+  `mfa_code_invalid`, `login_step_expired`.
+
 ### O console
 
 Entra como qualquer aplicação e depois usa a **sessão do próprio SSO**, na mesma origem da API

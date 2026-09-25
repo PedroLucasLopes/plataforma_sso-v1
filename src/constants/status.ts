@@ -66,6 +66,15 @@ export const LINK_STATUS = labelled<LinkState>('link', {
   WAITING: { tone: 'neutral', icon: 'mdi-clock-outline' },
 })
 
+export type CredentialState = 'NONE' | 'PENDING' | 'READY' | 'LOCKED'
+
+export const CREDENTIAL_STATUS = labelled<CredentialState>('credential', {
+  READY: { tone: 'success', icon: 'mdi-check-circle-outline' },
+  PENDING: { tone: 'warning', icon: 'mdi-clock-outline' },
+  LOCKED: { tone: 'error', icon: 'mdi-lock-outline' },
+  NONE: { tone: 'neutral', icon: 'mdi-minus-circle-outline' },
+})
+
 export const DEFAULT_ROLE_NAMES: DefaultRoleName[] = [
   'SUPERADMIN',
   'ADMIN',
