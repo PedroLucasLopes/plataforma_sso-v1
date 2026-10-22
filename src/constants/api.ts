@@ -14,6 +14,8 @@ export const SELF_PROJECT_NAME = 'SSO'
 
 export const LINK_PATH = '/link'
 
+export const ACCOUNT_PATH = '/account'
+
 export const HUMAN_CHECK_HEADER = 'x-human-check'
 
 export const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'

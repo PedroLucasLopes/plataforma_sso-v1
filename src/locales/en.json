@@ -15,7 +15,8 @@
     "clientKeys": "Client keys",
     "forbidden": "Not allowed",
     "notFound": "Not found",
-    "link": "Your account"
+    "link": "Your account",
+    "account": "Your account"
   },
   "nav": {
     "overview": "Overview",
@@ -141,7 +142,12 @@
       "human_check_required": "Complete the human check before sending.",
       "human_check_failed": "The human check expired or was refused. Do it again.",
       "link_invalid": "This link no longer works. Ask for a new one.",
-      "json_required": "The request format was refused."
+      "json_required": "The request format was refused.",
+      "account_email_quota": "Too many account e-mails for this address in the last hour. Try again later.",
+      "account_deletion_admin": "Accounts that manage the SSO are deleted by a SUPERADMIN of the console.",
+      "current_password_invalid": "The current password does not match.",
+      "mfa_already_enrolled": "The second factor is already on for this account.",
+      "mfa_setup_expired": "The second factor setup expired. Start again."
     },
     "field": {
       "email_invalid": "Enter a valid email address.",
@@ -274,7 +280,8 @@
     "title": "You don't have access to the SSO console",
     "descriptionAs": "You are signed in as {name} ({email}), but this account has no role in the SSO project. Ask an administrator for access.",
     "description": "Your account has no role in the SSO project. Ask an administrator for access.",
-    "useAnotherAccount": "Use another account"
+    "useAnotherAccount": "Use another account",
+    "manageAccount": "Manage my account"
   },
   "unavailable": {
     "title": "The SSO is not responding",
@@ -569,12 +576,20 @@
     "changeNote": "The new role replaces the current one. Applications apply it when the access token renews, within 15 minutes.",
     "removeSelf": "You lose access to this console right away.",
     "removeFromSso": "{name} loses access to the SSO console on the next request.",
-    "removeMessage": "{name} stops signing in to {project}. Their refresh tokens for it are revoked now, and an access token already issued runs out within 15 minutes.",
+    "removeMessage": "{name} stops signing in to {project} and is blocked there: they do not come back on their own, not even through open sign-up, until readmitted here. Their refresh tokens for it are revoked now, and an access token already issued runs out within 15 minutes.",
     "added": "Member added",
     "roleChanged": "Role changed",
     "roleChangedDescription": "{name} is now {role} in {project}",
     "removed": "Member removed",
-    "removedDescription": "{name} left {project}"
+    "removedDescription": "{name} left {project}",
+    "blockedTitle": "Blocked",
+    "blockedDescription": "People removed from this project. They do not come back on their own, not even through open sign-up, until readmitted here.",
+    "blockedAt": "Removed on",
+    "readmit": "Readmit",
+    "readmitTitle": "Readmit {name}",
+    "readmitDescription": "{name} signs in to {project} again with the role chosen here, and the block is lifted.",
+    "readmitted": "Person readmitted",
+    "readmittedDescription": "{name} is back in {project}"
   },
   "users": {
     "description": "People who can sign in through the SSO. Nobody signs in without being registered here first.",
@@ -716,7 +731,16 @@
       "passwordChanged": {
         "title": "Password changed",
         "description": "Every session was signed out. Go back to {application} and sign in with the new password."
+      },
+      "deleted": {
+        "title": "Account deleted",
+        "description": "The account and its sessions were erased, and the applications that sign in through {application} will be told to erase what they keep about you."
       }
+    },
+    "delete": {
+      "title": "Delete your account",
+      "description": "The account {email} and its access to every application that signs in through {application} will be erased. This cannot be undone.",
+      "submit": "Delete my account for good"
     }
   },
   "access": {
@@ -752,6 +776,35 @@
       "logoUnreadable": "The file could not be read.",
       "removeLogo": "Remove the logo",
       "saved": "Brand saved."
+    }
+  },
+  "account": {
+    "title": "Your account",
+    "description": "The access you use in the applications that sign in here.",
+    "signedOut": "No session is open in this browser. Sign in to one of the applications that use this access and come back to this page.",
+    "signOut": "Sign out of this account",
+    "identity": {
+      "title": "Who you are",
+      "applications": "Signs in to: {applications}"
+    },
+    "secondFactor": {
+      "title": "Second factor",
+      "enrolled": "On, with an authenticator app. Recovery codes left: {count}.",
+      "missing": "Protect the account with a code from an authenticator app, on top of the password. Once on, it is asked at every sign-in.",
+      "password": "Current password",
+      "passwordHint": "Confirm your password to turn it on.",
+      "start": "Turn on the second factor"
+    },
+    "deletion": {
+      "title": "Delete the account",
+      "description": "Erases the account, its password, its second factor and its access to every application. We send a link to your e-mail to confirm; nothing is erased before that.",
+      "admin": "This account manages the SSO. Ask a SUPERADMIN of the console to delete it.",
+      "unavailable": "E-mail delivery is not set up, and deletion needs it to confirm. Ask the administrator to delete the account.",
+      "start": "Delete my account",
+      "confirmTitle": "Delete your account?",
+      "confirmMessage": "We will send a link to {email}. The account is only deleted when you open the link and confirm.",
+      "confirm": "Send the link",
+      "sent": "We sent the link to {email}. It is valid for 30 minutes: open it and confirm to delete the account."
     }
   }
 }

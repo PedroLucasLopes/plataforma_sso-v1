@@ -123,7 +123,9 @@ export async function request<T> (path: string, options: RequestOptions = {}): P
       onUnauthorized()
     }
 
-    throw new ApiError(401, t('errors.status.unauthorized'), 'unauthorized')
+    const { message, code } = describe(401, await readBody(response))
+
+    throw new ApiError(401, message, code ?? 'unauthorized')
   }
 
   const payload = response.status === 204 ? null : await readBody(response)

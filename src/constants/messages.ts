@@ -69,6 +69,11 @@ export const ERROR_CODES: ReadonlySet<string> = new Set([
   'human_check_failed',
   'link_invalid',
   'json_required',
+  'account_email_quota',
+  'account_deletion_admin',
+  'current_password_invalid',
+  'mfa_already_enrolled',
+  'mfa_setup_expired',
 ])
 
 const FIELD_ERROR_CODES: ReadonlySet<string> = new Set([

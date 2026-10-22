@@ -1,5 +1,8 @@
 import type {
+  AccountDeletionView,
   AccountLinkView,
+  AccountMfaSetupView,
+  AccountProfileView,
   ClientKey,
   GeneratedClientKey,
   IssuedPassword,
@@ -78,6 +81,16 @@ export const accountApi = {
     request<LoginStepView>('/account/signup', { method: 'POST', body, redirectOnUnauthorized: false }),
   password: (body: { token: string, password: string }) =>
     request<LoginStepView>('/account/password', { method: 'POST', body, redirectOnUnauthorized: false }),
+  delete: (token: string) =>
+    request<AccountDeletionView>('/account/delete', { method: 'POST', body: { token }, redirectOnUnauthorized: false }),
+
+  profile: () => request<AccountProfileView>('/account/profile', { redirectOnUnauthorized: false }),
+  setupMfa: (body: { password?: string }) =>
+    request<AccountMfaSetupView>('/account/mfa/setup', { method: 'POST', body, redirectOnUnauthorized: false }),
+  confirmMfa: (body: { code: string }) =>
+    request<{ recoveryCodes: string[] }>('/account/mfa/confirm', { method: 'POST', body, redirectOnUnauthorized: false }),
+  requestDeletion: (body: { locale: string }) =>
+    request<AccountDeletionView>('/account/deletion', { method: 'POST', body, redirectOnUnauthorized: false }),
 }
 
 export const projectsApi = {

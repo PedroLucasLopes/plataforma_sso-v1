@@ -98,14 +98,35 @@ O e-mail traz `/link#token=…`. O token vem no fragmento, que o navegador não 
 e a página tira o fragmento da barra no primeiro instante (`history.replaceState`), guardando o token
 só num `ref`.
 
-- `POST /sso/account/link` diz para que serve o link (`signup` ou `password`), de quem e de qual
-  aplicação; link vencido, usado ou desconhecido mostra "este link não vale mais".
+- `POST /sso/account/link` diz para que serve o link (`signup`, `password` ou `delete`), de quem e de
+  qual aplicação; link vencido, usado ou desconhecido mostra "este link não vale mais".
+- **Excluir a conta** não pede campo nenhum: a página diz o que vai ser apagado, e o botão chama
+  `POST /sso/account/delete`. Depois mostra "conta excluída", sem botão para aplicação nenhuma.
 - **Criar conta** pede nome e senha duas vezes; **senha nova**, só a senha. Recusa de senha chega como
   `password_refused` com `reason`, e o texto é o do motivo, em `errors.passwordReason`.
 - **Depois**: com `redirectTo` (o pedido ainda vivo neste navegador), a página navega direto para a
   aplicação; com `enroll_mfa`, volta à tela de login para cadastrar o segundo fator; senão, mostra o
   resultado e o botão "Ir para <aplicação>", para a origem que o SSO devolveu em `continueTo`. Endereço
   que não é `http`/`https` é ignorado.
+
+### A página da conta (`/account`)
+
+Onde a pessoa cuida da própria conta, na mesma moldura da tela de login (`DlSignIn`). A página não abre
+login: `GET /sso/account/profile` usa a sessão do SSO que a pessoa já tem por ter entrado numa
+aplicação, e sem ela (401) a página só diz para entrar por uma aplicação e voltar. As aplicações mandam
+a pessoa para `/account`; o console a oferece na tela de sem acesso, "Gerenciar minha conta".
+
+- **Quem é você**: nome, e-mail e as aplicações em que a conta entra.
+- **Segundo fator**: ativo, com quantos códigos de recuperação restam; ou o cadastro, que pede a senha
+  atual quando a conta tem senha, mostra o QR (gerado no navegador pelo `qrcode`, como no login) e
+  confere o código. Os códigos de recuperação aparecem uma vez, no `DlSecretDialog`.
+- **Excluir a conta**: o botão confirma e pede ao SSO o link por e-mail; a exclusão acontece no `/link`.
+  Conta que administra o SSO e SSO sem e-mail configurado veem o motivo, com o botão desligado.
+- **Sair desta conta** encerra a sessão do SSO (`POST /sso/session/logout`).
+
+O `csrfToken` vem no `GET /sso/account/profile` e vai para a store de sessão, de onde o `http.ts` o põe
+em toda escrita, como no console. 401 no meio do uso (`login_required`) volta a página ao estado sem
+sessão, sem relogin automático.
 
 ### A política de conteúdo das duas telas
 
@@ -336,6 +357,7 @@ pastilhas de situação, papel, método e chave, e `navigation.ts` o que o banco
 | Apagar rota ou papel com permissão falha no banco | a ação fica desabilitada até a permissão sair |
 | Rota não guarda data nem autor | o detalhe do caminho sai inteiro do overview, sem chamada a mais |
 | Um papel por pessoa por projeto | trocar o papel e tirar do projeto são ações da linha, em `MembersPanel` |
+| Tirar do projeto bloqueia | o overview traz `blocked`; `MembersPanel` lista os bloqueados num cartão próprio, com "Readmitir", que vincula de novo (`POST /projectuser`) e tira o bloqueio. A confirmação de remover avisa do bloqueio |
 | Rota que o papel não alcança responde 404 | a tela esconde antes; um 404 inesperado vira a mensagem de registro não encontrado |
 | O projeto `SSO` é protegido no servidor | `SELF_PROJECT_NAME` e `session.root`: renomear, suspender e apagar somem para todos; catálogo, membros, redirect URIs e chaves do SSO somem para quem não é a raiz, com aviso no rodapé |
 | O `SUPERADMIN` do SSO é a raiz e sempre sobra um | o papel não oferece renomear nem apagar; o último `SUPERADMIN` não troca de papel nem sai |
@@ -411,6 +433,11 @@ assinatura de índice no espalhamento: `{ ...route.query, tab }` vira `{ tab: st
 ⚠️ **Verificação em aba escondida engana.** Com o painel do navegador oculto, `requestAnimationFrame`
 e as transições param: gráfico parece preso em "Loading", número parado em zero, e linha de lista
 que devia ter saído continua na tela. Confira o DOM antes de chamar de defeito.
+
+⚠️ **O 401 jogava fora o código do erro.** O `http.ts` trocava toda resposta 401 por "sua sessão
+terminou", e a tela de login dizia isso para senha errada (`invalid_credentials`) e código errado
+(`mfa_code_invalid`). Agora o 401 passa pelo mesmo catálogo de códigos dos outros erros, e só código
+desconhecido cai na frase de sessão.
 
 ⚠️ **A CSP do nginx sai de um `map`, fora do `server`.** O template vira `conf.d/default.conf`, que o
 nginx inclui dentro de `http`, onde o `map` vale. Um `set $csp_policy` dentro do `server` passaria por

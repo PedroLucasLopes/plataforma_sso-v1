@@ -54,10 +54,31 @@ export interface LoginStepView {
 }
 
 export interface AccountLinkView {
-  purpose: 'signup' | 'password'
+  purpose: 'signup' | 'password' | 'delete'
   email: string
   application: string
   logo: string | null
+}
+
+export interface AccountProfileView {
+  name: string
+  email: string
+  password: boolean
+  google: boolean
+  applications: string[]
+  secondFactor: { enrolled: boolean, recoveryCodesLeft: number }
+  deletion: { allowed: boolean, reason: 'admin' | 'email_unavailable' | null }
+  csrfToken: string
+}
+
+export interface AccountMfaSetupView {
+  secret: string
+  otpauth: string
+}
+
+export interface AccountDeletionView {
+  next: 'check_email' | 'deleted'
+  email?: string
 }
 
 export interface ProjectPolicyInput {
@@ -150,6 +171,12 @@ export interface ProjectOverview {
     email: string
     role: RoleName
     grantedRoutes: number
+  }[]
+  blocked: {
+    id: string
+    name: string
+    email: string
+    blockedAt: string
   }[]
 }
 

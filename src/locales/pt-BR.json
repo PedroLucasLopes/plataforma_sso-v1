@@ -15,7 +15,8 @@
     "clientKeys": "Chaves de cliente",
     "forbidden": "Não permitido",
     "notFound": "Não encontrado",
-    "link": "Sua conta"
+    "link": "Sua conta",
+    "account": "Sua conta"
   },
   "nav": {
     "overview": "Visão geral",
@@ -141,7 +142,12 @@
       "human_check_required": "Faça a verificação antes de enviar.",
       "human_check_failed": "A verificação venceu ou foi recusada. Faça de novo.",
       "link_invalid": "Este link não vale mais. Peça outro.",
-      "json_required": "O formato do pedido foi recusado."
+      "json_required": "O formato do pedido foi recusado.",
+      "account_email_quota": "Muitos e-mails de conta para este endereço na última hora. Tente mais tarde.",
+      "account_deletion_admin": "Contas que administram o SSO são excluídas por um SUPERADMIN do console.",
+      "current_password_invalid": "A senha atual não confere.",
+      "mfa_already_enrolled": "O segundo fator já está ativo nesta conta.",
+      "mfa_setup_expired": "O cadastro do segundo fator expirou. Comece de novo."
     },
     "field": {
       "email_invalid": "Informe um e-mail válido.",
@@ -274,7 +280,8 @@
     "title": "Você não tem acesso ao console do SSO",
     "descriptionAs": "Você entrou como {name} ({email}), mas esta conta não tem papel no projeto SSO. Peça acesso a um administrador.",
     "description": "Sua conta não tem papel no projeto SSO. Peça acesso a um administrador.",
-    "useAnotherAccount": "Usar outra conta"
+    "useAnotherAccount": "Usar outra conta",
+    "manageAccount": "Gerenciar minha conta"
   },
   "unavailable": {
     "title": "O SSO não está respondendo",
@@ -569,12 +576,20 @@
     "changeNote": "O papel novo substitui o atual. As aplicações o aplicam quando o access token renova, em até 15 minutos.",
     "removeSelf": "Você perde o acesso a este console na hora.",
     "removeFromSso": "{name} perde o acesso ao console do SSO na próxima requisição.",
-    "removeMessage": "{name} deixa de entrar em {project}. Os refresh tokens dessa pessoa ali são revogados agora, e um access token já emitido expira em até 15 minutos.",
+    "removeMessage": "{name} deixa de entrar em {project} e fica bloqueado nele: não volta sozinho, nem pelo cadastro aberto, até ser readmitido aqui. Os refresh tokens dessa pessoa ali são revogados agora, e um access token já emitido expira em até 15 minutos.",
     "added": "Membro adicionado",
     "roleChanged": "Papel trocado",
     "roleChangedDescription": "{name} agora é {role} em {project}",
     "removed": "Membro removido",
-    "removedDescription": "{name} saiu de {project}"
+    "removedDescription": "{name} saiu de {project}",
+    "blockedTitle": "Bloqueados",
+    "blockedDescription": "Quem foi removido deste projeto. A pessoa não volta sozinha, nem pelo cadastro aberto, até ser readmitida aqui.",
+    "blockedAt": "Removido em",
+    "readmit": "Readmitir",
+    "readmitTitle": "Readmitir {name}",
+    "readmitDescription": "{name} volta a entrar em {project} com o papel escolhido aqui, e o bloqueio sai.",
+    "readmitted": "Pessoa readmitida",
+    "readmittedDescription": "{name} voltou a {project}"
   },
   "users": {
     "description": "Pessoas que podem entrar pelo SSO. Ninguém entra sem antes estar cadastrado aqui.",
@@ -716,7 +731,16 @@
       "passwordChanged": {
         "title": "Senha trocada",
         "description": "Todas as sessões foram encerradas. Volte para {application} e entre com a senha nova."
+      },
+      "deleted": {
+        "title": "Conta excluída",
+        "description": "A conta e as sessões foram apagadas, e as aplicações que entram por {application} vão ser avisadas para apagar o que guardam de você."
       }
+    },
+    "delete": {
+      "title": "Excluir a sua conta",
+      "description": "A conta {email} e o acesso a todas as aplicações que entram por {application} vão ser apagados. Não há como desfazer.",
+      "submit": "Excluir minha conta de vez"
     }
   },
   "access": {
@@ -752,6 +776,35 @@
       "logoUnreadable": "Não foi possível ler o arquivo.",
       "removeLogo": "Tirar o logo",
       "saved": "Marca salva."
+    }
+  },
+  "account": {
+    "title": "Sua conta",
+    "description": "O acesso que você usa nas aplicações que entram por aqui.",
+    "signedOut": "Nenhuma sessão aberta neste navegador. Entre por uma das aplicações que usam este acesso e volte a esta página.",
+    "signOut": "Sair desta conta",
+    "identity": {
+      "title": "Quem é você",
+      "applications": "Entra em: {applications}"
+    },
+    "secondFactor": {
+      "title": "Segundo fator",
+      "enrolled": "Ativo, pelo aplicativo autenticador. Códigos de recuperação restantes: {count}.",
+      "missing": "Proteja a conta com o código de um aplicativo autenticador, além da senha. Depois de ativo, ele é pedido a cada entrada.",
+      "password": "Senha atual",
+      "passwordHint": "Confirme a senha para ativar.",
+      "start": "Ativar o segundo fator"
+    },
+    "deletion": {
+      "title": "Excluir a conta",
+      "description": "Apaga a conta, a senha, o segundo fator e o acesso a todas as aplicações. Mandamos um link ao seu e-mail para confirmar; nada é apagado antes disso.",
+      "admin": "Esta conta administra o SSO. Peça a exclusão a um SUPERADMIN do console.",
+      "unavailable": "O envio de e-mail não está configurado, e a exclusão precisa dele para confirmar. Peça a exclusão ao administrador.",
+      "start": "Excluir minha conta",
+      "confirmTitle": "Excluir a sua conta?",
+      "confirmMessage": "Vamos mandar um link para {email}. A conta só é excluída quando você abrir o link e confirmar.",
+      "confirm": "Mandar o link",
+      "sent": "Mandamos o link para {email}. Ele vale por 30 minutos: abra e confirme para excluir a conta."
     }
   }
 }

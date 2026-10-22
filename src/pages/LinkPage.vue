@@ -16,7 +16,19 @@
         :src="view.logo"
       >
 
-      <form v-if="phase === 'form' && view" class="link-form" @submit.prevent="submit">
+      <div v-if="phase === 'form' && view?.purpose === 'delete'" class="link-form">
+        <DlButton
+          block
+          color="error"
+          :loading="busy"
+          size="large"
+          @click="erase"
+        >
+          {{ t('link.delete.submit') }}
+        </DlButton>
+      </div>
+
+      <form v-else-if="phase === 'form' && view" class="link-form" @submit.prevent="submit">
         <DlTextField
           v-if="view.purpose === 'signup'"
           v-model="name"
@@ -76,7 +88,7 @@
   import { accountApi } from '@/services/sso'
 
   type Phase = 'form' | 'finished' | 'invalid'
-  type Outcome = 'created' | 'createdSignIn' | 'passwordChanged'
+  type Outcome = 'created' | 'createdSignIn' | 'passwordChanged' | 'deleted'
 
   const { t } = useI18n()
 
@@ -101,6 +113,10 @@
       return t(`link.done.${outcome.value}.title`)
     }
 
+    if (view.value?.purpose === 'delete') {
+      return t('link.delete.title')
+    }
+
     return view.value?.purpose === 'signup' ? t('link.signup.title') : t('link.newPassword.title')
   })
 
@@ -114,6 +130,10 @@
 
     if (phase.value === 'finished') {
       return t(`link.done.${outcome.value}.description`, { application })
+    }
+
+    if (view.value?.purpose === 'delete') {
+      return t('link.delete.description', { email, application })
     }
 
     return view.value?.purpose === 'signup'
@@ -183,6 +203,32 @@
     continueTo.value = safeTarget(result.continueTo)
     outcome.value = done
     phase.value = 'finished'
+  }
+
+  async function erase (): Promise<void> {
+    if (busy.value) {
+      return
+    }
+
+    failure.value = null
+    busy.value = true
+
+    try {
+      await accountApi.delete(token.value)
+
+      continueTo.value = null
+      outcome.value = 'deleted'
+      phase.value = 'finished'
+    } catch (error) {
+      if (error instanceof ApiError && error.code === 'link_invalid') {
+        phase.value = 'invalid'
+        return
+      }
+
+      failure.value = { title: error instanceof ApiError ? error.message : t('login.unavailable.title') }
+    } finally {
+      busy.value = false
+    }
   }
 
   async function submit (): Promise<void> {
