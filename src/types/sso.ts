@@ -1,6 +1,8 @@
 import type { Permission } from '@pedrolucaslopes/dotlog-ui'
 
 export type ProjectStatus = 'PENDING' | 'ACTIVE' | 'SUSPENDED'
+export type SignupPolicy = 'CLOSED' | 'OPEN'
+export type MfaPolicy = 'REQUIRED' | 'OPTIONAL'
 export type DefaultRoleName = 'SUPERADMIN' | 'ADMIN' | 'MANAGER' | 'VIEWER'
 export type RoleName = string
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'UPDATE'
@@ -23,22 +25,71 @@ export interface SessionView {
 
 export type LoginStage = 'credentials' | 'change_password' | 'enroll_mfa' | 'mfa'
 
+export interface HumanCheckWidget {
+  provider: 'turnstile'
+  siteKey: string
+}
+
 export interface LoginRequestView {
   kind: 'authorize' | 'session'
   application: string | null
+  logo: string | null
   expiresAt: string
   providers: { id: string, label: string, url: string }[]
   step: LoginStage
   email: string | null
+  signup: boolean
+  passwordReset: boolean
+  humanCheck: HumanCheckWidget | null
 }
 
 export interface LoginStepView {
-  next: LoginStage | 'done'
+  next: LoginStage | 'done' | 'check_email'
   email?: string
   redirectTo?: string
+  continueTo?: string | null
   secret?: string
   otpauth?: string
   recoveryCodes?: string[]
+}
+
+export interface AccountLinkView {
+  purpose: 'signup' | 'password' | 'delete'
+  email: string
+  application: string
+  logo: string | null
+}
+
+export interface AccountProfileView {
+  name: string
+  email: string
+  password: boolean
+  google: boolean
+  applications: string[]
+  secondFactor: { enrolled: boolean, recoveryCodesLeft: number }
+  deletion: { allowed: boolean, reason: 'admin' | 'email_unavailable' | null }
+  csrfToken: string
+}
+
+export interface AccountMfaSetupView {
+  secret: string
+  otpauth: string
+}
+
+export interface AccountDeletionView {
+  next: 'check_email' | 'deleted'
+  email?: string
+}
+
+export interface ProjectPolicyInput {
+  signupPolicy: SignupPolicy
+  mfaPolicy: MfaPolicy
+  defaultRoleId: string | null
+}
+
+export interface ProjectBrandingInput {
+  displayName: string | null
+  logo: string | null
 }
 
 export interface UserCredentialView {
@@ -71,6 +122,11 @@ export interface Project {
   name: string
   clientId: string
   status: ProjectStatus
+  signupPolicy: SignupPolicy
+  mfaPolicy: MfaPolicy
+  defaultRoleId: string | null
+  displayName: string | null
+  logo?: string | null
   createdAt: string
   activatedAt: string | null
   suspendedAt: string | null
@@ -85,6 +141,11 @@ export interface ProjectOverview {
   createdAt: string
   activatedAt: string | null
   suspendedAt: string | null
+  signupPolicy: SignupPolicy
+  mfaPolicy: MfaPolicy
+  defaultRoleId: string | null
+  displayName: string | null
+  logo: string | null
   redirectUris: string[]
   redirectUriRecords: { id: string, redirectUri: string }[]
   clientKeys: {
@@ -110,6 +171,12 @@ export interface ProjectOverview {
     email: string
     role: RoleName
     grantedRoutes: number
+  }[]
+  blocked: {
+    id: string
+    name: string
+    email: string
+    blockedAt: string
   }[]
 }
 

@@ -6,14 +6,24 @@
       :title="t('noAccess.title')"
       tone="warning"
     >
-      <DlButton
-        icon="mdi-account-switch-outline"
-        :loading="session.signingOut"
-        variant="outlined"
-        @click="session.signOut()"
-      >
-        {{ t('noAccess.useAnotherAccount') }}
-      </DlButton>
+      <div class="no-access-actions">
+        <DlButton
+          icon="mdi-account-cog-outline"
+          variant="tonal"
+          @click="router.push({ name: 'account' })"
+        >
+          {{ t('noAccess.manageAccount') }}
+        </DlButton>
+
+        <DlButton
+          icon="mdi-account-switch-outline"
+          :loading="session.signingOut"
+          variant="outlined"
+          @click="session.signOut()"
+        >
+          {{ t('noAccess.useAnotherAccount') }}
+        </DlButton>
+      </div>
     </DlEmptyState>
   </GateLayout>
 </template>
@@ -42,3 +52,12 @@
     }
   })
 </script>
+
+<style scoped>
+.no-access-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+</style>
