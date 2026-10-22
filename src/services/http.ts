@@ -20,6 +20,7 @@ export interface RequestOptions {
   emptyOn404?: boolean
   redirectOnUnauthorized?: boolean
   signal?: AbortSignal
+  headers?: Record<string, string>
 }
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
@@ -81,7 +82,7 @@ function describe (status: number, payload: unknown): { message: string, code: s
 
 export async function request<T> (path: string, options: RequestOptions = {}): Promise<T> {
   const method = options.method ?? 'GET'
-  const headers: Record<string, string> = { Accept: 'application/json' }
+  const headers: Record<string, string> = { ...options.headers, Accept: 'application/json' }
 
   if (options.body !== undefined) {
     headers['Content-Type'] = 'application/json'

@@ -1,4 +1,12 @@
-import type { HttpMethod, Project, ProjectOverview, ProjectStatus, RoleName } from '@/types/sso'
+import type {
+  HttpMethod,
+  Project,
+  ProjectBrandingInput,
+  ProjectOverview,
+  ProjectPolicyInput,
+  ProjectStatus,
+  RoleName,
+} from '@/types/sso'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import {
@@ -67,6 +75,18 @@ export const useProjectsStore = defineStore('projects', () => {
     await projectsApi.setStatus(projectId, status)
     catalog.invalidate('projects')
     await refresh(projectId, withOverview)
+  }
+
+  async function setPolicy (projectId: string, input: ProjectPolicyInput): Promise<void> {
+    await projectsApi.setPolicy(projectId, input)
+    catalog.invalidate('projects')
+    await refresh(projectId, true)
+  }
+
+  async function setBranding (projectId: string, input: ProjectBrandingInput): Promise<void> {
+    await projectsApi.update(projectId, input)
+    catalog.invalidate('projects')
+    await refresh(projectId, true)
   }
 
   async function addRedirectUri (projectId: string, redirectUri: string): Promise<void> {
@@ -182,6 +202,8 @@ export const useProjectsStore = defineStore('projects', () => {
     rename,
     remove,
     setStatus,
+    setPolicy,
+    setBranding,
     addRedirectUri,
     updateRedirectUri,
     removeRedirectUri,

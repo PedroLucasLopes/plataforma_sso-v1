@@ -61,6 +61,10 @@
         <MembersPanel v-if="overview" :project="overview" />
       </template>
 
+      <template #access>
+        <AccessPolicyPanel v-if="overview" :project="overview" />
+      </template>
+
       <template #keys>
         <ClientKeysPanel :project-id="project.id" :project-name="project.name" />
       </template>
@@ -133,6 +137,7 @@
   import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
   import ClientKeysPanel from '@/components/ClientKeysPanel.vue'
+  import AccessPolicyPanel from '@/components/project/AccessPolicyPanel.vue'
   import ActivationChecklist from '@/components/project/ActivationChecklist.vue'
   import MembersPanel from '@/components/project/MembersPanel.vue'
   import RedirectUrisPanel from '@/components/project/RedirectUrisPanel.vue'
@@ -211,6 +216,7 @@
       { key: 'routes', label: t('project.tabs.routes'), icon: 'mdi-sitemap-outline', count: current?.routes.length, permission },
       { key: 'roles', label: t('project.tabs.roles'), icon: 'mdi-shield-account-outline', count: current?.roles.length, permission },
       { key: 'members', label: t('project.tabs.members'), icon: 'mdi-account-multiple-outline', count: current?.users.length, permission },
+      { key: 'access', label: t('project.tabs.access'), icon: 'mdi-account-key-outline', permission },
       {
         key: 'keys',
         label: t('project.tabs.keys'),

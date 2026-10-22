@@ -14,7 +14,8 @@
     "user": "User",
     "clientKeys": "Client keys",
     "forbidden": "Not allowed",
-    "notFound": "Not found"
+    "notFound": "Not found",
+    "link": "Your account"
   },
   "nav": {
     "overview": "Overview",
@@ -129,12 +130,38 @@
       "password_not_issued": "This account has no password issued.",
       "mfa_code_invalid": "The code does not match.",
       "login_step_expired": "This step expired. Start the sign-in again.",
-      "no_pending_request": "There is no pending sign-in request in this browser."
+      "no_pending_request": "There is no pending sign-in request in this browser.",
+      "project_policy_root_only": "Only the root of the SSO changes the sign-up and second factor policies.",
+      "default_role_required": "Choose a default role before opening sign-up or making the second factor optional.",
+      "role_is_default": "This is the default role of the project. Choose another default role first.",
+      "logo_invalid": "The logo must be a PNG, JPEG or WebP image.",
+      "logo_too_large": "The logo is too large.",
+      "signup_closed": "This application does not accept new accounts.",
+      "email_unavailable": "The SSO cannot send e-mails right now. Try again later.",
+      "human_check_required": "Complete the human check before sending.",
+      "human_check_failed": "The human check expired or was refused. Do it again.",
+      "link_invalid": "This link no longer works. Ask for a new one.",
+      "json_required": "The request format was refused."
     },
     "field": {
       "email_invalid": "Enter a valid email address.",
       "public_key_not_pem": "Paste a public key in PEM format, starting with -----BEGIN PUBLIC KEY-----.",
-      "role_name_invalid": "Use 2 to 40 characters: an uppercase letter, then uppercase letters, digits or underscores."
+      "role_name_invalid": "Use 2 to 40 characters: an uppercase letter, then uppercase letters, digits or underscores.",
+      "password_length": "Use at least 12 characters.",
+      "name_length": "Use 2 to 100 characters in the name.",
+      "name_invalid": "The name needs at least one letter.",
+      "display_name_too_long": "The display name is too long.",
+      "logo_too_large": "The logo is too large."
+    },
+    "passwordReason": {
+      "too_short": "Use at least 12 characters.",
+      "too_long": "Use at most 200 characters.",
+      "padded": "The password cannot start or end with a space.",
+      "too_repetitive": "Use more varied characters.",
+      "needs_letters_and_digits": "Use letters and numbers.",
+      "personal_data": "The password cannot contain your name, your e-mail or the name of the application.",
+      "predictable": "The password cannot be a sequence or a repetition, like 1234 or aaaa.",
+      "breached": "This password appeared in data breaches. Choose another one."
     }
   },
   "forms": {
@@ -212,6 +239,29 @@
       "title": "Keep your recovery codes",
       "description": "Each one works once, and they are the only way back if you lose the app. They show up only now.",
       "copy": "Copy the codes"
+    },
+    "brandLogo": "{application} logo",
+    "backToSignIn": "Back to sign in",
+    "signup": {
+      "link": "Create an account",
+      "title": "Create your account",
+      "description": "Enter your e-mail. We will send a link to choose your name and password on {application}.",
+      "submit": "Send the link"
+    },
+    "reset": {
+      "link": "Forgot your password?",
+      "title": "Choose a new password",
+      "description": "Enter the e-mail of your account. We will send a link to choose a new password.",
+      "submit": "Send the link"
+    },
+    "sent": {
+      "title": "Check your e-mail",
+      "signup": "We sent the next step to {email}. The link arrives in a moment, works once and expires soon.",
+      "reset": "If {email} has an account, a link to choose a new password arrives in a moment. It works once and expires soon."
+    },
+    "humanCheck": {
+      "pending": "Complete the check above before sending.",
+      "unavailable": "The human check did not load. Reload the page and try again."
     }
   },
   "callback": {
@@ -326,7 +376,8 @@
       "routes": "Routes",
       "roles": "Roles & permissions",
       "members": "Members",
-      "keys": "Client keys"
+      "keys": "Client keys",
+      "access": "Sign-up & security"
     },
     "identity": {
       "title": "Identity",
@@ -631,5 +682,76 @@
     },
     "registered": "Public key registered",
     "revoked": "Client key revoked"
+  },
+  "link": {
+    "name": "Your name",
+    "password": "Password",
+    "passwordHint": "At least 12 characters, with letters and numbers, and without your name or e-mail.",
+    "repeat": "Repeat the password",
+    "mismatch": "The two passwords do not match.",
+    "continue": "Go to {application}",
+    "signup": {
+      "title": "Finish your account",
+      "description": "Choose your name and a password for {email} on {application}.",
+      "submit": "Create my account"
+    },
+    "newPassword": {
+      "title": "Choose a new password",
+      "description": "The new password is for {email}. Saving it signs out every open session.",
+      "submit": "Save the new password"
+    },
+    "invalid": {
+      "title": "This link no longer works",
+      "description": "Links work once and expire soon. Go back to the application and ask for a new one."
+    },
+    "done": {
+      "created": {
+        "title": "Your account is ready",
+        "description": "You are signed in. Go back to {application} to continue."
+      },
+      "createdSignIn": {
+        "title": "Your account is ready",
+        "description": "Go back to {application} and sign in with your password to set up the second factor."
+      },
+      "passwordChanged": {
+        "title": "Password changed",
+        "description": "Every session was signed out. Go back to {application} and sign in with the new password."
+      }
+    }
+  },
+  "access": {
+    "save": "Save",
+    "policy": {
+      "title": "Sign-up and second factor",
+      "description": "Who can create an account in this application, which role they get, and when the second factor is required.",
+      "signup": "Sign-up",
+      "signupHint": "Open lets anyone create an account on the sign-in screen.",
+      "closed": "Closed: accounts come from the console",
+      "open": "Open: people create their own account",
+      "defaultRole": "Default role",
+      "defaultRoleHint": "Given to whoever signs up or enters for the first time. Required for open sign-up or an optional second factor.",
+      "mfa": "Second factor",
+      "mfaHint": "Optional only applies to the default role, and never to people with a role in the SSO.",
+      "required": "Required for everyone",
+      "optional": "Optional for the default role",
+      "note": "Only the root changes these policies. The default role cannot be deleted while it is in use.",
+      "rootOnly": "Only the root of the SSO changes these policies.",
+      "selfNote": "The SSO project is always closed and always requires the second factor.",
+      "saved": "Policies saved."
+    },
+    "brand": {
+      "title": "Brand on the sign-in screen",
+      "description": "The name and the logo people see when they sign in or create an account for this application.",
+      "displayName": "Display name",
+      "displayNameHint": "Empty shows the project name, {name}.",
+      "displayNameTooLong": "Use up to {size} characters.",
+      "logo": "Logo",
+      "logoHint": "PNG, JPEG or WebP, up to {size} KB.",
+      "logoType": "Use a PNG, JPEG or WebP image.",
+      "logoTooLarge": "The logo must have up to {size} KB.",
+      "logoUnreadable": "The file could not be read.",
+      "removeLogo": "Remove the logo",
+      "saved": "Brand saved."
+    }
   }
 }

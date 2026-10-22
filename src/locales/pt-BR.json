@@ -14,7 +14,8 @@
     "user": "Usuário",
     "clientKeys": "Chaves de cliente",
     "forbidden": "Não permitido",
-    "notFound": "Não encontrado"
+    "notFound": "Não encontrado",
+    "link": "Sua conta"
   },
   "nav": {
     "overview": "Visão geral",
@@ -129,12 +130,38 @@
       "password_not_issued": "Esta conta não tem senha emitida.",
       "mfa_code_invalid": "Código não confere.",
       "login_step_expired": "Esta etapa expirou. Comece o login de novo.",
-      "no_pending_request": "Não há pedido de login pendente neste navegador."
+      "no_pending_request": "Não há pedido de login pendente neste navegador.",
+      "project_policy_root_only": "Só a raiz do SSO muda as políticas de cadastro e de segundo fator.",
+      "default_role_required": "Escolha um papel padrão antes de abrir o cadastro ou deixar o segundo fator opcional.",
+      "role_is_default": "Este é o papel padrão do projeto. Escolha outro papel padrão antes.",
+      "logo_invalid": "O logo precisa ser uma imagem PNG, JPEG ou WebP.",
+      "logo_too_large": "O logo é grande demais.",
+      "signup_closed": "Esta aplicação não aceita contas novas.",
+      "email_unavailable": "O SSO não consegue mandar e-mail agora. Tente mais tarde.",
+      "human_check_required": "Faça a verificação antes de enviar.",
+      "human_check_failed": "A verificação venceu ou foi recusada. Faça de novo.",
+      "link_invalid": "Este link não vale mais. Peça outro.",
+      "json_required": "O formato do pedido foi recusado."
     },
     "field": {
       "email_invalid": "Informe um e-mail válido.",
       "public_key_not_pem": "Cole uma chave pública em formato PEM, começando com -----BEGIN PUBLIC KEY-----.",
-      "role_name_invalid": "Use de 2 a 40 caracteres: uma letra maiúscula e depois maiúsculas, dígitos ou sublinhados."
+      "role_name_invalid": "Use de 2 a 40 caracteres: uma letra maiúscula e depois maiúsculas, dígitos ou sublinhados.",
+      "password_length": "Use pelo menos 12 caracteres.",
+      "name_length": "Use de 2 a 100 caracteres no nome.",
+      "name_invalid": "O nome precisa de pelo menos uma letra.",
+      "display_name_too_long": "O nome de exibição é longo demais.",
+      "logo_too_large": "O logo é grande demais."
+    },
+    "passwordReason": {
+      "too_short": "Use pelo menos 12 caracteres.",
+      "too_long": "Use no máximo 200 caracteres.",
+      "padded": "A senha não pode começar nem terminar com espaço.",
+      "too_repetitive": "Use caracteres mais variados.",
+      "needs_letters_and_digits": "Use letras e números.",
+      "personal_data": "A senha não pode ter o seu nome, o seu e-mail nem o nome da aplicação.",
+      "predictable": "A senha não pode ser uma sequência ou repetição, como 1234 ou aaaa.",
+      "breached": "Esta senha apareceu em vazamentos de dados. Escolha outra."
     }
   },
   "forms": {
@@ -212,6 +239,29 @@
       "title": "Guarde os códigos de recuperação",
       "description": "Cada um entra uma vez, e eles são a única volta se você perder o aplicativo. Aparecem só agora.",
       "copy": "Copiar os códigos"
+    },
+    "brandLogo": "Logo de {application}",
+    "backToSignIn": "Voltar para entrar",
+    "signup": {
+      "link": "Criar conta",
+      "title": "Crie sua conta",
+      "description": "Informe seu e-mail. Enviamos um link para você escolher seu nome e sua senha em {application}.",
+      "submit": "Enviar o link"
+    },
+    "reset": {
+      "link": "Esqueceu a senha?",
+      "title": "Escolha uma senha nova",
+      "description": "Informe o e-mail da sua conta. Enviamos um link para você escolher uma senha nova.",
+      "submit": "Enviar o link"
+    },
+    "sent": {
+      "title": "Confira seu e-mail",
+      "signup": "Enviamos o próximo passo para {email}. O link chega em instantes, funciona uma vez e vale por pouco tempo.",
+      "reset": "Se {email} tiver conta, o link para escolher uma senha nova chega em instantes. Ele funciona uma vez e vale por pouco tempo."
+    },
+    "humanCheck": {
+      "pending": "Faça a verificação acima antes de enviar.",
+      "unavailable": "A verificação de que você é uma pessoa não carregou. Recarregue a página e tente de novo."
     }
   },
   "callback": {
@@ -326,7 +376,8 @@
       "routes": "Rotas",
       "roles": "Papéis e permissões",
       "members": "Membros",
-      "keys": "Chaves de cliente"
+      "keys": "Chaves de cliente",
+      "access": "Cadastro e segurança"
     },
     "identity": {
       "title": "Identidade",
@@ -631,5 +682,76 @@
     },
     "registered": "Chave pública cadastrada",
     "revoked": "Chave de cliente revogada"
+  },
+  "link": {
+    "name": "Seu nome",
+    "password": "Senha",
+    "passwordHint": "Pelo menos 12 caracteres, com letras e números, sem o seu nome nem o seu e-mail.",
+    "repeat": "Repita a senha",
+    "mismatch": "As duas senhas não conferem.",
+    "continue": "Ir para {application}",
+    "signup": {
+      "title": "Termine sua conta",
+      "description": "Escolha seu nome e uma senha para {email} em {application}.",
+      "submit": "Criar minha conta"
+    },
+    "newPassword": {
+      "title": "Escolha uma senha nova",
+      "description": "A senha nova é de {email}. Ao salvar, todas as sessões abertas são encerradas.",
+      "submit": "Salvar a senha nova"
+    },
+    "invalid": {
+      "title": "Este link não vale mais",
+      "description": "Os links funcionam uma vez e valem por pouco tempo. Volte à aplicação e peça outro."
+    },
+    "done": {
+      "created": {
+        "title": "Sua conta está pronta",
+        "description": "Você já entrou. Volte para {application} para continuar."
+      },
+      "createdSignIn": {
+        "title": "Sua conta está pronta",
+        "description": "Volte para {application} e entre com a sua senha para cadastrar o segundo fator."
+      },
+      "passwordChanged": {
+        "title": "Senha trocada",
+        "description": "Todas as sessões foram encerradas. Volte para {application} e entre com a senha nova."
+      }
+    }
+  },
+  "access": {
+    "save": "Salvar",
+    "policy": {
+      "title": "Cadastro e segundo fator",
+      "description": "Quem pode criar conta nesta aplicação, com que papel entra e quando o segundo fator é obrigatório.",
+      "signup": "Cadastro",
+      "signupHint": "Aberto deixa qualquer pessoa criar conta na tela de entrada.",
+      "closed": "Fechado: as contas nascem no console",
+      "open": "Aberto: a pessoa cria a própria conta",
+      "defaultRole": "Papel padrão",
+      "defaultRoleHint": "Dado a quem se cadastra ou entra pela primeira vez. Obrigatório com cadastro aberto ou segundo fator opcional.",
+      "mfa": "Segundo fator",
+      "mfaHint": "Opcional só vale para o papel padrão, e nunca para quem tem papel no SSO.",
+      "required": "Obrigatório para todos",
+      "optional": "Opcional para o papel padrão",
+      "note": "Só a raiz muda estas políticas. O papel padrão não pode ser apagado enquanto estiver em uso.",
+      "rootOnly": "Só a raiz do SSO muda estas políticas.",
+      "selfNote": "O projeto SSO é sempre fechado e sempre exige o segundo fator.",
+      "saved": "Políticas salvas."
+    },
+    "brand": {
+      "title": "Marca na tela de entrada",
+      "description": "O nome e o logo que as pessoas veem ao entrar ou criar conta nesta aplicação.",
+      "displayName": "Nome de exibição",
+      "displayNameHint": "Vazio, a tela mostra o nome do projeto, {name}.",
+      "displayNameTooLong": "Use até {size} caracteres.",
+      "logo": "Logo",
+      "logoHint": "PNG, JPEG ou WebP, até {size} KB.",
+      "logoType": "Use uma imagem PNG, JPEG ou WebP.",
+      "logoTooLarge": "O logo pode ter até {size} KB.",
+      "logoUnreadable": "Não foi possível ler o arquivo.",
+      "removeLogo": "Tirar o logo",
+      "saved": "Marca salva."
+    }
   }
 }

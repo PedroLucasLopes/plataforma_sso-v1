@@ -1,4 +1,5 @@
 import type {
+  AccountLinkView,
   ClientKey,
   GeneratedClientKey,
   IssuedPassword,
@@ -7,7 +8,9 @@ import type {
   LoginStepView,
   Me,
   Project,
+  ProjectBrandingInput,
   ProjectOverview,
+  ProjectPolicyInput,
   ProjectStatus,
   RedirectUri,
   Role,
@@ -19,10 +22,19 @@ import type {
   UserCredentialView,
   UserInput,
 } from '@/types/sso'
-import { API_PREFIX } from '@/constants/api'
+import { API_PREFIX, HUMAN_CHECK_HEADER } from '@/constants/api'
 import { request } from './http'
 
 const id = (value: string): string => encodeURIComponent(value)
+
+function humanCheck (token: string | null): Record<string, string> {
+  return token ? { [HUMAN_CHECK_HEADER]: token } : {}
+}
+
+export interface AccountEmailInput {
+  email: string
+  locale: string
+}
 
 export const sessionApi = {
   me: () => request<Me>('/me', { redirectOnUnauthorized: false }),
@@ -40,9 +52,32 @@ export const sessionApi = {
     request<LoginStepView>('/login/mfa/confirm', { method: 'POST', body, redirectOnUnauthorized: false }),
   verifyMfa: (body: { code: string }) =>
     request<LoginStepView>('/login/mfa', { method: 'POST', body, redirectOnUnauthorized: false }),
+  requestSignup: (body: AccountEmailInput, humanToken: string | null) =>
+    request<LoginStepView>('/login/signup', {
+      method: 'POST',
+      body,
+      headers: humanCheck(humanToken),
+      redirectOnUnauthorized: false,
+    }),
+  requestPasswordReset: (body: AccountEmailInput, humanToken: string | null) =>
+    request<LoginStepView>('/login/password/reset', {
+      method: 'POST',
+      body,
+      headers: humanCheck(humanToken),
+      redirectOnUnauthorized: false,
+    }),
 
   loginUrl: (redirectUri: string, state: string): string =>
     `${API_PREFIX}/session/login?${new URLSearchParams({ redirect_uri: redirectUri, state })}`,
+}
+
+export const accountApi = {
+  link: (token: string) =>
+    request<AccountLinkView>('/account/link', { method: 'POST', body: { token }, redirectOnUnauthorized: false }),
+  signup: (body: { token: string, name: string, password: string }) =>
+    request<LoginStepView>('/account/signup', { method: 'POST', body, redirectOnUnauthorized: false }),
+  password: (body: { token: string, password: string }) =>
+    request<LoginStepView>('/account/password', { method: 'POST', body, redirectOnUnauthorized: false }),
 }
 
 export const projectsApi = {
@@ -51,11 +86,13 @@ export const projectsApi = {
   get: (projectId: string) => request<Project>(`/project/${id(projectId)}`),
   overview: (projectId: string) => request<ProjectOverview>(`/project/${id(projectId)}/overview`),
   create: (body: { name: string }) => request<Project>('/project', { method: 'POST', body }),
-  update: (projectId: string, body: { name: string }) =>
+  update: (projectId: string, body: { name: string } | ProjectBrandingInput) =>
     request<Project>(`/project/${id(projectId)}`, { method: 'PUT', body }),
   remove: (projectId: string) => request<void>(`/project/${id(projectId)}`, { method: 'DELETE' }),
   setStatus: (projectId: string, status: ProjectStatus) =>
     request<Project>(`/project/${id(projectId)}/status`, { method: 'PATCH', body: { status } }),
+  setPolicy: (projectId: string, body: ProjectPolicyInput) =>
+    request<Project>(`/project/${id(projectId)}/policy`, { method: 'PATCH', body }),
 }
 
 export const usersApi = {

@@ -145,6 +145,14 @@ if (sources) {
     for (const match of text.matchAll(/`([a-z][A-Za-z0-9]*(?:\.\w+)*\.)\$\{/g)) {
       prefixes.add(match[1])
     }
+
+    for (const match of text.matchAll(/\bt\(\s*(['`])([a-z][A-Za-z0-9]*(?:\.\w+)+)\1\s*[,)]/g)) {
+      const key = match[2]
+
+      if (!reference.has(key) && groups.has(key)) {
+        problems.push(`${relative(process.cwd(), file)}: t("${key}") aponta para um grupo de chaves, não para um texto`)
+      }
+    }
   }
 
   for (const key of reference.keys()) {

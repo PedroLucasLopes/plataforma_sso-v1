@@ -58,13 +58,48 @@ export const ERROR_CODES: ReadonlySet<string> = new Set([
   'public_key_invalid',
   'public_key_not_rsa',
   'public_key_too_short',
+  'project_policy_root_only',
+  'default_role_required',
+  'role_is_default',
+  'logo_invalid',
+  'logo_too_large',
+  'signup_closed',
+  'email_unavailable',
+  'human_check_required',
+  'human_check_failed',
+  'link_invalid',
+  'json_required',
 ])
 
 const FIELD_ERROR_CODES: ReadonlySet<string> = new Set([
   'role_name_invalid',
   'public_key_not_pem',
   'email_invalid',
+  'password_length',
+  'name_length',
+  'name_invalid',
+  'display_name_too_long',
+  'logo_too_large',
 ])
+
+const PASSWORD_REASONS: ReadonlySet<string> = new Set([
+  'too_short',
+  'too_long',
+  'padded',
+  'too_repetitive',
+  'needs_letters_and_digits',
+  'personal_data',
+  'predictable',
+  'breached',
+])
+
+function passwordMessage (body: Record<string, unknown>): string {
+  const reason = typeof body.reason === 'string' ? body.reason : null
+
+  return reason && PASSWORD_REASONS.has(reason)
+    ? t(`errors.passwordReason.${reason}`)
+    : t('errors.code.password_refused')
+}
 
 function validationMessage (body: Record<string, unknown>): string {
   const fields = Array.isArray(body.fields) ? body.fields as unknown[] : []
@@ -88,7 +123,11 @@ export function apiErrorText (code: string | null, body: Record<string, unknown>
     return null
   }
 
-  return code === 'validation_failed' ? validationMessage(body) : t(`errors.code.${code}`)
+  if (code === 'validation_failed') {
+    return validationMessage(body)
+  }
+
+  return code === 'password_refused' ? passwordMessage(body) : t(`errors.code.${code}`)
 }
 
 export const STATUS_MESSAGE_KEYS: Readonly<Record<number, string>> = {

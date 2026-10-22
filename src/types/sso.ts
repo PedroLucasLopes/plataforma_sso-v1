@@ -1,6 +1,8 @@
 import type { Permission } from '@pedrolucaslopes/dotlog-ui'
 
 export type ProjectStatus = 'PENDING' | 'ACTIVE' | 'SUSPENDED'
+export type SignupPolicy = 'CLOSED' | 'OPEN'
+export type MfaPolicy = 'REQUIRED' | 'OPTIONAL'
 export type DefaultRoleName = 'SUPERADMIN' | 'ADMIN' | 'MANAGER' | 'VIEWER'
 export type RoleName = string
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'UPDATE'
@@ -23,22 +25,50 @@ export interface SessionView {
 
 export type LoginStage = 'credentials' | 'change_password' | 'enroll_mfa' | 'mfa'
 
+export interface HumanCheckWidget {
+  provider: 'turnstile'
+  siteKey: string
+}
+
 export interface LoginRequestView {
   kind: 'authorize' | 'session'
   application: string | null
+  logo: string | null
   expiresAt: string
   providers: { id: string, label: string, url: string }[]
   step: LoginStage
   email: string | null
+  signup: boolean
+  passwordReset: boolean
+  humanCheck: HumanCheckWidget | null
 }
 
 export interface LoginStepView {
-  next: LoginStage | 'done'
+  next: LoginStage | 'done' | 'check_email'
   email?: string
   redirectTo?: string
+  continueTo?: string | null
   secret?: string
   otpauth?: string
   recoveryCodes?: string[]
+}
+
+export interface AccountLinkView {
+  purpose: 'signup' | 'password'
+  email: string
+  application: string
+  logo: string | null
+}
+
+export interface ProjectPolicyInput {
+  signupPolicy: SignupPolicy
+  mfaPolicy: MfaPolicy
+  defaultRoleId: string | null
+}
+
+export interface ProjectBrandingInput {
+  displayName: string | null
+  logo: string | null
 }
 
 export interface UserCredentialView {
@@ -71,6 +101,11 @@ export interface Project {
   name: string
   clientId: string
   status: ProjectStatus
+  signupPolicy: SignupPolicy
+  mfaPolicy: MfaPolicy
+  defaultRoleId: string | null
+  displayName: string | null
+  logo?: string | null
   createdAt: string
   activatedAt: string | null
   suspendedAt: string | null
@@ -85,6 +120,11 @@ export interface ProjectOverview {
   createdAt: string
   activatedAt: string | null
   suspendedAt: string | null
+  signupPolicy: SignupPolicy
+  mfaPolicy: MfaPolicy
+  defaultRoleId: string | null
+  displayName: string | null
+  logo: string | null
   redirectUris: string[]
   redirectUriRecords: { id: string, redirectUri: string }[]
   clientKeys: {
