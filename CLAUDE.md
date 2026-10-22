@@ -71,6 +71,69 @@ próprio console.
 - **O botão escolhido trava** enquanto navega ao Google, e destrava se a pessoa voltar pelo botão do
   navegador (`pageshow` com `persisted`).
 - **Não é embutível.** `X-Frame-Options: DENY` e `frame-ancestors 'none'`, no Vite e no nginx.
+- **Nome e logo do projeto.** `application` já é o nome de exibição quando o projeto tem um, e o
+  `logo` (data URI, guardado no SSO) aparece como `<img>` no topo do slot do `DlSignIn`: a prop `logo`
+  dele é ícone, e a marca do SSO continua no cabeçalho, como em toda tela de consentimento. Projeto sem
+  logo, como o KRLoc, sai como antes.
+
+### Criar conta e senha nova (projeto `OPEN`)
+
+`GET /sso/login/request` diz `signup` e `passwordReset`; os dois só vêm `true` para pedido de projeto
+com cadastro aberto, e com o SSO podendo mandar e-mail. Fora disso a tela é a de sempre.
+
+- **"Criar conta" e "Esqueceu a senha?"** ficam embaixo do formulário de entrada e trocam o modo da
+  mesma tela: só o e-mail, a verificação do Turnstile e o envio. O Google continua no modo de criar
+  conta, porque o primeiro login dele também cria a conta no projeto aberto.
+- **A resposta é sempre "confira seu e-mail"**, com o texto escrito para não dizer se a conta existe;
+  a senha só é escolhida depois, na página do link.
+- **O Turnstile** é desenhado por `useHumanCheck`, que carrega o script da Cloudflare uma vez
+  (`render=explicit`), guarda o token só na memória e o reinicia a cada envio, porque cada token vale
+  uma vez. Ele vai no cabeçalho `x-human-check`. Sem `humanCheck` no pedido (SSO sem Turnstile), a
+  tela não desenha nada e manda sem token.
+- **A língua da tela vai no pedido** (`locale`), e é nela que o e-mail chega.
+
+### O link do e-mail (`/link`)
+
+O e-mail traz `/link#token=…`. O token vem no fragmento, que o navegador não manda a servidor nenhum,
+e a página tira o fragmento da barra no primeiro instante (`history.replaceState`), guardando o token
+só num `ref`.
+
+- `POST /sso/account/link` diz para que serve o link (`signup`, `password` ou `delete`), de quem e de
+  qual aplicação; link vencido, usado ou desconhecido mostra "este link não vale mais".
+- **Excluir a conta** não pede campo nenhum: a página diz o que vai ser apagado, e o botão chama
+  `POST /sso/account/delete`. Depois mostra "conta excluída", sem botão para aplicação nenhuma.
+- **Criar conta** pede nome e senha duas vezes; **senha nova**, só a senha. Recusa de senha chega como
+  `password_refused` com `reason`, e o texto é o do motivo, em `errors.passwordReason`.
+- **Depois**: com `redirectTo` (o pedido ainda vivo neste navegador), a página navega direto para a
+  aplicação; com `enroll_mfa`, volta à tela de login para cadastrar o segundo fator; senão, mostra o
+  resultado e o botão "Ir para <aplicação>", para a origem que o SSO devolveu em `continueTo`. Endereço
+  que não é `http`/`https` é ignorado.
+
+### A página da conta (`/account`)
+
+Onde a pessoa cuida da própria conta, na mesma moldura da tela de login (`DlSignIn`). A página não abre
+login: `GET /sso/account/profile` usa a sessão do SSO que a pessoa já tem por ter entrado numa
+aplicação, e sem ela (401) a página só diz para entrar por uma aplicação e voltar. As aplicações mandam
+a pessoa para `/account`; o console a oferece na tela de sem acesso, "Gerenciar minha conta".
+
+- **Quem é você**: nome, e-mail e as aplicações em que a conta entra.
+- **Segundo fator**: ativo, com quantos códigos de recuperação restam; ou o cadastro, que pede a senha
+  atual quando a conta tem senha, mostra o QR (gerado no navegador pelo `qrcode`, como no login) e
+  confere o código. Os códigos de recuperação aparecem uma vez, no `DlSecretDialog`.
+- **Excluir a conta**: o botão confirma e pede ao SSO o link por e-mail; a exclusão acontece no `/link`.
+  Conta que administra o SSO e SSO sem e-mail configurado veem o motivo, com o botão desligado.
+- **Sair desta conta** encerra a sessão do SSO (`POST /sso/session/logout`).
+
+O `csrfToken` vem no `GET /sso/account/profile` e vai para a store de sessão, de onde o `http.ts` o põe
+em toda escrita, como no console. 401 no meio do uso (`login_required`) volta a página ao estado sem
+sessão, sem relogin automático.
+
+### A política de conteúdo das duas telas
+
+O nginx escolhe a CSP por `map $request_uri`: `/login` e `/link` aceitam script e frame de
+`https://challenges.cloudflare.com`, que é o Turnstile; todo o resto, o console inclusive, continua com
+`script-src 'self'` e `frame-src 'none'`. O console chega à tela de login por navegação completa (o SSO
+redireciona), então cada documento carrega a política do próprio caminho.
 
 ### As etapas do login
 
@@ -87,6 +150,8 @@ do pedido pendente, **em que etapa a pessoa está**: `credentials`, `change_pass
   só acontece quando a pessoa fecha o diálogo.
 - **Erro vem por código** e é traduzido como qualquer outro: `invalid_credentials`, `account_locked`,
   `mfa_code_invalid`, `login_step_expired`.
+- **Step-up.** Quem entrou sem segundo fator num projeto `OPTIONAL` e abre um projeto que o exige
+  chega à tela já na etapa `mfa` ou `enroll_mfa`, da mesma pessoa: a tela não pede senha de novo.
 
 ### O console
 
@@ -213,6 +278,19 @@ o diálogo "Add to project" da ficha do usuário, que busca o overview só do pr
 do caminho fica num botão ao lado: um clique distraído não tira a pessoa do papel que ela editava.
 Conceder e revogar moram em `composables/useGrants.ts`, usado pelos dois lados.
 
+**A aba "Cadastro e segurança"** (`AccessPolicyPanel`) tem dois cartões:
+
+- **Cadastro e segundo fator**: cadastro (`CLOSED` ou `OPEN`), papel padrão e segundo fator
+  (`REQUIRED` ou `OPTIONAL`), salvos juntos em `PATCH /project/:id/policy`. Só a raiz edita; os outros
+  papéis veem os valores desabilitados, com o aviso no rodapé. O projeto `SSO` aparece sempre fechado e
+  obrigatório, sem edição, porque o servidor recusa.
+- **Marca na tela de entrada**: nome de exibição e logo, pelo `PUT /project/:id` de sempre. O logo
+  entra pelo `DlFileDrop` (PNG, JPEG ou WebP, até `LOGO_MAX_BYTES`), vira data URI no navegador e tem
+  pré-visualização e "Tirar o logo". O cartão some no projeto `SSO`, que o servidor não deixa editar.
+
+Os dois cartões releem o projeto e o overview depois de salvar, e só sobrescrevem o formulário quando o
+valor gravado muda.
+
 ---
 
 ## 📁 Estrutura
@@ -221,14 +299,14 @@ Conceder e revogar moram em `composables/useGrants.ts`, usado pelos dois lados.
 💻 src/
 ├─ 🧭 router/        # rotas, guard de sessão e de permissão, barra de carregamento
 ├─ 🧱 layouts/       # ConsoleLayout (DlAppShell) · GateLayout (telas sem menu)
-├─ 📄 pages/         # Login, Callback, NoAccess, Unavailable, Dashboard, projects/, users/, ClientKeys
-├─ 🧩 components/    # ClientKeysPanel · project/ (checklist, redirect URIs, rotas e detalhe, papéis, membros)
+├─ 📄 pages/         # Login, Link (criar conta e senha nova), Callback, NoAccess, Unavailable, Dashboard, projects/, users/, ClientKeys
+├─ 🧩 components/    # ClientKeysPanel · project/ (checklist, redirect URIs, rotas e detalhe, papéis, membros, cadastro e segurança)
 ├─ 🗃️ stores/        # session, preferences, catalog, projects, clientKeys, users
 ├─ 🔌 services/      # http.ts (erro, CSRF, 401, 404 vazio) · sso.ts (endpoints por recurso)
 ├─ 🗣️ locales/       # en.json (referência), es.json, pt-BR.json: todo texto de tela
 ├─ 🔧 plugins/       # i18n.ts (vue-i18n, língua inicial, `t` fora de componente) · vuetify.ts
 ├─ 🎨 constants/     # theme, layout, api, navigation, status, messages (códigos → chaves)
-├─ 🧰 composables/   # useCrudDialog · useConfirm · useGrants · useSessionWatch (relê a sessão)
+├─ 🧰 composables/   # useCrudDialog · useConfirm · useGrants · useSessionWatch (relê a sessão) · useHumanCheck (Turnstile)
 ├─ 🔤 types/         # sso.ts, espelho dos DTOs do backend
 └─ 🛠️ utils/         # format.ts · forms.ts · routes.ts (rotas do overview no formato da árvore)
 ```
@@ -279,11 +357,18 @@ pastilhas de situação, papel, método e chave, e `navigation.ts` o que o banco
 | Apagar rota ou papel com permissão falha no banco | a ação fica desabilitada até a permissão sair |
 | Rota não guarda data nem autor | o detalhe do caminho sai inteiro do overview, sem chamada a mais |
 | Um papel por pessoa por projeto | trocar o papel e tirar do projeto são ações da linha, em `MembersPanel` |
+| Tirar do projeto bloqueia | o overview traz `blocked`; `MembersPanel` lista os bloqueados num cartão próprio, com "Readmitir", que vincula de novo (`POST /projectuser`) e tira o bloqueio. A confirmação de remover avisa do bloqueio |
 | Rota que o papel não alcança responde 404 | a tela esconde antes; um 404 inesperado vira a mensagem de registro não encontrado |
 | O projeto `SSO` é protegido no servidor | `SELF_PROJECT_NAME` e `session.root`: renomear, suspender e apagar somem para todos; catálogo, membros, redirect URIs e chaves do SSO somem para quem não é a raiz, com aviso no rodapé |
 | O `SUPERADMIN` do SSO é a raiz e sempre sobra um | o papel não oferece renomear nem apagar; o último `SUPERADMIN` não troca de papel nem sai |
 | Redirect URI do `SSO` não se edita; a última e a desta origem não saem | a ação fica indisponível na linha. Nas outras aplicações, apagar pede confirmação |
 | `authId: null` em `PUT /user/:id` desfaz o vínculo com o Google | ação "Unlink Google account" |
+| A política de cadastro e de segundo fator só a raiz muda | `AccessPolicyPanel` habilita os campos só com `session.root`; o servidor recusa os outros com `project_policy_root_only` |
+| O papel padrão não se apaga enquanto é padrão | a recusa chega como `role_is_default`, com texto próprio |
+| A listagem de projetos não traz o logo | o logo sai do overview, que a aba já carrega |
+| Pedido de cadastro e de senha nova responde igual, exista a conta ou não | a tela diz "confira seu e-mail" e não tenta adivinhar o que aconteceu |
+| Senha recusada traz o motivo em `reason` | `apiErrorText` escolhe o texto em `errors.passwordReason` |
+| Rotas de conta só aceitam JSON da própria origem | a tela fala com `/sso` na mesma origem; `json_required` e `origin_not_allowed` têm texto, mas não aparecem no uso normal |
 
 ---
 
@@ -349,6 +434,16 @@ assinatura de índice no espalhamento: `{ ...route.query, tab }` vira `{ tab: st
 e as transições param: gráfico parece preso em "Loading", número parado em zero, e linha de lista
 que devia ter saído continua na tela. Confira o DOM antes de chamar de defeito.
 
+⚠️ **O 401 jogava fora o código do erro.** O `http.ts` trocava toda resposta 401 por "sua sessão
+terminou", e a tela de login dizia isso para senha errada (`invalid_credentials`) e código errado
+(`mfa_code_invalid`). Agora o 401 passa pelo mesmo catálogo de códigos dos outros erros, e só código
+desconhecido cai na frase de sessão.
+
+⚠️ **A CSP do nginx sai de um `map`, fora do `server`.** O template vira `conf.d/default.conf`, que o
+nginx inclui dentro de `http`, onde o `map` vale. Um `set $csp_policy` dentro do `server` passaria por
+cima do `map` e tiraria o Turnstile de `/login`. O envsubst da imagem só troca `${SSO_UPSTREAM}`; o
+`$` da regex do `map` fica intacto.
+
 ## ✅ Invariantes ao alterar
 
 - Componente de tela vem de `@pedrolucaslopes/dotlog-ui`, pelo npm. Componente novo nasce lá, com
@@ -356,6 +451,12 @@ que devia ter saído continua na tela. Confira o DOM antes de chamar de defeito.
 - Nenhum token de acesso, chave privada ou segredo em store, `localStorage`, log ou URL.
 - `NODE_AUTH_TOKEN` só no ambiente. Nunca no `.npmrc`, no Dockerfile como `ARG`, ou em arquivo versionado.
 - A tela de login só mostra texto de erro a partir de código conhecido.
+- "Criar conta" e "Esqueceu a senha?" só aparecem quando o SSO diz `signup` e `passwordReset`; a tela
+  não decide sozinha que um projeto é aberto.
+- O token do link nunca sai do fragmento para a URL, o `localStorage` ou o log: a página tira o
+  fragmento da barra ao abrir e guarda o token só na memória.
+- Só `/login` e `/link` carregam script de fora (o Turnstile). O console continua com
+  `script-src 'self'`.
 - Texto de tela vai para `src/locales`, nas três línguas, e sai por `t()`. Nada de rótulo, mensagem
   ou opção escrito no componente, na store ou na constante.
 - Rótulo que depende da língua é lido na hora de desenhar: `computed`, template ou getter.

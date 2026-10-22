@@ -23,6 +23,18 @@ const routes: RouteRecordRaw[] = [
     meta: { public: true, title: 'pageTitles.login' },
   },
   {
+    path: '/link',
+    name: 'link',
+    component: () => import('@/pages/LinkPage.vue'),
+    meta: { public: true, title: 'pageTitles.link' },
+  },
+  {
+    path: '/account',
+    name: 'account',
+    component: () => import('@/pages/AccountPage.vue'),
+    meta: { public: true, title: 'pageTitles.account' },
+  },
+  {
     path: '/callback',
     name: 'callback',
     component: () => import('@/pages/CallbackPage.vue'),

@@ -109,6 +109,43 @@
     :title="removal.target ? t('members.removeTitle', { name: removal.target.name }) : t('members.remove')"
     @confirm="remove"
   />
+
+  <DlSectionCard
+    v-if="blockedRows.length > 0"
+    :count="blockedRows.length"
+    :description="t('members.blockedDescription')"
+    :title="t('members.blockedTitle')"
+  >
+    <DlDataTable
+      :actions="blockedActions"
+      bare
+      :columns="blockedColumns"
+      :limit="blockedRows.length + 1"
+      :rows="blockedRows"
+      @action="onBlockedAction"
+    />
+  </DlSectionCard>
+
+  <DlFormDialog
+    v-model="readmission.open"
+    :description="t('members.readmitDescription', { name: readmission.form.name, project: project.name })"
+    :dirty="readmission.dirty"
+    :error="readmission.error"
+    mode="create"
+    :submit-label="t('members.readmit')"
+    :submitting="readmission.submitting"
+    :title="t('members.readmitTitle', { name: readmission.form.name })"
+    @submit="readmit"
+  >
+    <DlSelect
+      :error="readmission.attempted && !readmission.form.roleId ? t('common.chooseRole') : null"
+      :label="t('common.role')"
+      :model-value="readmission.form.roleId || null"
+      :options="roleOptions"
+      required
+      @update:model-value="value => (readmission.form.roleId = asOption(value) ?? '')"
+    />
+  </DlFormDialog>
 </template>
 
 <script lang="ts" setup>
@@ -137,6 +174,7 @@
   import { useCatalogStore } from '@/stores/catalog'
   import { useProjectsStore } from '@/stores/projects'
   import { useSessionStore } from '@/stores/session'
+  import { formatDateTime } from '@/utils/format'
   import { asOption } from '@/utils/forms'
   import { roleChips, roleLabel, sortRoles } from '@/utils/routes'
 
@@ -330,6 +368,65 @@
   function open (row: MemberRow): void {
     if (session.can('GET', `/user/${row.id}`)) {
       void router.push({ name: 'user', params: { id: row.id } })
+    }
+  }
+
+  interface BlockedRow extends Record<string, unknown> {
+    id: string
+    name: string
+    email: string
+    blockedAt: string
+  }
+
+  const blockedRows = computed<BlockedRow[]>(() =>
+    props.project.blocked.map(entry => ({
+      id: entry.id,
+      name: entry.name,
+      email: entry.email,
+      blockedAt: formatDateTime(entry.blockedAt),
+    })),
+  )
+
+  const blockedColumns = computed<Column<BlockedRow>[]>(() => [
+    { key: 'name', label: t('common.name') },
+    { key: 'email', label: t('common.email'), secondary: true },
+    { key: 'blockedAt', label: t('members.blockedAt'), width: '170px' },
+  ])
+
+  const blockedActions = computed<RowAction<BlockedRow>[]>(() => (locked.value || props.project.roles.length === 0
+    ? []
+    : [
+      {
+        key: 'readmit',
+        label: t('members.readmit'),
+        icon: 'mdi-account-reactivate-outline',
+        method: 'POST',
+        path: '/projectuser',
+      },
+    ]))
+
+  const readmission = useCrudDialog(() => ({ name: '', roleId: '' }))
+
+  function onBlockedAction (key: string, row: BlockedRow): void {
+    if (key === 'readmit') {
+      readmission.openEdit(row.id, { name: row.name, roleId: props.project.defaultRoleId ?? '' })
+    }
+  }
+
+  async function readmit (): Promise<void> {
+    const userId = readmission.targetId
+    const { name, roleId } = readmission.form
+
+    const ok = await readmission.submit(!!userId && !!roleId, async () => {
+      if (userId) {
+        await projects.addMember(props.project.id, userId, roleId)
+      }
+    })
+
+    if (ok) {
+      toast.success(t('members.readmitted'), {
+        description: t('members.readmittedDescription', { name, project: props.project.name }),
+      })
     }
   }
 </script>
