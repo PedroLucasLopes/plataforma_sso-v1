@@ -20,7 +20,6 @@ export interface RequestOptions {
   emptyOn404?: boolean
   redirectOnUnauthorized?: boolean
   signal?: AbortSignal
-  headers?: Record<string, string>
 }
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
@@ -82,7 +81,7 @@ function describe (status: number, payload: unknown): { message: string, code: s
 
 export async function request<T> (path: string, options: RequestOptions = {}): Promise<T> {
   const method = options.method ?? 'GET'
-  const headers: Record<string, string> = { ...options.headers, Accept: 'application/json' }
+  const headers: Record<string, string> = { Accept: 'application/json' }
 
   if (options.body !== undefined) {
     headers['Content-Type'] = 'application/json'
@@ -123,9 +122,7 @@ export async function request<T> (path: string, options: RequestOptions = {}): P
       onUnauthorized()
     }
 
-    const { message, code } = describe(401, await readBody(response))
-
-    throw new ApiError(401, message, code ?? 'unauthorized')
+    throw new ApiError(401, t('errors.status.unauthorized'), 'unauthorized')
   }
 
   const payload = response.status === 204 ? null : await readBody(response)

@@ -12,87 +12,35 @@
     @select="choose"
   >
     <template v-if="state === 'ready'">
-      <img
-        v-if="request?.logo"
-        :alt="t('login.brandLogo', { application: request.application ?? '' })"
-        class="login-brand"
-        :src="request.logo"
-      >
+      <form v-if="step === 'credentials'" class="login-form" @submit.prevent="submitCredentials">
+        <DlTextField
+          v-model="email"
+          autocomplete="username"
+          :disabled="busy"
+          :label="t('login.form.email')"
+          name="email"
+          type="email"
+        />
 
-      <template v-if="step === 'credentials'">
-        <form v-if="mode === 'login'" class="login-form" @submit.prevent="submitCredentials">
-          <DlTextField
-            v-model="email"
-            autocomplete="username"
-            :disabled="busy"
-            :label="t('login.form.email')"
-            name="email"
-            type="email"
-          />
+        <DlTextField
+          v-model="password"
+          autocomplete="current-password"
+          :disabled="busy"
+          :label="t('login.form.password')"
+          name="password"
+          type="password"
+        />
 
-          <DlTextField
-            v-model="password"
-            autocomplete="current-password"
-            :disabled="busy"
-            :label="t('login.form.password')"
-            name="password"
-            type="password"
-          />
-
-          <DlButton
-            block
-            color="primary"
-            :loading="busy"
-            size="large"
-            type="submit"
-          >
-            {{ t('login.form.submit') }}
-          </DlButton>
-
-          <div v-if="request?.signup || request?.passwordReset" class="login-links">
-            <DlButton v-if="request?.signup" size="small" variant="text" @click="openMode('signup')">
-              {{ t('login.signup.link') }}
-            </DlButton>
-
-            <DlButton v-if="request?.passwordReset" size="small" variant="text" @click="openMode('reset')">
-              {{ t('login.reset.link') }}
-            </DlButton>
-          </div>
-        </form>
-
-        <form v-else-if="mode === 'signup' || mode === 'reset'" class="login-form" @submit.prevent="submitEmail">
-          <DlTextField
-            v-model="email"
-            autocomplete="email"
-            :disabled="busy"
-            :label="t('login.form.email')"
-            name="email"
-            type="email"
-          />
-
-          <div v-if="request?.humanCheck" ref="humanBox" class="login-human" />
-
-          <DlButton
-            block
-            color="primary"
-            :loading="busy"
-            size="large"
-            type="submit"
-          >
-            {{ mode === 'signup' ? t('login.signup.submit') : t('login.reset.submit') }}
-          </DlButton>
-
-          <DlButton block size="small" variant="text" @click="openMode('login')">
-            {{ t('login.backToSignIn') }}
-          </DlButton>
-        </form>
-
-        <div v-else class="login-form">
-          <DlButton block variant="outlined" @click="openMode('login')">
-            {{ t('login.backToSignIn') }}
-          </DlButton>
-        </div>
-      </template>
+        <DlButton
+          block
+          color="primary"
+          :loading="busy"
+          size="large"
+          type="submit"
+        >
+          {{ t('login.form.submit') }}
+        </DlButton>
+      </form>
 
       <form v-else-if="step === 'change_password'" class="login-form" @submit.prevent="submitNewPassword">
         <DlTextField
@@ -198,21 +146,17 @@
     type SignInProvider,
   } from '@pedrolucaslopes/dotlog-ui'
   import QRCode from 'qrcode'
-  import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+  import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useRoute } from 'vue-router'
-  import { useHumanCheck } from '@/composables/useHumanCheck'
   import { APP_LOGO, APP_NAME } from '@/constants/layout'
   import { loginError, PROVIDER_ICONS } from '@/constants/messages'
   import { ApiError } from '@/services/http'
   import { sessionApi } from '@/services/sso'
   import { queryString } from '@/utils/format'
 
-  type LoginMode = 'login' | 'signup' | 'reset' | 'sent'
-
-  const { t, locale } = useI18n()
+  const { t } = useI18n()
   const route = useRoute()
-  const human = useHumanCheck()
 
   const state = ref<'loading' | 'ready' | 'blocked'>('loading')
   const request = ref<LoginRequestView | null>(null)
@@ -220,9 +164,6 @@
   const unavailable = ref(false)
 
   const step = ref<LoginStage>('credentials')
-  const mode = ref<LoginMode>('login')
-  const sentFor = ref<'signup' | 'reset'>('signup')
-  const humanBox = ref<HTMLElement | null>(null)
   const email = ref('')
   const password = ref('')
   const newPassword = ref('')
@@ -242,7 +183,7 @@
       }
       case 'mfa': { return t('login.mfa.title')
       }
-      default: { return modeHeading.value
+      default: { return null
       }
     }
   })
@@ -254,37 +195,6 @@
       case 'enroll_mfa': { return t('login.enroll.description')
       }
       case 'mfa': { return t('login.mfa.description')
-      }
-      default: { return modeDescription.value
-      }
-    }
-  })
-
-  const modeHeading = computed(() => {
-    switch (mode.value) {
-      case 'signup': { return t('login.signup.title')
-      }
-      case 'reset': { return t('login.reset.title')
-      }
-      case 'sent': { return t('login.sent.title')
-      }
-      default: { return null
-      }
-    }
-  })
-
-  const modeDescription = computed(() => {
-    const application = request.value?.application ?? ''
-
-    switch (mode.value) {
-      case 'signup': { return t('login.signup.description', { application })
-      }
-      case 'reset': { return t('login.reset.description')
-      }
-      case 'sent': {
-        return sentFor.value === 'signup'
-          ? t('login.sent.signup', { email: email.value })
-          : t('login.sent.reset', { email: email.value })
       }
       default: { return null
       }
@@ -303,10 +213,6 @@
       return failure.value
     }
 
-    if (human.failed.value && (mode.value === 'signup' || mode.value === 'reset')) {
-      return { title: t('login.humanCheck.unavailable') }
-    }
-
     const code_ = queryString(route.query.error)
 
     if (!code_) {
@@ -321,7 +227,7 @@
   })
 
   const providers = computed<SignInProvider[]>(() =>
-    step.value === 'credentials' && (mode.value === 'login' || mode.value === 'signup')
+    step.value === 'credentials'
       ? (request.value?.providers ?? []).map(provider => ({
         id: provider.id,
         label: provider.label,
@@ -345,24 +251,6 @@
       state.value = 'blocked'
     }
   })
-
-  async function openMode (next: LoginMode): Promise<void> {
-    mode.value = next
-    failure.value = null
-    human.unmount()
-
-    if (next !== 'signup' && next !== 'reset') {
-      return
-    }
-
-    await nextTick()
-
-    const widget = request.value?.humanCheck
-
-    if (widget && humanBox.value) {
-      await human.mount(humanBox.value, widget.siteKey, next === 'signup' ? 'signup' : 'password_reset')
-    }
-  }
 
   async function run (action: () => Promise<void>): Promise<void> {
     if (busy.value) {
@@ -440,30 +328,6 @@
     })
   }
 
-  function submitEmail (): void {
-    const purpose = mode.value === 'signup' ? 'signup' : 'reset'
-
-    void run(async () => {
-      if (request.value?.humanCheck && !human.token.value) {
-        throw new ApiError(403, t('login.humanCheck.pending'))
-      }
-
-      const body = { email: email.value.trim(), locale: locale.value }
-      const token = human.token.value
-
-      try {
-        await (purpose === 'signup'
-          ? sessionApi.requestSignup(body, token)
-          : sessionApi.requestPasswordReset(body, token))
-      } finally {
-        human.reset()
-      }
-
-      sentFor.value = purpose
-      await openMode('sent')
-    })
-  }
-
   function submitNewPassword (): void {
     void run(async () => {
       if (newPassword.value !== repeatPassword.value) {
@@ -527,27 +391,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.login-brand {
-  display: block;
-  max-width: 160px;
-  max-height: 64px;
-  margin: 0 auto 4px;
-  object-fit: contain;
-}
-
-.login-links {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 4px;
-}
-
-.login-human {
-  display: flex;
-  justify-content: center;
-  min-height: 65px;
 }
 
 .login-qr {
